@@ -1,0 +1,3 @@
+[submodule "devopstemplate/template"]
+	path = devopstemplate/template
+	url = git@github.com:lrothack/dev-ops.git
