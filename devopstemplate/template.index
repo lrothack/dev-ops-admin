@@ -1,0 +1,10 @@
+.gitignore
+.dockerignore
+tests/__init__.py
+Dockerfile
+Makefile
+MANIFEST.in
+sonarqube/README.md
+sonarqube/docker-compose.yml
+setup.py
+requirements.txt
