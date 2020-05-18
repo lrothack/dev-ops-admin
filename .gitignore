@@ -1,0 +1,9 @@
+.coverage
+.scannerwork
+.codereports/
+.eggs/
+*.egg-info/
+sonarqube/
+build/
+dist/
+venv*/
