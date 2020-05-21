@@ -14,14 +14,41 @@ class MakefileTemplate(object):
             contents_list: list of strings specifying the Makefile template
                 contents such that each list element corresponds to a line.
         Returns:
-            sections: list of tuples [(section_title, section_content),...]
+            section_content_list: list of tuples
+                [(section_title, section_content_list),...]
                 defining the sections of the Makefile. Concatenating the
-                section_content strings results in the original template.
+                section_content_list elements results in the original inputs.
+                Note: any lines before the first section will be returned with
+                section_title None.
         """
-        section_current = None
+        # Record content lines in ordered dictionary.
+        # Whenever a line contains a section title, a new key is added to the
+        # dictionary
         section_dict = OrderedDict()
-        section_dict['STARTSECTION'] = []
-        p_sec = re.compile('^# +--- (.*)? ---')
+        # Save the current section title for convenience
+        # Initialize the dictionary with None key and an empty list value
+        # None refers to all lines before the first section
+        section_current = None
+        section_dict[section_current] = []
+        # Regex for detecting a section title in a line
+        # Matches variants of '# --- section ---' with different amounts of
+        # whitespace. () groups the section title for easy access.
+        p_sec = re.compile(r'^#\s*---\s*(.*)\s*---')
+        for line in content_list:
+            # Match only matches at the *beginning* of the string
+            # --> using ^ in the regex would not strictly be necessary
+            match = p_sec.match(line)
+            # match is None if no match line does not match regex
+            if match:
+                # Extract section title (0: entire match, 1: first group, ...)
+                section_current = match.group(1)
+                # Initialize new section
+                section_dict[section_current] = [line]
+            else:
+                # Add line to current section
+                section_dict[section_current].append(line)
+
+        return section_dict.items()
 
     def generate(self, section_titles):
         """Generate Makefile with contents for specified sections
