@@ -36,14 +36,15 @@ class MakefileSection(object):
 
 class MakefileTemplate(object):
 
-    # def __init__(self, filepath):
-    #     with open(filepath, 'r') as fh:
-    #         content_list = fh.readlines()
+    def __init__(self, filepath):
+        with open(filepath, 'r') as fh:
+            content_list = fh.readlines()
 
-    #     content_list = [line.strip() for line in content_list]
-    #     self.__mk_section_list = self.parse(content_list)
+        content_list = [line.strip() for line in content_list]
+        self.__mk_section_list = self.parse(content_list)
 
-    def parse(self, content_list):
+    @staticmethod
+    def parse(content_list):
         """Parse the Makefile template and return Makefile divided in sections.
 
         The first section is a pseudo-section which contains all lines found
@@ -52,7 +53,7 @@ class MakefileTemplate(object):
         list if no such lines have been found.
 
         Params:
-            contents_list: list of strings specifying the Makefile template
+            content_list: list of strings specifying the Makefile template
                 contents such that each list element corresponds to a line.
         Returns:
             mk_section_list: list of MakefileSection objects
@@ -92,15 +93,89 @@ class MakefileTemplate(object):
 
         return mk_section_list
 
-    def generate(self, section_titles):
-        """Generate Makefile with contents for specified sections
+    @staticmethod
+    def generate(mk_section_list, section_keyword_blacklist=None,
+                 var_value_dict=None):
+        """Generate Makefile *without* contents of specified sections
 
-        Relies on the class member section_dict for obtaining section contents
-        for section titles.
+        A section will not be included if a keyword from the
+        section_keyword_blacklist is contained in a section title.
+        Existing variable assignments can optionally be modified with
+        variable_value_dict.
 
         Params:
-            section_titles: list of strings with section titles.
+            mk_section_list: list of MakefileSection objects. First element
+                refers to pseudo-section (section title is None) containing
+                lines in front of the first section declaration.
+            section_keyword_blacklist: list of strings with keywords for
+                filtering sections by their titles. (optional)
+            var_value_dict: dict mapping from variable names to variable
+                values. Existing variable assignments will be modified if a
+                line begins with the variable name and is followed by any
+                Makefile assignment operator. In this case the entire line will
+                be replaced with the new variable-value assignment. (optional)
+
         Returns:
-            contents_list: list of strings with the generated Makefile template
+            content_list: list of strings with the generated Makefile template
                 contents such that each list element corresponds to a line.
         """
+        if section_keyword_blacklist is None:
+            keyword_set = set()
+        else:
+            keyword_set = set(kw.lower() for kw in section_keyword_blacklist)
+
+        if var_value_dict is None:
+            var_value_dict = {}
+
+        content_list = []
+        # add all lines that have been found before the first declared section
+        sec_cont_list = mk_section_list[0].content_list
+        # substitute variable assignments
+        sub_list = MakefileTemplate.__subst_var_assign(sec_cont_list,
+                                                       var_value_dict)
+        content_list.extend(sub_list)
+
+        # start with the second element, i.e., with declared section
+        for section in mk_section_list[1:]:
+            # Check if any keyword from the blacklist is in the section title
+            title = section.title.lower()
+            if any(kw in title for kw in keyword_set):
+                continue
+
+            # Add the section contents to the content_list
+            sec_cont_list = section.content_list
+            # substitute variable assignments
+            sub_list = MakefileTemplate.__subst_var_assign(sec_cont_list,
+                                                           var_value_dict)
+            content_list.extend(sub_list)
+
+        return content_list
+
+    @staticmethod
+    def __subst_var_assign(content_list, variable_value_dict):
+        """Substitute variable assignments in content_list
+
+        Params:
+            content_list: list of strings representing lines
+            variable_value_dict: dict mapping from variable names to variable
+                values. Also see generate method.
+        Returns:
+            content_subst_list: list of strings, with adjusted assignments.
+        """
+        # New list for storing processed lines
+        content_subst_list = []
+        # For each line
+        for line in content_list:
+            # and all variable-value mappings
+            for variable, value in variable_value_dict.items():
+                # check if any variable assignment is present at the beginning
+                # of the line
+                if re.match(r'^%s\s*=' % variable, line):
+                    # if so, generate a new line and break the loop as the
+                    # current line cannot match with any other variable
+                    line = f'{variable} = {value}'
+                    break
+            # add the processed line to the result list
+            content_subst_list.append(line)
+
+        return content_subst_list

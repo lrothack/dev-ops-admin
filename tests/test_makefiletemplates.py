@@ -1,6 +1,6 @@
 import unittest
 from itertools import chain
-from devopstemplate.makefiletemplate import MakefileTemplate
+from devopstemplate.makefiletemplate import MakefileTemplate as MkTemplate
 
 
 class TestMakefileTemplate(unittest.TestCase):
@@ -9,25 +9,25 @@ class TestMakefileTemplate(unittest.TestCase):
         self.__test_str_list = ['# this',
                                 '#  is a comment',
                                 '# --- section 1 --- text',
-                                ' VAR = test',
+                                'VAR  = test',
                                 ' ',
                                 '#---  section2   ---',
                                 '#--sec3 test---',
                                 '# ---section  3---',
                                 '',
+                                'VAR1=int',
                                 '#---test',
+                                'VAR2=bool',
                                 '#---section2---',
                                 'target: dep',
                                 '   cmd']
 
     def __section_title_list(self):
-        mk_template = MakefileTemplate()
-        mk_section_list = mk_template.parse(self.__test_str_list)
+        mk_section_list = MkTemplate.parse(self.__test_str_list)
         return [section.title for section in mk_section_list]
 
     def __section_content_list(self):
-        mk_template = MakefileTemplate()
-        mk_section_list = mk_template.parse(self.__test_str_list)
+        mk_section_list = MkTemplate.parse(self.__test_str_list)
         return [section.content_list for section in mk_section_list]
 
     def test_parse_len(self):
@@ -58,8 +58,40 @@ class TestMakefileTemplate(unittest.TestCase):
         self.assertListEqual(sec_content_list[0], self.__test_str_list[:2])
         self.assertListEqual(sec_content_list[1], self.__test_str_list[2:5])
         self.assertListEqual(sec_content_list[2], self.__test_str_list[5:7])
-        self.assertListEqual(sec_content_list[3], self.__test_str_list[7:10])
-        self.assertListEqual(sec_content_list[4], self.__test_str_list[10:])
+        self.assertListEqual(sec_content_list[3], self.__test_str_list[7:12])
+        self.assertListEqual(sec_content_list[4], self.__test_str_list[12:])
+
+    def test_generate_contents(self):
+        mk_section_list = MkTemplate.parse(self.__test_str_list)
+        gen_str_list = MkTemplate.generate(mk_section_list)
+        self.assertListEqual(gen_str_list, self.__test_str_list)
+
+    def test_generate_blacklist(self):
+        mk_section_list = MkTemplate.parse(self.__test_str_list)
+        section_keyword_blacklist = ['section2']
+        gen_str_list = MkTemplate.generate(mk_section_list,
+                                           section_keyword_blacklist)
+        result_str_list = (self.__test_str_list[:5] +
+                           self.__test_str_list[7:12])
+        self.assertListEqual(gen_str_list, result_str_list)
+
+    def test_generate_subst(self):
+        mk_section_list = MkTemplate.parse(self.__test_str_list)
+        gen_str_list = MkTemplate.generate(mk_section_list,
+                                           var_value_dict={'VAR': 'value',
+                                                           'VAR1': 5})
+        result_str_list = (self.__test_str_list[:3] +
+                           ['VAR = value'] +
+                           self.__test_str_list[4:9] +
+                           ['VAR1 = 5'] +
+                           self.__test_str_list[10:])
+        self.assertListEqual(gen_str_list, result_str_list)
+
+    def test_generate_subst_invalidvar(self):
+        mk_section_list = MkTemplate.parse(self.__test_str_list)
+        gen_str_list = MkTemplate.generate(mk_section_list,
+                                           var_value_dict={'VAR3': 'value'})
+        self.assertListEqual(gen_str_list, self.__test_str_list)
 
 
 if __name__ == "__main__":
