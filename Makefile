@@ -119,6 +119,7 @@ clean:
 ## clean-all:    Clean up auto-generated files and directories
 ##               (WARNING: do not store user data in auto-generated directories)
 clean-all: clean
+	@rm -rf $(REPDIR)
 	@rm -rf $(NAME).egg-info
 	@rm -rf build
 	@rm -rf dist
@@ -156,7 +157,15 @@ test:
 #                 intall with `make install_dev`)
 #                (requires SonarQube client sonar-scanner, 
 #                 install with `brew sonar-scanner` or see ./Dockerfile)
-sonar: $(NOSETESTSREP) $(COVERAGEREP) $(PYLINTREP) $(BANDITREP) $(SETUPTOOLSFILES)
+# leading dash (in front of commands, not parameters) ignores error codes,
+# `make` would fail if test case fails or linter reports infos/warnings/errors.
+sonar: $(SETUPTOOLSFILES)
+	@mkdir -p $(REPDIR)
+	-$(BANDIT) -r $(PACKAGE) --format json >$(BANDITREP)
+	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
+	-$(NOSETESTS) --with-xunit --xunit-file=$(NOSETESTSREP) \
+              --with-coverage --cover-xml --cover-xml-file=$(COVERAGEREP) \
+			  --where $(TESTS)
 	$(SONARSCANNER) -Dsonar.host.url=http://$(SONARHOST):$(SONARPORT) \
               -Dsonar.projectKey=$(NAME) \
               -Dsonar.projectVersion=$(VERSION) \
@@ -168,31 +177,6 @@ sonar: $(NOSETESTSREP) $(COVERAGEREP) $(PYLINTREP) $(BANDITREP) $(SETUPTOOLSFILE
               -Dsonar.python.coverage.reportPaths=$(COVERAGEREP) \
               -Dsonar.python.pylint.reportPath=$(PYLINTREP) \
               -Dsonar.python.bandit.reportPaths=$(BANDITREP)
-
-
-# analysis tools can be installed with `make install_dev`
-# leading - ignores error codes, make would fail if test case fails
-$(NOSETESTSREP):
-	@mkdir -p $(REPDIR)
-	-$(NOSETESTS) --with-xunit --xunit-file=$@ --where $(TESTS)
-
-# analysis tools can be installed with `make install_dev`
-# leading - ignores error codes, make would fail if test case fails
-$(COVERAGEREP):
-	@mkdir -p $(REPDIR)
-	-$(NOSETESTS) --with-coverage --cover-xml --cover-xml-file=$@ --where $(TESTS)
-	
-# analysis tools can be installed with `make install_dev`
-# --exit-zero always return exit code 0: make would fail otherwise
-$(PYLINTREP): $(SETUPTOOLSFILES)
-	@mkdir -p $(REPDIR)
-	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $@
-
-# analysis tools can be installed with `make install_dev`
-# leading - ignores error codes, make would fail if test case fails
-$(BANDITREP): $(SETUPTOOLSFILES)
-	@mkdir -p $(REPDIR)
-	-$(BANDIT) -r $(PACKAGE) --format json >$@
 
 
 # --- Docker targets ---
