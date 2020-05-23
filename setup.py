@@ -23,7 +23,7 @@ setup(name='devopstemplate',
       # install_requires=[],
       # Defines dev environment containing development dependencies
       # (for linting, testing, etc.)
-      extras_require={'dev': ['pip >= 20.1',
+      extras_require={'dev': ['pip >= 20.1.1',
                               'wheel',
                               'nose',
                               'coverage',
