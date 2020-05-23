@@ -36,12 +36,29 @@ class MakefileSection(object):
 
 class MakefileTemplate(object):
 
-    def __init__(self, filepath):
-        with open(filepath, 'r') as fh:
-            content_list = fh.readlines()
-
-        content_list = [line.strip() for line in content_list]
+    def __init__(self, filehandle):
+        # Read file contents and split text lines such that lines are not
+        # terminated by 'newline' anymore.
+        content_list = filehandle.read().splitlines()
         self.__mk_section_list = self.parse(content_list)
+
+    def write(self, filehandle, section_keyword_blacklist=None,
+              var_value_dict=None):
+        """Generate and write Makefile *without* contents of specified sections
+
+        See 'generate' method for detailed description (method and parameters).
+
+        Params:
+            filehandle: file object that the Makefile will be written to.
+            section_keyword_blacklist: list of strings with keywords for
+                filtering sections by their titles. (optional)
+            var_value_dict: dict mapping from variable names to variable
+                values. (optional)
+        """
+        content_list = self.generate(self.__mk_section_list,
+                                     section_keyword_blacklist,
+                                     var_value_dict)
+        filehandle.write('\n'.join(content_list))
 
     @staticmethod
     def parse(content_list):
@@ -158,7 +175,7 @@ class MakefileTemplate(object):
         Params:
             content_list: list of strings representing lines
             variable_value_dict: dict mapping from variable names to variable
-                values. Also see generate method.
+                values. Also see 'generate' method.
         Returns:
             content_subst_list: list of strings, with adjusted assignments.
         """

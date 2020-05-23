@@ -1,5 +1,6 @@
 import unittest
 from itertools import chain
+import tempfile
 from devopstemplate.makefiletemplate import MakefileTemplate as MkTemplate
 
 
@@ -71,27 +72,55 @@ class TestMakefileTemplate(unittest.TestCase):
         section_keyword_blacklist = ['section2']
         gen_str_list = MkTemplate.generate(mk_section_list,
                                            section_keyword_blacklist)
-        result_str_list = (self.__test_str_list[:5] +
-                           self.__test_str_list[7:12])
-        self.assertListEqual(gen_str_list, result_str_list)
+        expected_str_list = (self.__test_str_list[:5] +
+                             self.__test_str_list[7:12])
+        self.assertListEqual(gen_str_list, expected_str_list)
 
     def test_generate_subst(self):
         mk_section_list = MkTemplate.parse(self.__test_str_list)
         gen_str_list = MkTemplate.generate(mk_section_list,
                                            var_value_dict={'VAR': 'value',
                                                            'VAR1': 5})
-        result_str_list = (self.__test_str_list[:3] +
-                           ['VAR = value'] +
-                           self.__test_str_list[4:9] +
-                           ['VAR1 = 5'] +
-                           self.__test_str_list[10:])
-        self.assertListEqual(gen_str_list, result_str_list)
+        expected_str_list = (self.__test_str_list[:3] +
+                             ['VAR = value'] +
+                             self.__test_str_list[4:9] +
+                             ['VAR1 = 5'] +
+                             self.__test_str_list[10:])
+        self.assertListEqual(gen_str_list, expected_str_list)
 
     def test_generate_subst_invalidvar(self):
         mk_section_list = MkTemplate.parse(self.__test_str_list)
         gen_str_list = MkTemplate.generate(mk_section_list,
                                            var_value_dict={'VAR3': 'value'})
         self.assertListEqual(gen_str_list, self.__test_str_list)
+
+    def test_makefiletemplate(self):
+        # Create tmp file
+        with tempfile.TemporaryFile('r+') as fh:
+            # write test data to tmp file
+            fh.write('\n'.join(self.__test_str_list))
+            # reset file pointer
+            fh.seek(0)
+            # read contents into MakefileTemplate object
+            mktemp = MkTemplate(fh)
+
+        # Create a new tmp file for writing generated Makefile
+        with tempfile.TemporaryFile('r+') as fh:
+            # Generate according to modifiers and write Makefile
+            mktemp.write(fh,
+                         section_keyword_blacklist=['section 1'],
+                         var_value_dict={'VAR': 'value',
+                                         'VAR1': 5})
+            # Reset file pointer and read results
+            fh.seek(0)
+            mktemp_str_list = fh.read().splitlines()
+
+        # Compare expected results with generated results
+        expected_str_list = (self.__test_str_list[:2] +
+                             self.__test_str_list[5:9] +
+                             ['VAR1 = 5'] +
+                             self.__test_str_list[10:])
+        self.assertListEqual(mktemp_str_list, expected_str_list)
 
 
 if __name__ == "__main__":
