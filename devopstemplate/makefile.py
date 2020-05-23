@@ -1,7 +1,7 @@
 import re
 
 
-class MakefileSection(object):
+class MakefileSection():
     """Represents a section of a Makefile
 
     Attributes:
@@ -34,7 +34,7 @@ class MakefileSection(object):
         self.content_list.append(line)
 
 
-class MakefileTemplate(object):
+class MakefileTemplate():
 
     def __init__(self, filehandle):
         # Read file contents and split text lines such that lines are not
