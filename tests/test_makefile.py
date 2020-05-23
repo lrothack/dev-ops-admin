@@ -1,7 +1,7 @@
 import unittest
 from itertools import chain
 import tempfile
-from devopstemplate.makefiletemplate import MakefileTemplate as MkTemplate
+from devopstemplate.makefile import MakefileTemplate as MkTemplate
 
 
 class TestMakefileTemplate(unittest.TestCase):
