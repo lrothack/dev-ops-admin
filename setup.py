@@ -7,7 +7,7 @@ with open('devopstemplate/template/README.md', 'r') as fh:
     long_description_template = fh.read()
 
 with open('devopstemplate/template.index', 'r') as fh:
-    template_index = [line.strip() for line in fh.readlines()]
+    template_index = fh.read().splitlines()
 
 # setup.py defines the Python package. The build process is triggered from
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
@@ -33,7 +33,8 @@ setup(name='devopstemplate',
                               'flake8']
                       },
       entry_points={'console_scripts':
-                    ['devopstemplate=devopstemplate.admin:main']},
+                    ['devopstemplate=devopstemplate.template:main']
+                    },
       package_data={
           # Include data files in devopstemplate package
           # the file template.index specifies file paths relative to
