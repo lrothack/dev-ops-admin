@@ -90,7 +90,7 @@ RUN pip install /dist/*.whl
 # Switch to working directory in user's home, dir exists due to useradd param
 WORKDIR /home/user/app
 # Copy entrypoint.sh script from build stage
-COPY --from=build /app/scripts/entrypoint.sh .
+COPY --from=build /app/entrypoint.sh .
 # Change owner
 RUN chown user:user . ; chown user:user entrypoint.sh
 # Switch user/set user for running the app
@@ -99,7 +99,7 @@ USER user
 ENTRYPOINT ["./entrypoint.sh"]
 # Provide default args with CMD. Default args are overridden by command-line
 # arguments to docker run on the command-line.
-CMD ["--help"]
+# CMD ["--help"]
 # Important: both entrypoint and cmd have to be specified in json style
 # --> json style allows for better CLI interoperability when running the 
 # container. Most importantly users can provide command-line arguments for

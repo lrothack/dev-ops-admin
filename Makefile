@@ -94,7 +94,7 @@ DOCKERSONARPORT=9000
 # Only evaluated if $DOCKERSONAR==True
 DOCKERNET=sonarqube_net
 # Name of the executable that is to be run in the Docker entry point script
-# (scripts/entrypoint.sh). It is expected that there exists an executable
+# (entrypoint.sh). It is expected that there exists an executable
 # called $DOCKERENTRYPOINTEXEC in the PATH of the Docker container. 
 DOCKERENTRYPOINTEXEC=$(NAME)
 
