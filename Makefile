@@ -93,11 +93,14 @@ DOCKERSONARPORT=9000
 # in the same network at $DOCKERSONARHOST:$DOCKERSONARPORT
 # Only evaluated if $DOCKERSONAR==True
 DOCKERNET=sonarqube_net
-
+# Name of the executable that is to be run in the Docker entry point script
+# (scripts/entrypoint.sh). It is expected that there exists an executable
+# called $DOCKERENTRYPOINTEXEC in the PATH of the Docker container. 
+DOCKERENTRYPOINTEXEC=$(NAME)
 
 # --- Common targets ---
 
-.PHONY: help clean clean-all bdist_wheel install_dev test sonar build_docker
+.PHONY: help clean clean-all bdist_wheel install_dev test pylint sonar build_docker
 
 ## 
 ## MAKEFILE for building and testing Python package including
@@ -146,6 +149,10 @@ install_dev: $(SETUPTOOLSFILES)
 test:
 	$(NOSETESTS) --where $(TESTS)
 
+## pylint:       Run Python linter and print output to terminal
+pylint:
+	$(PYLINT) --exit-zero $(PACKAGE)
+
 
 # --- SonarQube targets ---
 
@@ -193,16 +200,20 @@ sonar: $(SETUPTOOLSFILES)
 # shell as are the other commands in the recipe.
 build_docker: $(SETUPTOOLSFILES)
 	$(info WARNING: Do not run this target within a Docker build/container)
-	$(info Running Docker build in context $(ROOT))
+	$(info Running Docker build in context: $(ROOT))
+	$(info ENTRYPOINT executable: $(DOCKERENTRYPOINTEXEC))
 ifeq ($(DOCKERSONAR), True)
 	$(info building Docker image within Docker network $(DOCKERNET))
 	$(info (make sure SonarQube is running in the same network))
 	$(info (run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d`))
 	$(DOCKER) build --rm --network=$(DOCKERNET) -t $(NAME) $(ROOT) \
+		--build-arg ENTRYPOINT=$(DOCKERENTRYPOINTEXEC) \
 		--build-arg SONARHOST=$(DOCKERSONARHOST) \
 		--build-arg SONARPORT=$(DOCKERSONARPORT)
 else
 	$(info building Docker image without reporting to SonarQube)
-	$(DOCKER) build --rm -t $(NAME) $(ROOT) --build-arg SONAR=False
+	$(DOCKER) build --rm -t $(NAME) $(ROOT) \
+		--build-arg ENTRYPOINT=$(DOCKERENTRYPOINTEXEC) \
+		--build-arg SONAR=False
 endif
 	@echo "build finished, run the container with \`docker run --rm $(NAME)\`"
