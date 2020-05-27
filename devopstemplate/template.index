@@ -2,6 +2,7 @@
 .dockerignore
 tests/__init__.py
 Dockerfile
+entrypoint.sh
 Makefile
 MANIFEST.in
 sonarqube/README.md
