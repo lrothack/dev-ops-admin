@@ -33,7 +33,7 @@ setup(name='devopstemplate',
                               'flake8']
                       },
       entry_points={'console_scripts':
-                    ['devopstemplate=devopstemplate.template:main']
+                    ['devopstemplate=devopstemplate.main:main']
                     },
       package_data={
           # Include data files in devopstemplate package
