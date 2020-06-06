@@ -3,10 +3,7 @@ import devopstemplate
 from devopstemplate.template import DevOpsTemplate
 
 
-class TestMakefileTemplate(unittest.TestCase):
-
-    def test_readresources(self):
-        dvt = DevOpsTemplate()
+class TestDevOpsTemplate(unittest.TestCase):
 
     def test_version(self):
         version = devopstemplate.__version__
