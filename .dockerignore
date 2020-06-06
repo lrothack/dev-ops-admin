@@ -1,0 +1,12 @@
+Dockerfile
+.dockerignore
+.coverage
+.scannerwork
+.codereports/
+.eggs
+*.egg-info/
+.vscode
+sonarqube/
+build/
+dist/
+venv*
