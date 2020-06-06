@@ -89,6 +89,8 @@ DOCKERSONAR=True
 DOCKERSONARHOST=sonarqube
 # Report to sonar port (when running in Docker build)
 DOCKERSONARPORT=9000
+# DISABLE/enable sonarqube SCM (git) support (when running in Docker build)
+DOCKERSONARNOSCM=False
 # Docker network for running the Docker build. Sonarqube server must be hosted
 # in the same network at $DOCKERSONARHOST:$DOCKERSONARPORT
 # Only evaluated if $DOCKERSONAR==True
@@ -97,6 +99,7 @@ DOCKERNET=sonarqube_net
 # (entrypoint.sh). It is expected that there exists an executable
 # called $DOCKERENTRYPOINTEXEC in the PATH of the Docker container. 
 DOCKERENTRYPOINTEXEC=$(NAME)
+
 
 # --- Common targets ---
 
@@ -122,6 +125,7 @@ clean:
 ## clean-all:    Clean up auto-generated files and directories
 ##               (WARNING: do not store user data in auto-generated directories)
 clean-all: clean
+	@rm -rf .coverage .scannerwork
 	@rm -rf $(REPDIR)
 	@rm -rf $(NAME).egg-info
 	@rm -rf build
@@ -209,7 +213,8 @@ ifeq ($(DOCKERSONAR), True)
 	$(DOCKER) build --rm --network=$(DOCKERNET) -t $(NAME) $(ROOT) \
 		--build-arg ENTRYPOINT=$(DOCKERENTRYPOINTEXEC) \
 		--build-arg SONARHOST=$(DOCKERSONARHOST) \
-		--build-arg SONARPORT=$(DOCKERSONARPORT)
+		--build-arg SONARPORT=$(DOCKERSONARPORT) \
+		--build-arg SONARNOSCM=$(DOCKERSONARNOSCM)
 else
 	$(info building Docker image without reporting to SonarQube)
 	$(DOCKER) build --rm -t $(NAME) $(ROOT) \
