@@ -2,38 +2,43 @@
 
 - Obtain Python package version with setuptools
 - Initialize Python logging framework
-
-Useful log message formats:
-LOGGING_FORMAT = '%(asctime)-15s: [%(name)s] %(message)s'
-LOGGING_FORMAT = '[%(name)s] %(message)s'
-LOGGING_FORMAT = '%(message)s'
 """
 
 import pkg_resources
 __version__ = pkg_resources.require(__name__)[0].version
 
 import logging
-# Default log level: info
-# logging.basicConfig(level=logging.INFO,
-#                     format='%(message)s')
-LOGGING_HANDLER = logging.StreamHandler()
-logging.getLogger().addHandler(LOGGING_HANDLER)
-logging.getLogger().setLevel(logging.INFO)
 
 
-def logging_debug():
-    logging_format = '%(asctime)-15s: [%(name)s] %(message)s'
-    logging.getLogger().setLevel(logging.DEBUG)
-    LOGGING_HANDLER.setFormatter(logging.Formatter(logging_format))
+class _LoggerConfig():
+    """
+    Useful log message formats:
+    LOGGING_FORMAT = '%(asctime)-15s: [%(name)s] %(message)s'
+    LOGGING_FORMAT = '[%(name)s] %(message)s'
+    LOGGING_FORMAT = '%(message)s'
+    """
+
+    def __init__(self):
+        # Default log level: info
+        # logging.basicConfig(level=logging.INFO,
+        #                     format='%(message)s')
+        self.__format_plain = '%(message)s'
+        self.__format_debug = '%(asctime)-15s: [%(name)s] %(message)s'
+        self.__handler = logging.StreamHandler()
+        logging.getLogger().addHandler(self.__handler)
+        self.info()
+
+    def debug(self):
+        logging.getLogger().setLevel(logging.DEBUG)
+        self.__handler.setFormatter(logging.Formatter(self.__format_debug))
+
+    def info(self):
+        logging.getLogger().setLevel(logging.INFO)
+        self.__handler.setFormatter(logging.Formatter(self.__format_plain))
+
+    def warning(self):
+        logging.getLogger().setLevel(logging.WARNING)
+        self.__handler.setFormatter(logging.Formatter(self.__format_plain))
 
 
-def logging_info():
-    logging_format = '%(message)s'
-    logging.getLogger().setLevel(logging.INFO)
-    LOGGING_HANDLER.setFormatter(logging.Formatter(logging_format))
-
-
-def logging_warn():
-    logging_format = '%(message)s'
-    logging.getLogger().setLevel(logging.WARNING)
-    LOGGING_HANDLER.setFormatter(logging.Formatter(logging_format))
+LOGCONFIG = _LoggerConfig()
