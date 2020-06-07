@@ -8,14 +8,14 @@ from devopstemplate.template import DevOpsTemplate
 
 
 def create(args):
-    dvtmp = DevOpsTemplate()
-    dvtmp.create(projectname=args.projectname,
-                 add_scripts=args.add_scripts_dir,
-                 add_docs=args.add_docs_dir,
-                 no_gitignore=args.no_gitignore_file,
-                 no_readme=args.no_readme_file,
-                 no_sonar=args.no_sonar,
-                 no_docker=args.no_docker)
+    template = DevOpsTemplate()
+    template.create(projectname=args.projectname,
+                    add_scripts=args.add_scripts_dir,
+                    add_docs=args.add_docs_dir,
+                    no_gitignore=args.no_gitignore_file,
+                    no_readme=args.no_readme_file,
+                    no_sonar=args.no_sonar,
+                    no_docker=args.no_docker)
 
 
 def manage(args):
