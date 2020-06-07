@@ -81,7 +81,7 @@ SONARNOSCM=False
 DOCKER = docker
 #
 # Configuration variables for sonarqube reporting within Docker build when
-# running `make build_docker`, i.e., variables will be passed to Docker build
+# running `make docker_build`, i.e., variables will be passed to Docker build
 # as build arguments
 # Enable/disable SonarQube reporting during Docker build
 DOCKERSONAR=True
@@ -103,7 +103,7 @@ DOCKERENTRYPOINTEXEC=$(NAME)
 
 # --- Common targets ---
 
-.PHONY: help clean clean-all bdist_wheel install_dev test pylint sonar build_docker
+.PHONY: help clean clean-all bdist_wheel install_dev test pylint sonar docker_build
 
 ## 
 ## MAKEFILE for building and testing Python package including
@@ -192,17 +192,17 @@ sonar: $(SETUPTOOLSFILES)
 
 # --- Docker targets ---
 
-## build_docker: Build docker image for Python application including
+## docker_build: Build docker image for Python application including
 ##               code analysis and reporting to SonarQube (multi-stage build)
 ##               (requires SonarQube server, see target 'sonar' above)
 ##               (SonarQube reporting during Docker build can be disabled
-##                with `make build_docker DOCKERSONAR=False`)
+##                with `make docker_build DOCKERSONAR=False`)
 #                (WARNING: do not run in Docker, Docker-in-Docker!)
 # The if-statement is required in order to determine if we have to run the
 # build in the $(DOCKERNET) network
 # Note: info is parsed and immediately printed by make, echo is executed in a
 # shell as are the other commands in the recipe.
-build_docker: $(SETUPTOOLSFILES)
+docker_build: $(SETUPTOOLSFILES)
 	$(info WARNING: Do not run this target within a Docker build/container)
 	$(info Running Docker build in context: $(ROOT))
 	$(info ENTRYPOINT executable: $(DOCKERENTRYPOINTEXEC))
@@ -222,3 +222,8 @@ else
 		--build-arg SONAR=False
 endif
 	@echo "build finished, run the container with \`docker run --rm $(NAME)\`"
+
+## docker_tag:   Tag the 'latest' image created with `make docker_build` with
+##               the current version that is defined in setup.cfg/setup.py
+docker_tag: $(SETUPTOOLSFILES)
+	$(DOCKER) tag $(NAME) $(NAME):$(VERSION)
