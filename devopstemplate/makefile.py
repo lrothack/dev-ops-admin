@@ -1,3 +1,7 @@
+"""Parse and generate a Makefile
+- divide Makefile in sections
+- combine sections according to user request to new Makefile
+"""
 import re
 
 

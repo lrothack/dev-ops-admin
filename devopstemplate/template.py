@@ -1,3 +1,7 @@
+"""Create new projects from template and administer existing projects
+- defines which files will be installed for specific user requests
+- defines how files will be installed according to user requests
+"""
 import os
 import shutil
 import logging
@@ -51,7 +55,7 @@ class DevOpsTemplate():
         if os.path.exists(project_fname) and self.__skip:
             logger.warning('File %s exists, skipping', project_fname)
             return
-        elif os.path.exists(project_fname) and not self.__overwrite:
+        if os.path.exists(project_fname) and not self.__overwrite:
             raise FileExistsError(f'File {project_fname} already exists, exit.'
                                   ' (use --skip-exists or --overwrite-exists'
                                   ' to control behavior)')

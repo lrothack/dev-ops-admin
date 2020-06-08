@@ -4,10 +4,9 @@
 - Initialize Python logging framework
 """
 
+import logging
 import pkg_resources
 __version__ = pkg_resources.require(__name__)[0].version
-
-import logging
 
 
 class _LoggerConfig():
@@ -19,6 +18,9 @@ class _LoggerConfig():
     """
 
     def __init__(self):
+        """Initialize log config with default level info and a short log
+        message (contains just the message and not meta information)
+        """
         # Default log level: info
         # logging.basicConfig(level=logging.INFO,
         #                     format='%(message)s')
@@ -29,16 +31,28 @@ class _LoggerConfig():
         self.info()
 
     def debug(self):
+        """Switch to debug log level. Change level-of-detail for log message.
+        (add meta information)
+        """
         logging.getLogger().setLevel(logging.DEBUG)
         self.__handler.setFormatter(logging.Formatter(self.__format_debug))
 
     def info(self):
+        """Switch to info log level. Change level-of-detail for log message.
+        (just the log message)
+        """
         logging.getLogger().setLevel(logging.INFO)
         self.__handler.setFormatter(logging.Formatter(self.__format_plain))
 
     def warning(self):
+        """Switch to info log level. Change level-of-detail for log message.
+        (just the log message)
+        """
         logging.getLogger().setLevel(logging.WARNING)
         self.__handler.setFormatter(logging.Formatter(self.__format_plain))
 
 
+"""Global module variable that stores a singelton of the LoggerConfig
+Can be used globally in order to adjust log behavior.
+"""
 LOGCONFIG = _LoggerConfig()

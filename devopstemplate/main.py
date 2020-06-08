@@ -1,3 +1,7 @@
+"""Command-line interface for creating and adminitrating template projects
+
+Defines module functions for sub-commands
+"""
 import sys
 import platform
 import logging
@@ -8,6 +12,11 @@ from devopstemplate.template import DevOpsTemplate
 
 
 def create(args):
+    """Wrapper for sub-command create
+
+    Params:
+        args: argparse.Namespace object with argument parser attributes
+    """
     template = DevOpsTemplate(projectdirectory=args.project_dir,
                               overwrite_exists=args.overwrite_exists,
                               skip_exists=args.skip_exists)
@@ -21,6 +30,11 @@ def create(args):
 
 
 def manage(args):
+    """Wrapper for sub-command manage
+
+    Params:
+        args: argparse.Namespace object with argument parser attributes
+    """
     print('manage:')
     print(str(args))
 
