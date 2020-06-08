@@ -67,6 +67,11 @@ class TestDevOpsTemplate(unittest.TestCase):
         self.assertEqual(content_list[:len(self.__ref_template_index_head)],
                          self.__ref_template_index_head)
 
+    def test_copy_pkgexists(self):
+        template = DevOpsTemplate(overwrite_exists=True)
+        with self.assertRaises(FileNotFoundError):
+            template._DevOpsTemplate__copy('non_existing_file', None)
+
 
 if __name__ == "__main__":
     unittest.main()
