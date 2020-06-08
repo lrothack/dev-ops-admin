@@ -78,7 +78,9 @@ def parse_args(args_list):
     # Subparser commands for project creation and management
     subparsers = parser.add_subparsers(help='Commands')
 
-    create_parser = subparsers.add_parser('create')
+    create_parser = subparsers.add_parser('create',
+                                          help=('Create a new project based '
+                                                'on the DevOps template'))
     create_parser.add_argument('projectname',
                                help=('Name of the Python package / '
                                      'top-level import directory'))
