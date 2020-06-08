@@ -35,8 +35,7 @@ def manage(args):
     Params:
         args: argparse.Namespace object with argument parser attributes
     """
-    print('manage:')
-    print(str(args))
+    pass
 
 
 def parse_args(args_list):
@@ -53,7 +52,7 @@ def parse_args(args_list):
     Params:
         args_list: list of strings with command-line flags (sys.argv[1:])
     """
-    logger = logging.getLogger('template:parse_args')
+    logger = logging.getLogger('main.parse_args')
     descr = ''.join(['Create and manage DevOps template projects ',
                      f'(version {devopstemplate.__version__})'])
     parser = argparse.ArgumentParser(description=descr)
@@ -137,13 +136,13 @@ def parse_args(args_list):
 
 
 def main():
-    """Entrypoint starting the command-line interface
+    """Entrypoint for starting the command-line interface.
     Control-flow continues depending on user arguments.
 
     Passes all command-line flags sys.argv[1:] to argparse
     (implemented in parse_args)
     """
-    logger = logging.getLogger(f'{__name__}:main')
+    logger = logging.getLogger('main.main')
     logger.debug('%s:: %s\n', platform.node(), ' '.join(sys.argv))
     parse_args(sys.argv[1:])
 

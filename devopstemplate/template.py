@@ -52,7 +52,7 @@ class DevOpsTemplate():
             FileExistsError: If project_fname already exists in the project
                 and skip-exists=False, overwrite-exists=False
         """
-        logger = logging.getLogger(f'{__name__}:__copy')
+        logger = logging.getLogger('DevOpsTemplate.__copy')
         if not pkg.exists(pkg_fname):
             raise FileNotFoundError(f'File {pkg_fname} not available in '
                                     'distribution package')
