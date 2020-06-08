@@ -22,11 +22,12 @@ class TestDevOpsTemplate(unittest.TestCase):
             self.assertGreaterEqual(int(part), 0)
 
     def test_copy(self):
-        template = DevOpsTemplate()
         with tempfile.TemporaryDirectory() as tmpdirname:
-            tmp_fname = os.path.join(tmpdirname, 'tmp_file')
+            template = DevOpsTemplate(projectdirectory=tmpdirname)
+            tmp_fname = 'tmp_file'
+            tmp_fpath = os.path.join(tmpdirname, tmp_fname)
             template._DevOpsTemplate__copy('template.index', tmp_fname)
-            with open(tmp_fname, 'r') as tmp_fh:
+            with open(tmp_fpath, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
 
@@ -34,33 +35,35 @@ class TestDevOpsTemplate(unittest.TestCase):
                          self.__ref_template_index_head)
 
     def test_copy_exists(self):
-        template = DevOpsTemplate()
         with tempfile.TemporaryDirectory() as tmpdirname:
-            tmp_fname = os.path.join(tmpdirname, 'tmp_file')
-            tmp_path = Path(tmp_fname)
+            template = DevOpsTemplate(projectdirectory=tmpdirname)
+            tmp_fname = 'tmp_file'
+            tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             with self.assertRaises(FileExistsError):
                 template._DevOpsTemplate__copy('template.index', tmp_fname)
 
     def test_copy_skip(self):
-        template = DevOpsTemplate(skip_exists=True)
         with tempfile.TemporaryDirectory() as tmpdirname:
-            tmp_fname = os.path.join(tmpdirname, 'tmp_file')
-            tmp_path = Path(tmp_fname)
+            template = DevOpsTemplate(projectdirectory=tmpdirname,
+                                      skip_exists=True)
+            tmp_fname = 'tmp_file'
+            tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             template._DevOpsTemplate__copy('template.index', tmp_fname)
-            with open(tmp_fname, 'r') as tmp_fh:
+            with open(tmp_path, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 self.assertEqual(contents, '')
 
     def test_copy_overwrite(self):
-        template = DevOpsTemplate(overwrite_exists=True)
         with tempfile.TemporaryDirectory() as tmpdirname:
-            tmp_fname = os.path.join(tmpdirname, 'tmp_file')
-            tmp_path = Path(tmp_fname)
+            template = DevOpsTemplate(projectdirectory=tmpdirname,
+                                      overwrite_exists=True)
+            tmp_fname = 'tmp_file'
+            tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             template._DevOpsTemplate__copy('template.index', tmp_fname)
-            with open(tmp_fname, 'r') as tmp_fh:
+            with open(tmp_path, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
 
@@ -68,7 +71,7 @@ class TestDevOpsTemplate(unittest.TestCase):
                          self.__ref_template_index_head)
 
     def test_copy_pkgexists(self):
-        template = DevOpsTemplate(overwrite_exists=True)
+        template = DevOpsTemplate()
         with self.assertRaises(FileNotFoundError):
             template._DevOpsTemplate__copy('non_existing_file', None)
 

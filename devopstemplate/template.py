@@ -37,9 +37,24 @@ class DevOpsTemplate():
         logger.info('  SonarQube support: %s', not no_sonar)
         logger.info('  Docker support:    %s', not no_docker)
 
+        # Create source directory (if not present)
+        self.__mkdir(projectname)
+
     def manage(self, add_gitignore, add_readme, add_scripts,
                add_docs, add_sonar, add_docker):
         pass
+
+    def __mkdir(self, project_dname):
+        """Create a directory within the project if not present
+
+        Params:
+            project_dname: String specifying the name of the directory
+        """
+        logger = logging.getLogger('DevOpsTemplate.__mkdir')
+        project_dpath = os.path.join(self.__projectdir, project_dname)
+        if not os.path.exists(project_dpath):
+            logger.info('creating directory: %s', project_dpath)
+            os.makedirs(project_dpath)
 
     def __copy(self, pkg_fname, project_fname):
         """Copy file-like objects according to overwrite and skip class members
@@ -56,20 +71,18 @@ class DevOpsTemplate():
         if not pkg.exists(pkg_fname):
             raise FileNotFoundError(f'File {pkg_fname} not available in '
                                     'distribution package')
-        if os.path.exists(project_fname) and self.__skip:
-            logger.warning('File %s exists, skipping', project_fname)
+        project_fpath = os.path.join(self.__projectdir, project_fname)
+        if os.path.exists(project_fpath) and self.__skip:
+            logger.warning('File %s exists, skipping', project_fpath)
             return
-        if os.path.exists(project_fname) and not self.__overwrite:
-            raise FileExistsError(f'File {project_fname} already exists, exit.'
+        if os.path.exists(project_fpath) and not self.__overwrite:
+            raise FileExistsError(f'File {project_fpath} already exists, exit.'
                                   ' (use --skip-exists or --overwrite-exists'
                                   ' to control behavior)')
         with pkg.stream(pkg_fname) as pkg_fh:
-            with open(project_fname, 'wb') as project_fh:
+            with open(project_fpath, 'wb') as project_fh:
                 shutil.copyfileobj(pkg_fh, project_fh)
-        logger.debug('template:%s  ->  project:%s', pkg_fname, project_fname)
-
-    def __add_common(self, projectname):
-        pass
+        logger.debug('template:%s  ->  project:%s', pkg_fname, project_fpath)
 
     def __add_gitignore(self):
         pass
