@@ -83,7 +83,7 @@ def string_list(resource_name, encoding='utf-8'):
         contents of of resource interpreted as list of text strings (default
             encoding)
     """
-    return string(resource_name).splitlines()
+    return string(resource_name, encoding).splitlines()
 
 
 def stream(resource_name):

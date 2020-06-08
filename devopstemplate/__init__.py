@@ -52,7 +52,6 @@ class _LoggerConfig():
         self.__handler.setFormatter(logging.Formatter(self.__format_plain))
 
 
-"""Global module variable that stores a singelton of the LoggerConfig
-Can be used globally in order to adjust log behavior.
-"""
+# Global module variable that stores a singelton of the LoggerConfig
+# Can be used globally in order to adjust log behavior.
 LOGCONFIG = _LoggerConfig()

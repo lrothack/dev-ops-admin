@@ -39,6 +39,8 @@ class MakefileSection():
 
 
 class MakefileTemplate():
+    """Parse Makefile template into sections and generate Makefile for project.
+    """
 
     def __init__(self, filehandle):
         # Read file contents and split text lines such that lines are not
