@@ -62,12 +62,10 @@ def parse_args(args_list):
                         help='Project directory, default: current directory')
     parser.add_argument('--skip-exists', action='store_true',
                         help=('Skip copying files if they already '
-                              'exist in the project directory '
-                              'without failing'))
+                              'exist in the project directory'))
     parser.add_argument('--overwrite-exists', action='store_true',
                         help=('Overwrite files if they already '
-                              'exist in the project directory '
-                              'without failing'))
+                              'exist in the project directory'))
     parser.add_argument('--quiet', action='store_true',
                         help='Only print warning/error messages')
     parser.add_argument('--verbose', action='store_true',
