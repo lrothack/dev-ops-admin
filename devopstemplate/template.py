@@ -47,6 +47,10 @@ class DevOpsTemplate():
         Params:
             pkg_fname: String specifying the file in the distribution package
             project_fname: String specifying the target file in the project
+        Raises:
+            FileNotFoundError: If pkg_fname is not available
+            FileExistsError: If project_fname already exists in the project
+                and skip-exists=False, overwrite-exists=False
         """
         logger = logging.getLogger(f'{__name__}:__copy')
         if not pkg.exists(pkg_fname):
