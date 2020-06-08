@@ -13,7 +13,7 @@ with open('devopstemplate/template.index', 'r') as fh:
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
 # change.
 setup(name='devopstemplate',
-      version='0.1.0',
+      version='0.2.0',
       # Import package
       packages=['devopstemplate'],
       # Installation dependencies
