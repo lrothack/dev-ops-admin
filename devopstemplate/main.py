@@ -8,7 +8,9 @@ from devopstemplate.template import DevOpsTemplate
 
 
 def create(args):
-    template = DevOpsTemplate()
+    template = DevOpsTemplate(projectdirectory=args.project_dir,
+                              overwrite_exists=args.overwrite_exists,
+                              skip_exists=args.skip_exists)
     template.create(projectname=args.projectname,
                     add_scripts=args.add_scripts_dir,
                     add_docs=args.add_docs_dir,
@@ -44,6 +46,14 @@ def parse_args(args_list):
     # top-level arguments (optional)
     parser.add_argument('--project-dir', default='.',
                         help='Project directory, default: current directory')
+    parser.add_argument('--skip-exists', action='store_true',
+                        help=('Skip copying files if they already '
+                              'exist in the project directory '
+                              'without failing'))
+    parser.add_argument('--overwrite-exists', action='store_true',
+                        help=('Overwrite files if they already '
+                              'exist in the project directory '
+                              'without failing'))
     parser.add_argument('--quiet', action='store_true',
                         help='Only print warning/error messages')
     parser.add_argument('--verbose', action='store_true',
