@@ -137,8 +137,14 @@ def parse_args(args_list):
 
 
 def main():
+    """Entrypoint starting the command-line interface
+    Control-flow continues depending on user arguments.
+
+    Passes all command-line flags sys.argv[1:] to argparse
+    (implemented in parse_args)
+    """
     logger = logging.getLogger(f'{__name__}:main')
-    logger.info('%s:: %s\n', platform.node(), ' '.join(sys.argv))
+    logger.debug('%s:: %s\n', platform.node(), ' '.join(sys.argv))
     parse_args(sys.argv[1:])
 
 
