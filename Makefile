@@ -153,14 +153,15 @@ dist: $(SETUPTOOLSFILES)
 install-dev: $(SETUPTOOLSFILES)
 	$(PIP) install -r requirements.txt
 
-## test:         Run Python unit tests with pytest
+## test:         Run Python unit tests with pytest and analyse coverage
 test:
 	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) $(TESTS)
 	$(COVERAGE) report -m
 
-## pylint:       Run Python linter and print output to terminal
-pylint:
-	$(PYLINT) --exit-zero $(PACKAGE)
+## lint:         Run Python linter (bandit, pylint) and print output to terminal
+lint:
+	-$(BANDIT) -r $(PACKAGE)
+	$(PYLINT) --output-format=colorized --reports=n --exit-zero $(PACKAGE)
 
 
 # --- SonarQube targets ---
