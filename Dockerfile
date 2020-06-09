@@ -56,15 +56,15 @@ COPY . .
 # Note that the build won't fail if unit tests fail (in both cases)
 RUN if [ ${SONAR} = "True" ] ; then \
     make clean-all \
-    && make install_dev \
+    && make install-dev \
     && make sonar SONARHOST=${SONARHOST} SONARPORT=${SONARPORT} SONARNOSCM=${SONARNOSCM} \
     ; else \
     make clean-all \
-    && make install_dev \
+    && make install-dev \
     && (make pylint test || exit 0) \
     ;fi
 # Use Makefile in order to build a Python wheel from the app
-RUN make clean-all && make bdist_wheel
+RUN make clean-all && make dist
 
 # Start a new stage for the deployment image in order to minimize image size
 # --> sonar-scanner and test libs are not required here 

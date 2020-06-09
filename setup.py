@@ -13,7 +13,7 @@ with open('devopstemplate/template.index', 'r') as fh:
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
 # change.
 setup(name='devopstemplate',
-      version='0.2.0',
+      version='0.3.0',
       # Import package
       packages=['devopstemplate'],
       # Installation dependencies
@@ -25,7 +25,7 @@ setup(name='devopstemplate',
       # (for linting, testing, etc.)
       extras_require={'dev': ['pip >= 20.1.1',
                               'wheel',
-                              'nose',
+                              'pytest',
                               'coverage',
                               'bandit',
                               'pylint',

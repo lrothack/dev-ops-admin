@@ -1,6 +1,7 @@
 Dockerfile
 .dockerignore
 .coverage
+.pytest_cache
 .scannerwork
 .codereports/
 .eggs

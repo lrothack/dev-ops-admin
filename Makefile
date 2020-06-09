@@ -28,8 +28,8 @@ PIP = pip
 # Files required by setuptools (python setup.py, pip)
 # Note that setuptools can only supports running from the project root
 # --> SETUPTOOLSFILES must be present in the working directory
-# Adjust the list when your configuration changes, e.g., one of the files is
-# not used anymore.
+# Adjust the list when your configuration changes, e.g., you use additional
+# files one of the files is not used anymore.
 SETUPTOOLSFILES = setup.py requirements.txt
 #
 # Obtain Python package path, name and version
@@ -53,16 +53,17 @@ TESTS=$(ROOT)/tests
 # Note that the test / code analysis tools are not specific to SonarQube but
 # are only required for SonarQube reporting in the Makefile
 SONARSCANNER = sonar-scanner
+PYTEST = pytest
+COVERAGE = coverage
 PYLINT = pylint
-NOSETESTS = nosetests
 BANDIT = bandit
 # Directory where to save linting and testing reports
 REPDIR=$(CWD)/.codereports
 # Report result files
-NOSETESTSREP=$(REPDIR)/nosetests.xml
+PYTESTREP=$(REPDIR)/pytest.xml
 COVERAGEREP=$(REPDIR)/coverage.xml
-PYLINTREP=$(REPDIR)/pylint_report.txt
-BANDITREP=$(REPDIR)/bandit_report.json
+PYLINTREP=$(REPDIR)/pylint.txt
+BANDITREP=$(REPDIR)/bandit.json
 #
 # Configuration variables for local sonarqube reporting with `make sonar`
 # Report to sonar host (when running locally)
@@ -81,7 +82,7 @@ SONARNOSCM=False
 DOCKER = docker
 #
 # Configuration variables for sonarqube reporting within Docker build when
-# running `make docker_build`, i.e., variables will be passed to Docker build
+# running `make docker-build`, i.e., variables will be passed to Docker build
 # as build arguments
 # Enable/disable SonarQube reporting during Docker build
 DOCKERSONAR=True
@@ -103,7 +104,7 @@ DOCKERENTRYPOINTEXEC=$(NAME)
 
 # --- Common targets ---
 
-.PHONY: help clean clean-all bdist_wheel install_dev test pylint sonar docker_build
+.PHONY: help clean clean-all dist install-dev test pylint sonar docker-build docker-tag
 
 ## 
 ## MAKEFILE for building and testing Python package including
@@ -119,15 +120,17 @@ help:
 
 ## clean:        Clean up auto-generated files
 clean:
-	@rm -f $(NOSETESTSREP) $(COVERAGEREP)
+	@rm -f $(PYTESTREP) $(COVERAGEREP)
 	@rm -f $(PYLINTREP) $(BANDITREP)
 
 ## clean-all:    Clean up auto-generated files and directories
 ##               (WARNING: do not store user data in auto-generated directories)
 clean-all: clean
 	@rm -rf .coverage .scannerwork
+	@rm -rf .pytest_cache
 	@rm -rf $(REPDIR)
 	@rm -rf $(NAME).egg-info
+	@rm -rf $(PACKAGE)/$(NAME).egg-info
 	@rm -rf build
 	@rm -rf dist
 
@@ -138,20 +141,22 @@ clean-all: clean
 $(SETUPTOOLSFILES):
 	$(error "Python packaging files missing in working directory ($(SETUPTOOLSFILES))")
 
-## bdist_wheel:  Build a Python wheel with setuptools (based on setup.py)
-bdist_wheel: $(SETUPTOOLSFILES)
+## dist:         Build a Python wheel with setuptools (based on setup.py)
+dist: $(SETUPTOOLSFILES)
+	$(PYTHON) setup.py sdist
 	$(PYTHON) setup.py bdist_wheel
 
-## install_dev:  Install development dependencies (based on setup.py)
+## install-dev:  Install development dependencies (based on setup.py)
 ##               (installation within a Python virtual environment is
 ##                recommended)
 ##               (application sources will be symlinked to PYTHONPATH)
-install_dev: $(SETUPTOOLSFILES)
+install-dev: $(SETUPTOOLSFILES)
 	$(PIP) install -r requirements.txt
 
-## test:         Run Python unit tests with nosetests
+## test:         Run Python unit tests with pytest
 test:
-	$(NOSETESTS) --where $(TESTS)
+	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) $(TESTS)
+	$(COVERAGE) report -m
 
 ## pylint:       Run Python linter and print output to terminal
 pylint:
@@ -165,7 +170,7 @@ pylint:
 ##                `docker-compose -p sonarqube \
 ##                                -f sonarqube/docker-compose.yml up -d`)
 #                (requires code analysis dependencies, 
-#                 intall with `make install_dev`)
+#                 intall with `make install-dev`)
 #                (requires SonarQube client sonar-scanner, 
 #                 install with `brew sonar-scanner` or see ./Dockerfile)
 # leading dash (in front of commands, not parameters) ignores error codes,
@@ -174,9 +179,8 @@ sonar: $(SETUPTOOLSFILES)
 	@mkdir -p $(REPDIR)
 	-$(BANDIT) -r $(PACKAGE) --format json >$(BANDITREP)
 	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
-	-$(NOSETESTS) --with-xunit --xunit-file=$(NOSETESTSREP) \
-              --with-coverage --cover-xml --cover-xml-file=$(COVERAGEREP) \
-			  --where $(TESTS)
+	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) --junit-xml=$(PYTESTREP) -o junit_family=xunit2 $(TESTS)
+	$(COVERAGE) xml -o $(COVERAGEREP)
 	$(SONARSCANNER) -Dsonar.host.url=http://$(SONARHOST):$(SONARPORT) \
               -Dsonar.projectKey=$(NAME) \
               -Dsonar.projectVersion=$(VERSION) \
@@ -184,7 +188,7 @@ sonar: $(SETUPTOOLSFILES)
               -Dsonar.sources=$(PACKAGE) \
               -Dsonar.tests=$(TESTS) \
               -Dsonar.scm.disabled=$(SONARNOSCM) \
-              -Dsonar.python.xunit.reportPath=$(NOSETESTSREP) \
+              -Dsonar.python.xunit.reportPath=$(PYTESTREP) \
               -Dsonar.python.coverage.reportPaths=$(COVERAGEREP) \
               -Dsonar.python.pylint.reportPath=$(PYLINTREP) \
               -Dsonar.python.bandit.reportPaths=$(BANDITREP)
@@ -192,17 +196,17 @@ sonar: $(SETUPTOOLSFILES)
 
 # --- Docker targets ---
 
-## docker_build: Build docker image for Python application including
+## docker-build: Build docker image for Python application including
 ##               code analysis and reporting to SonarQube (multi-stage build)
 ##               (requires SonarQube server, see target 'sonar' above)
 ##               (SonarQube reporting during Docker build can be disabled
-##                with `make docker_build DOCKERSONAR=False`)
+##                with `make docker-build DOCKERSONAR=False`)
 #                (WARNING: do not run in Docker, Docker-in-Docker!)
 # The if-statement is required in order to determine if we have to run the
 # build in the $(DOCKERNET) network
 # Note: info is parsed and immediately printed by make, echo is executed in a
 # shell as are the other commands in the recipe.
-docker_build: $(SETUPTOOLSFILES)
+docker-build: $(SETUPTOOLSFILES)
 	$(info WARNING: Do not run this target within a Docker build/container)
 	$(info Running Docker build in context: $(ROOT))
 	$(info ENTRYPOINT executable: $(DOCKERENTRYPOINTEXEC))
@@ -223,7 +227,7 @@ else
 endif
 	@echo "build finished, run the container with \`docker run --rm $(NAME)\`"
 
-## docker_tag:   Tag the 'latest' image created with `make docker_build` with
+## docker-tag:   Tag the 'latest' image created with `make docker-build` with
 ##               the current version that is defined in setup.cfg/setup.py
-docker_tag: $(SETUPTOOLSFILES)
+docker-tag: $(SETUPTOOLSFILES)
 	$(DOCKER) tag $(NAME) $(NAME):$(VERSION)
