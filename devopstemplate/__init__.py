@@ -1,57 +1,16 @@
 """Initializations on Python package level
 
-- Obtain Python package version with setuptools
+- Define package version
 - Initialize Python logging framework
 """
 
-import logging
-import pkg_resources
-__version__ = pkg_resources.require(__name__)[0].version
+from devopstemplate.log import LoggerConfig
 
-
-class _LoggerConfig():
-    """
-    Useful log message formats:
-    LOGGING_FORMAT = '%(asctime)-15s: [%(name)s] %(message)s'
-    LOGGING_FORMAT = '[%(name)s] %(message)s'
-    LOGGING_FORMAT = '%(message)s'
-    """
-
-    def __init__(self):
-        """Initialize log config with default level info and a short log
-        message (contains just the message and not meta information)
-        """
-        # Default log level: info
-        # logging.basicConfig(level=logging.INFO,
-        #                     format='%(message)s')
-        self.__format_plain = '%(message)s'
-        self.__format_debug = '%(asctime)-15s: [%(name)s] %(message)s'
-        self.__handler = logging.StreamHandler()
-        logging.getLogger().addHandler(self.__handler)
-        self.info()
-
-    def debug(self):
-        """Switch to debug log level. Change level-of-detail for log message.
-        (add meta information)
-        """
-        logging.getLogger().setLevel(logging.DEBUG)
-        self.__handler.setFormatter(logging.Formatter(self.__format_debug))
-
-    def info(self):
-        """Switch to info log level. Change level-of-detail for log message.
-        (just the log message)
-        """
-        logging.getLogger().setLevel(logging.INFO)
-        self.__handler.setFormatter(logging.Formatter(self.__format_plain))
-
-    def warning(self):
-        """Switch to info log level. Change level-of-detail for log message.
-        (just the log message)
-        """
-        logging.getLogger().setLevel(logging.WARNING)
-        self.__handler.setFormatter(logging.Formatter(self.__format_plain))
+# Version can be parsed from setup.py or managed globally,
+# e.g., with bumpversion
+__version__ = '0.3.0'
 
 
 # Global module variable that stores a singelton of the LoggerConfig
 # Can be used globally in order to adjust log behavior.
-LOGCONFIG = _LoggerConfig()
+LOGCONFIG = LoggerConfig()

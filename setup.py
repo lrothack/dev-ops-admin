@@ -1,19 +1,47 @@
+import os
+import re
 from setuptools import setup
+
+# Parse version
+
+
+def parse_version():
+    """Parse version number from __init__.py in top-level import package
+
+    It is assumed that the version is defined as a string and the '=' sign
+    is surrounded by at most one whitespace character to the left and to the
+    right.
+
+    Returns:
+        version string
+    Raises:
+        ValueError if the parser could not match the version definition
+    """
+    init_fpath = os.path.join('devopstemplate', '__init__.py')
+    with open(init_fpath, 'r') as fh:
+        init_contents = fh.read()
+        ver_re = r"^__version__ ?= ?['\"]([^'\"]*)['\"]"
+        match = re.search(ver_re, init_contents, re.M)
+        if match:
+            version = match.group(1)
+            return version
+        else:
+            raise ValueError('Could not parse version string')
+
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-with open('devopstemplate/template/README.md', 'r') as fh:
-    long_description_template = fh.read()
-
 with open('devopstemplate/template.index', 'r') as fh:
     template_index = fh.read().splitlines()
+
+version = parse_version()
 
 # setup.py defines the Python package. The build process is triggered from
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
 # change.
 setup(name='devopstemplate',
-      version='0.3.0',
+      version=version,
       # Import package
       packages=['devopstemplate'],
       # Installation dependencies
