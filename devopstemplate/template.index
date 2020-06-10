@@ -1,6 +1,10 @@
 .gitignore
 .dockerignore
+{{project_slug}}/__init__.py
+{{project_slug}}/log.py
+{{project_slug}}/main.py
 tests/__init__.py
+tests/test_{{project_slug}}.py
 Dockerfile
 entrypoint.sh
 Makefile
