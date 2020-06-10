@@ -8,7 +8,7 @@ class PackageResourcesTest(unittest.TestCase):
     def setUp(self):
         self.__ref_template_index_head = ['.gitignore',
                                           '.dockerignore',
-                                          'tests/__init__.py']
+                                          '{{project_slug}}/__init__.py']
 
     def test_exists(self):
         self.assertTrue(pkg.exists('template.index'))
