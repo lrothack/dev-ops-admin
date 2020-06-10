@@ -67,7 +67,7 @@ setup(name='devopstemplate',
           # Include data files in devopstemplate package
           # the file template.index specifies file paths relative to
           # devopstemplate/template directory
-          'devopstemplate': (['template.index'] +
+          'devopstemplate': (['template.index', 'template.json'] +
                              [f'template/{fpath}'
                               for fpath in template_index]),
       },
