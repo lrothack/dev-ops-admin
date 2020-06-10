@@ -125,6 +125,7 @@ def parse_args(args_list):
     # Set log level according to command-line flags
     if args_ns.verbose:
         devopstemplate.LOGCONFIG.debug()
+        logger.debug('%s:: %s\n', platform.node(), ' '.join(sys.argv))
     elif args_ns.quiet:
         devopstemplate.LOGCONFIG.warning()
 
@@ -142,8 +143,6 @@ def main():
     Passes all command-line flags sys.argv[1:] to argparse
     (implemented in parse_args)
     """
-    logger = logging.getLogger('main.main')
-    logger.debug('%s:: %s\n', platform.node(), ' '.join(sys.argv))
     parse_args(sys.argv[1:])
 
 
