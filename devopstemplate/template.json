@@ -1,7 +1,11 @@
 {
-    "author_name": "",
-    "author_email": "",
-    "project_name": "Sample Project",
-    "project_slug": "sampleproject",
-    "project_description": "Sample Project demonstrates the functionality of the Python DevOps template"
+    "author_name": "{{git.config.name}}",
+    "author_email": "{{git.config.email}}",
+    "project_name": null,
+    "project_slug": "{{ project_name.lower().replace(' ', '_').replace('-', '_') }}",
+    "project_version": "0.1.0",
+    "project_url": null,
+    "project_description": "",
+    "use_sonar": "y",
+    "use_docker": "y"
 }
