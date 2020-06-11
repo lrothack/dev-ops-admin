@@ -27,8 +27,7 @@ class DevOpsTemplate():
     def create(self, projectname, add_scripts, add_docs,
                no_gitignore, no_readme, no_sonar, no_docker):
         logger = logging.getLogger('DevOpsTemplate.create')
-        logger.info('Create project from template %s',
-                    devopstemplate.__version__)
+        logger.info('Create project from template')
         logger.info('Project name: %s', projectname)
         logger.info('  scripts directory: %s', add_scripts)
         logger.info('  docs directory:    %s', add_docs)

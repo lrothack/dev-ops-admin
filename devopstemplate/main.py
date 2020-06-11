@@ -53,8 +53,7 @@ def parse_args(args_list):
         args_list: list of strings with command-line flags (sys.argv[1:])
     """
     logger = logging.getLogger('main.parse_args')
-    descr = ''.join(['Create and manage DevOps template projects ',
-                     f'(version {devopstemplate.__version__})'])
+    descr = ''.join(['Create and manage DevOps template projects'])
     parser = argparse.ArgumentParser(description=descr)
     # top-level arguments (optional)
     parser.add_argument('--project-dir', default='.',
@@ -66,9 +65,11 @@ def parse_args(args_list):
                         help=('Overwrite files if they already '
                               'exist in the project directory'))
     parser.add_argument('--quiet', action='store_true',
-                        help='Only print warning/error messages')
+                        help='Print only warning/error messages')
     parser.add_argument('--verbose', action='store_true',
                         help='Print debug messages')
+    parser.add_argument('--version', action='store_true',
+                        help='Print version')
     # Default for printing help message if no command is provided
     # attribute 'func' is set to a lambda function
     # --> if attribute func keeps the lambda function until the entire parser
@@ -122,16 +123,22 @@ def parse_args(args_list):
 
     args_ns = parser.parse_args(args=args_list)
 
+    # If version flag is set: print version and quit
+    if args_ns.version:
+        logger.info('devopstemplate v%s', devopstemplate.__version__)
+        return
+
     # Set log level according to command-line flags
     if args_ns.verbose:
         devopstemplate.LOGCONFIG.debug()
-        logger.debug('%s:: %s\n', platform.node(), ' '.join(sys.argv))
+        logger.debug('%s:: %s', platform.node(), ' '.join(sys.argv))
+        logger.debug('devopstemplate v%s\n', devopstemplate.__version__)
     elif args_ns.quiet:
         devopstemplate.LOGCONFIG.warning()
 
     logger.debug('Command-line args: %s', args_list)
     args_dict = vars(args_ns)
-    logger.debug('Options:\n%s', '\n'.join(f'{key} : {val}'
+    logger.debug('Options:\n%s', ', '.join(f'{key} : {val}'
                                            for key, val in args_dict.items()))
     args_ns.func(args_ns)
 
