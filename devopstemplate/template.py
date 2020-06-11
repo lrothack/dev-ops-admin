@@ -1,6 +1,6 @@
 """Create new projects from template and administer existing projects
-- defines which files will be installed for specific user requests
-- defines how files will be installed according to user requests
+    - defines which files will be installed for specific user requests
+    - defines how files will be installed according to user requests
 """
 import os
 import shutil
