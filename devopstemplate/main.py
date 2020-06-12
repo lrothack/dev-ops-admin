@@ -6,9 +6,21 @@ import sys
 import platform
 import logging
 import argparse
-
+import subprocess
+import shutil
 import devopstemplate
 from devopstemplate.template import DevOpsTemplate
+
+
+def git_user():
+    name = ''
+    email = ''
+    if shutil.which('git'):
+        name = subprocess.check_output(['git', 'config', 'user.name'],
+                                       stderr=subprocess.STDOUT)
+        email = subprocess.check_output(['git', 'config', 'user.email'],
+                                        stderr=subprocess.STDOUT)
+    return name.decode().strip(), email.decode().strip()
 
 
 def create(args):
@@ -17,19 +29,59 @@ def create(args):
     Params:
         args: argparse.Namespace object with argument parser attributes
     """
+
     template = DevOpsTemplate(projectdirectory=args.project_dir,
                               overwrite_exists=args.overwrite_exists,
                               skip_exists=args.skip_exists)
-    template.create(projectname=args.projectname,
-                    add_scripts=args.add_scripts_dir,
-                    add_docs=args.add_docs_dir,
-                    no_gitignore=args.no_gitignore_file,
-                    no_readme=args.no_readme_file,
-                    no_sonar=args.no_sonar,
-                    no_docker=args.no_docker)
+    args_dict = vars(args)
+    key_list = ['projectname',
+                'project_slug',
+                'project_version',
+                'project_url',
+                'project_description',
+                'author_name',
+                'author_email',
+                'add_scripts_dir',
+                'add_docs_dir',
+                'no_gitignore_file',
+                'no_readme_file',
+                'no_sonar',
+                'no_docker']
+    # Define project package name
+    project_slug = args.projectname
+    project_slug = project_slug.replace(' ', '_').replace('-', '_')
+    args_dict['project_slug'] = project_slug
+
+    # Define configurate dict for creating project
+    params = {key: args_dict[key] for key in key_list}
+
+    # Override values in interactive mode
+    if args.interactive:
+        for key in key_list:
+            value = params[key]
+            key_disp = key.replace('_', '-')
+            if isinstance(value, bool):
+                value = 'y' if value else 'n'
+                value_user = input(f'{key_disp} [ {value} ] : ')
+                value_user = True if value_user == 'y' else False
+            else:
+                value_user = input(f'{key_disp} [ "{value}" ] : ')
+                value_user = value if value_user == '' else value_user
+            params[key] = value_user
+
+    template.create(projectname=args.projectname, projectcfg=params)
 
 
 def manage(args):
+    """Wrapper for sub-command manage
+
+    Params:
+        args: argparse.Namespace object with argument parser attributes
+    """
+    pass
+
+
+def cookiecutter(args):
     """Wrapper for sub-command manage
 
     Params:
@@ -81,20 +133,42 @@ def parse_args(args_list):
     create_parser = subparsers.add_parser('create',
                                           help=('Create a new project based '
                                                 'on the DevOps template'))
-    create_parser.add_argument('projectname',
-                               help=('Name of the Python package / '
-                                     'top-level import directory'))
-    create_parser.add_argument('--add-scripts-dir', action='store_true',
+    create_parser.add_argument('-i', '--interactive', action='store_true',
+                               help=('Configure project parameters/components'
+                                     ' interactively'))
+    create_prms = create_parser.add_argument_group('project parameters')
+    create_prms.add_argument('projectname',
+                             help=('Name of the Python package / '
+                                   'top-level import directory'))
+    create_prms.add_argument('--project-version',
+                             default='0.1.0',
+                             help=('default: "0.1.0"'))
+    create_prms.add_argument('--project-url',
+                             default='',
+                             help=('default: ""'))
+    create_prms.add_argument('--project-description',
+                             default='',
+                             help=('default: ""'))
+    # git user and email as default for author data
+    name, email = git_user()
+    create_prms.add_argument('--author-name',
+                             default=name,
+                             help=(f'default (from git): "{name}"'))
+    create_prms.add_argument('--author-email',
+                             default=email,
+                             help=(f'default (from git): "{email}"'))
+    create_cmpnts = create_parser.add_argument_group('project components')
+    create_cmpnts.add_argument('--add-scripts-dir', action='store_true',
                                help='Add scripts directory')
-    create_parser.add_argument('--add-docs-dir', action='store_true',
+    create_cmpnts.add_argument('--add-docs-dir', action='store_true',
                                help='Add docs directory')
-    create_parser.add_argument('--no-gitignore-file', action='store_true',
+    create_cmpnts.add_argument('--no-gitignore-file', action='store_true',
                                help='Do not add .gitignore file')
-    create_parser.add_argument('--no-readme-file', action='store_true',
+    create_cmpnts.add_argument('--no-readme-file', action='store_true',
                                help='Do not add README.md file')
-    create_parser.add_argument('--no-sonar', action='store_true',
+    create_cmpnts.add_argument('--no-sonar', action='store_true',
                                help='Do not add SonarQube support')
-    create_parser.add_argument('--no-docker', action='store_true',
+    create_cmpnts.add_argument('--no-docker', action='store_true',
                                help='Do not add Docker support')
     # If the create subparser has been activated by the 'create' command,
     # override the func attribute with a pointer to the 'create' function
@@ -121,6 +195,49 @@ def parse_args(args_list):
     # (defined above) --> overrides default defined for the main parser.
     manage_parser.set_defaults(func=manage)
 
+    cc_parser = subparsers.add_parser('cookiecutter',
+                                      help=('Create a cookiecutter'
+                                            ' template'))
+    cc_parser.add_argument('-i', '--interactive', action='store_true',
+                           help=('Configure project parameters/components'
+                                 ' interactively'))
+    cc_prms = cc_parser.add_argument_group('project parameters')
+    cc_prms.add_argument('--project-name',
+                         default='',
+                         help=('Name of the Python package / '
+                               'top-level import directory'))
+    cc_prms.add_argument('--project-version',
+                         default='0.1.0',
+                         help=('default: "0.1.0"'))
+    cc_prms.add_argument('--project-url',
+                         default='',
+                         help=('default: ""'))
+    cc_prms.add_argument('--project-description',
+                         default='',
+                         help=('default: ""'))
+    cc_prms.add_argument('--author-name',
+                         default='',
+                         help=(f'default ""'))
+    cc_prms.add_argument('--author-email',
+                         default='',
+                         help=(f'default ""'))
+    cc_cmpnts = cc_parser.add_argument_group('project components')
+    cc_cmpnts.add_argument('--add-scripts-dir', action='store_true',
+                           help='Add scripts directory')
+    cc_cmpnts.add_argument('--add-docs-dir', action='store_true',
+                           help='Add docs directory')
+    cc_cmpnts.add_argument('--no-gitignore-file', action='store_true',
+                           help='Do not add .gitignore file')
+    cc_cmpnts.add_argument('--no-readme-file', action='store_true',
+                           help='Do not add README.md file')
+    cc_cmpnts.add_argument('--no-sonar', action='store_true',
+                           help='Do not add SonarQube support')
+    cc_cmpnts.add_argument('--no-docker', action='store_true',
+                           help='Do not add Docker support')
+    # If the cookiecutter subparser has been activated by the 'cookiecutter'
+    # command, override the func attribute with a pointer to the 'cookiecutter'
+    # function (defined above) --> overrides default for the main parser.
+    cc_parser.set_defaults(func=cookiecutter)
     args_ns = parser.parse_args(args=args_list)
 
     # If version flag is set: print version and quit

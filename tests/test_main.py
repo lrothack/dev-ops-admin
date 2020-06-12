@@ -13,6 +13,12 @@ class TestMain(unittest.TestCase):
         args_ns = Namespace()
         args_ns.project_dir = '.'
         args_ns.projectname = 'test'
+        args_ns.project_version = '0.1.0'
+        args_ns.project_url = ''
+        args_ns.project_description = ''
+        user, email = devopstemplate.main.git_user()
+        args_ns.author_name = user
+        args_ns.author_email = email
         args_ns.add_scripts_dir = False
         args_ns.add_docs_dir = False
         args_ns.no_gitignore_file = False
@@ -24,6 +30,7 @@ class TestMain(unittest.TestCase):
         args_ns.verbose = False
         args_ns.quiet = False
         args_ns.version = False
+        args_ns.interactive = False
         args_ns.func = mock_create
 
         mock_create.assert_called_with(args_ns)

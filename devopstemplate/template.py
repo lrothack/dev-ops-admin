@@ -5,8 +5,10 @@
 import os
 import shutil
 import logging
-
-import devopstemplate
+import json
+from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Template
+# import devopstemplate
 import devopstemplate.pkg as pkg
 
 
@@ -24,17 +26,21 @@ class DevOpsTemplate():
         template_index_list = pkg.string_list('template.index')
         logger.debug('template index:\n%s', '\n'.join(template_index_list))
 
-    def create(self, projectname, add_scripts, add_docs,
-               no_gitignore, no_readme, no_sonar, no_docker):
+        self.__env = Environment(loader=PackageLoader(__name__, 'template'),
+                                 autoescape=select_autoescape(default=True))
+
+    def create(self, projectname, projectcfg):
         logger = logging.getLogger('DevOpsTemplate.create')
         logger.info('Create project from template')
         logger.info('Project name: %s', projectname)
-        logger.info('  scripts directory: %s', add_scripts)
-        logger.info('  docs directory:    %s', add_docs)
-        logger.info('  .gitignore file:   %s', not no_gitignore)
-        logger.info('  README.md file:    %s', not no_readme)
-        logger.info('  SonarQube support: %s', not no_sonar)
-        logger.info('  Docker support:    %s', not no_docker)
+        logger.debug('  scripts directory: %s', projectcfg['add_scripts_dir'])
+        logger.debug('  docs directory:    %s', projectcfg['add_docs_dir'])
+        logger.debug('  .gitignore file:   %s',
+                     not projectcfg['no_gitignore_file'])
+        logger.debug('  README.md file:    %s',
+                     not projectcfg['no_readme_file'])
+        logger.debug('  SonarQube support: %s', not projectcfg['no_sonar'])
+        logger.debug('  Docker support:    %s', not projectcfg['no_docker'])
 
         # Create source directory (if not present)
         self.__mkdir(projectname)
@@ -54,6 +60,8 @@ class DevOpsTemplate():
         if not os.path.exists(project_dpath):
             logger.info('creating directory: %s', project_dpath)
             os.makedirs(project_dpath)
+        else:
+            logger.debug('directory %s exists', project_dpath)
 
     def __copy(self, pkg_fname, project_fname):
         """Copy file-like objects according to overwrite and skip class members
@@ -82,6 +90,12 @@ class DevOpsTemplate():
             with open(project_fpath, 'wb') as project_fh:
                 shutil.copyfileobj(pkg_fh, project_fh)
         logger.debug('template:%s  ->  project:%s', pkg_fname, project_fpath)
+
+    def __render_file(self):
+        pass
+
+    def __render_string(self, contents):
+        return Template(contents)
 
     def __add_gitignore(self):
         pass
