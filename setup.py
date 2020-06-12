@@ -48,7 +48,7 @@ setup(name='devopstemplate',
       setup_requires=['setuptools >= 40.9.0',
                       'wheel'],
       # Package dependencies
-      # install_requires=[],
+      install_requires=['Jinja2'],
       # Defines dev environment containing development dependencies
       # (for linting, testing, etc.)
       extras_require={'dev': ['pip >= 20.1.1',
