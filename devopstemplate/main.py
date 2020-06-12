@@ -17,10 +17,12 @@ def git_user():
     email = ''
     if shutil.which('git'):
         name = subprocess.check_output(['git', 'config', 'user.name'],
-                                       stderr=subprocess.STDOUT)
+                                       stderr=subprocess.STDOUT,
+                                       encoding='utf-8')
         email = subprocess.check_output(['git', 'config', 'user.email'],
-                                        stderr=subprocess.STDOUT)
-    return name.decode().strip(), email.decode().strip()
+                                        stderr=subprocess.STDOUT,
+                                        encoding='utf-8')
+    return name.strip(), email.strip()
 
 
 def create(args):
