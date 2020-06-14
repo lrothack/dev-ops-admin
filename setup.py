@@ -1,5 +1,7 @@
 import os
 import re
+import itertools
+import json
 from setuptools import setup
 
 # Parse version
@@ -29,14 +31,18 @@ def parse_version():
             raise ValueError('Could not parse version string')
 
 
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+def parse_template_index():
+    with open('devopstemplate/template.json', 'r') as fh:
+        template_dict = json.load(fh)
+        template_index = list(itertools.chain(*template_dict.values()))
+    return template_index
 
-with open('devopstemplate/template.index', 'r') as fh:
-    template_index = fh.read().splitlines()
 
 version = parse_version()
+template_index = parse_template_index()
 
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
 # setup.py defines the Python package. The build process is triggered from
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
 # change.
@@ -67,7 +73,7 @@ setup(name='devopstemplate',
           # Include data files in devopstemplate package
           # the file template.index specifies file paths relative to
           # devopstemplate/template directory
-          'devopstemplate': (['template.index', 'template.json'] +
+          'devopstemplate': (['template.json'] +
                              [f'template/{fpath}'
                               for fpath in template_index]),
       },

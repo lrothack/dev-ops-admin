@@ -2,18 +2,17 @@ import unittest
 import os
 import tempfile
 from pathlib import Path
-import devopstemplate
+from tests.conftest import ref_file_head
 from devopstemplate.template import DevOpsTemplate
 
 
 class TestDevOpsTemplate(unittest.TestCase):
 
     def setUp(self):
-        self.__ref_template_index_head = ['.gitignore',
-                                          '.dockerignore',
-                                          '{{project_slug}}/__init__.py']
+        self.__ref_template_index_head = ref_file_head()
 
     def test_version(self):
+        import devopstemplate
         version = devopstemplate.__version__
         print(f'version: {version}')
         ver_parts = version.split('.')
@@ -26,7 +25,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = 'tmp_file'
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
-            template._DevOpsTemplate__copy('template.index', tmp_fname)
+            template._DevOpsTemplate__copy('template.json', tmp_fname)
             with open(tmp_fpath, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
@@ -41,7 +40,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             with self.assertRaises(FileExistsError):
-                template._DevOpsTemplate__copy('template.index', tmp_fname)
+                template._DevOpsTemplate__copy('template.json', tmp_fname)
 
     def test_copy_skip(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -50,7 +49,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = 'tmp_file'
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__copy('template.index', tmp_fname)
+            template._DevOpsTemplate__copy('template.json', tmp_fname)
             with open(tmp_path, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 self.assertEqual(contents, '')
@@ -62,7 +61,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = 'tmp_file'
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__copy('template.index', tmp_fname)
+            template._DevOpsTemplate__copy('template.json', tmp_fname)
             with open(tmp_path, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()

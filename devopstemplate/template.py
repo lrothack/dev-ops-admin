@@ -23,27 +23,28 @@ class DevOpsTemplate():
         self.__projectdir = projectdirectory
         self.__overwrite = overwrite_exists
         self.__skip = skip_exists
-        template_index_list = pkg.string_list('template.index')
-        logger.debug('template index:\n%s', '\n'.join(template_index_list))
+        # template_index_list = pkg.string_list('template.index')
+        # logger.debug('template index:\n%s', '\n'.join(template_index_list))
 
         self.__env = Environment(loader=PackageLoader(__name__, 'template'),
                                  autoescape=select_autoescape(default=True))
 
-    def create(self, projectname, projectcfg):
+    def create(self, projectname, projectconfig):
         logger = logging.getLogger('DevOpsTemplate.create')
         logger.info('Create project from template')
         logger.info('Project name: %s', projectname)
-        logger.debug('  scripts directory: %s', projectcfg['add_scripts_dir'])
-        logger.debug('  docs directory:    %s', projectcfg['add_docs_dir'])
+        logger.debug('  scripts directory: %s',
+                     projectconfig['add_scripts_dir'])
+        logger.debug('  docs directory:    %s',
+                     projectconfig['add_docs_dir'])
         logger.debug('  .gitignore file:   %s',
-                     not projectcfg['no_gitignore_file'])
+                     not projectconfig['no_gitignore_file'])
         logger.debug('  README.md file:    %s',
-                     not projectcfg['no_readme_file'])
-        logger.debug('  SonarQube support: %s', not projectcfg['no_sonar'])
-        logger.debug('  Docker support:    %s', not projectcfg['no_docker'])
-
-        # Create source directory (if not present)
-        self.__mkdir(projectname)
+                     not projectconfig['no_readme_file'])
+        logger.debug('  SonarQube support: %s',
+                     not projectconfig['no_sonar'])
+        logger.debug('  Docker support:    %s',
+                     not projectconfig['no_docker'])
 
     def manage(self, add_gitignore, add_readme, add_scripts,
                add_docs, add_sonar, add_docker):

@@ -1,0 +1,25 @@
+{
+    "common": [
+        "{{project_slug}}/__init__.py",
+        "{{project_slug}}/log.py",
+        "{{project_slug}}/main.py",
+        "tests/__init__.py",
+        "tests/test_{{project_slug}}.py",
+        "Makefile",
+        "MANIFEST.in",
+        "setup.py",
+        "requirements.txt"
+    ],
+    "git": [
+        ".gitignore"
+    ],
+    "docker": [
+        ".dockerignore",
+        "Dockerfile",
+        "entrypoint.sh"
+    ],
+    "sonar": [
+        "sonarqube/README.md",
+        "sonarqube/docker-compose.yml"
+    ]
+}
