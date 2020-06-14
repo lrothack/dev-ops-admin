@@ -219,10 +219,10 @@ def parse_args(args_list):
                          help=('default: ""'))
     cc_prms.add_argument('--author-name',
                          default='',
-                         help=(f'default ""'))
+                         help=('default ""'))
     cc_prms.add_argument('--author-email',
                          default='',
-                         help=(f'default ""'))
+                         help=('default ""'))
     cc_cmpnts = cc_parser.add_argument_group('project components')
     cc_cmpnts.add_argument('--add-scripts-dir', action='store_true',
                            help='Add scripts directory')
