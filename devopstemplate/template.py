@@ -23,8 +23,9 @@ class DevOpsTemplate():
         self.__dry_run = dry_run
         with pkg.stream('template.json') as fh:
             self.__template_dict = json.load(fh)
-
-        self.__env = Environment(loader=PackageLoader(__name__, 'template'),
+        self.__template_dname = 'template'
+        self.__env = Environment(loader=PackageLoader(__name__,
+                                                      self.__template_dname),
                                  autoescape=select_autoescape(default=True))
         # Create project base directory if not present
         self.__mkdir(projectdirectory)
@@ -50,7 +51,7 @@ class DevOpsTemplate():
         common_file_list = self.__template_dict['common']
         for template_fpath in common_file_list:
             project_fpath = Template(template_fpath).render(**projectconfig)
-            self.__copy(template_fpath, project_fpath)
+            self.__render(template_fpath, project_fpath)
 
     def manage(self, add_gitignore, add_readme, add_scripts,
                add_docs, add_sonar, add_docker):
@@ -71,20 +72,24 @@ class DevOpsTemplate():
         else:
             logger.debug('directory %s exists', project_dpath)
 
-    def __copy(self, pkg_fname, project_fname):
-        """Copy file-like objects according to overwrite and skip class members
+    def __render(self, pkg_fname, project_fname, context):
+        """Render template to project according to overwrite/skip class members
+        The source file will be used as a Jinja2 template and rendered before
+        the rendering result will be written to the target file.
 
         Params:
             pkg_fname: String specifying the file in the distribution package
             project_fname: String specifying the target file in the project
+            context: Dictionary with the context for rendering Jinja2 templates
         Raises:
             FileNotFoundError: If pkg_fname is not available
             FileExistsError: If project_fname already exists in the project
                 and skip-exists=False, overwrite-exists=False
         """
-        logger = logging.getLogger('DevOpsTemplate.__copy')
-        if not pkg.exists(pkg_fname):
-            raise FileNotFoundError(f'File {pkg_fname} not available in '
+        logger = logging.getLogger('DevOpsTemplate.__render')
+        pkg_fpath = os.path.join(self.__template_dname, pkg_fname)
+        if not pkg.exists(pkg_fpath):
+            raise FileNotFoundError(f'File {pkg_fpath} not available in '
                                     'distribution package')
         project_fpath = os.path.join(self.__projectdir, project_fname)
         if os.path.exists(project_fpath) and self.__skip:
@@ -100,9 +105,12 @@ class DevOpsTemplate():
             if not os.path.exists(parent_dname):
                 os.makedirs(parent_dname)
             # Copy file in binary mode
-            with pkg.stream(pkg_fname) as pkg_fh:
-                with open(project_fpath, 'wb') as project_fh:
-                    shutil.copyfileobj(pkg_fh, project_fh)
+            # with pkg.stream(pkg_fname) as pkg_fh:
+            #     with open(project_fpath, 'wb') as project_fh:
+            #         shutil.copyfileobj(pkg_fh, project_fh)
+            template = self.__env.get_template(pkg_fname)
+            with open(project_fpath, 'w') as project_fh:
+                template.stream(**context).dump(project_fh)
         logger.debug('template:%s  ->  project:%s', pkg_fname, project_fpath)
 
     def __render_file(self):

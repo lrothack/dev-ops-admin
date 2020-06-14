@@ -20,12 +20,13 @@ class TestDevOpsTemplate(unittest.TestCase):
         for part in ver_parts:
             self.assertGreaterEqual(int(part), 0)
 
-    def test_copy(self):
+    def test_render(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = 'tmp_file'
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
-            template._DevOpsTemplate__copy('template.json', tmp_fpath)
+            template._DevOpsTemplate__render('MANIFEST.in', tmp_fpath,
+                                             context={})
             with open(tmp_fpath, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
@@ -33,35 +34,38 @@ class TestDevOpsTemplate(unittest.TestCase):
         self.assertEqual(content_list[:len(self.__ref_template_index_head)],
                          self.__ref_template_index_head)
 
-    def test_copy_exists(self):
+    def test_render_exists(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = 'tmp_file'
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             with self.assertRaises(FileExistsError):
-                template._DevOpsTemplate__copy('template.json', tmp_path)
+                template._DevOpsTemplate__render('MANIFEST.in', tmp_path,
+                                                 context={})
 
-    def test_copy_skip(self):
+    def test_render_skip(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname,
                                       skip_exists=True)
             tmp_fname = 'tmp_file'
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__copy('template.json', tmp_path)
+            template._DevOpsTemplate__render('MANIFEST.in', tmp_path,
+                                             context={})
             with open(tmp_path, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 self.assertEqual(contents, '')
 
-    def test_copy_overwrite(self):
+    def test_render_overwrite(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname,
                                       overwrite_exists=True)
             tmp_fname = 'tmp_file'
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__copy('template.json', tmp_path)
+            template._DevOpsTemplate__render('MANIFEST.in', tmp_path,
+                                             context={})
             with open(tmp_path, 'r') as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
@@ -69,10 +73,11 @@ class TestDevOpsTemplate(unittest.TestCase):
         self.assertEqual(content_list[:len(self.__ref_template_index_head)],
                          self.__ref_template_index_head)
 
-    def test_copy_pkgexists(self):
+    def test_render_pkgexists(self):
         template = DevOpsTemplate()
         with self.assertRaises(FileNotFoundError):
-            template._DevOpsTemplate__copy('non_existing_file', None)
+            template._DevOpsTemplate__render('non_existing_file', None,
+                                             context={})
 
 
 class Jinja2RenderTest(unittest.TestCase):

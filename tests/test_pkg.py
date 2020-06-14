@@ -26,18 +26,18 @@ class PackageResourcesTest(unittest.TestCase):
 
     def test_string(self):
         refstr_head = '\n'.join(self.__ref_template_index_head)
-        filestr = pkg.string('template.json')
+        filestr = pkg.string('template/MANIFEST.in')
         filestr_head = filestr[: len(refstr_head)]
         self.assertEqual(filestr_head, refstr_head)
 
     def test_string_list(self):
-        filestr_list = pkg.string_list('template.json')
+        filestr_list = pkg.string_list('template/MANIFEST.in')
         self.assertEqual(filestr_list[:len(self.__ref_template_index_head)],
                          self.__ref_template_index_head)
 
     def test_stream(self):
         refstr_head = '\n'.join(self.__ref_template_index_head)
-        with pkg.stream('template.json') as fh:
+        with pkg.stream('template/MANIFEST.in') as fh:
             buffer = fh.read(2)
             b_list = [buffer]
             while buffer:
