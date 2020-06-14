@@ -30,6 +30,7 @@ class TestMain(unittest.TestCase):
         args_ns.verbose = False
         args_ns.quiet = False
         args_ns.version = False
+        args_ns.dry_run = False
         args_ns.interactive = False
         args_ns.func = mock_create
 
@@ -56,6 +57,7 @@ class TestMain(unittest.TestCase):
         args_ns.verbose = False
         args_ns.quiet = False
         args_ns.version = False
+        args_ns.dry_run = False
         args_ns.func = mock_manage
 
         mock_manage.assert_called_with(args_ns)

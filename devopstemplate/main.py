@@ -34,7 +34,8 @@ def create(args):
 
     template = DevOpsTemplate(projectdirectory=args.project_dir,
                               overwrite_exists=args.overwrite_exists,
-                              skip_exists=args.skip_exists)
+                              skip_exists=args.skip_exists,
+                              dry_run=args.dry_run)
     args_dict = vars(args)
     key_list = ['projectname',
                 'project_slug',
@@ -71,7 +72,7 @@ def create(args):
                 value_user = value if value_user == '' else value_user
             params[key] = value_user
 
-    template.create(projectname=args.projectname, projectcfg=params)
+    template.create(projectconfig=params)
 
 
 def manage(args):
@@ -122,6 +123,8 @@ def parse_args(args_list):
                         help='Print only warning/error messages')
     parser.add_argument('--verbose', action='store_true',
                         help='Print debug messages')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Pretend to perform actions')
     parser.add_argument('--version', action='store_true',
                         help='Print version')
     # Default for printing help message if no command is provided
