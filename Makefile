@@ -178,7 +178,7 @@ lint:
 # `make` would fail if test case fails or linter reports infos/warnings/errors.
 sonar: $(SETUPTOOLSFILES)
 	@mkdir -p $(REPDIR)
-	-$(BANDIT) -r $(PACKAGE) --format json >$(BANDITREP)
+	-$(BANDIT) -r $(PACKAGE)
 	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
 	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) --junit-xml=$(PYTESTREP) -o junit_family=xunit2 $(TESTS)
 	$(COVERAGE) xml -o $(COVERAGEREP)
@@ -191,8 +191,7 @@ sonar: $(SETUPTOOLSFILES)
               -Dsonar.scm.disabled=$(SONARNOSCM) \
               -Dsonar.python.xunit.reportPath=$(PYTESTREP) \
               -Dsonar.python.coverage.reportPaths=$(COVERAGEREP) \
-              -Dsonar.python.pylint.reportPath=$(PYLINTREP) \
-              -Dsonar.python.bandit.reportPaths=$(BANDITREP)
+              -Dsonar.python.pylint.reportPath=$(PYLINTREP)
 
 
 # --- Docker targets ---
