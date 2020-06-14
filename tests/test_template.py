@@ -4,6 +4,7 @@ import tempfile
 from pathlib import Path
 from jinja2 import Template
 from tests.conftest import ref_file_head
+from tests.conftest import ref_template_head
 from devopstemplate.template import DevOpsTemplate
 
 
@@ -20,7 +21,7 @@ class TestDevOpsTemplate(unittest.TestCase):
         for part in ver_parts:
             self.assertGreaterEqual(int(part), 0)
 
-    def test_render(self):
+    def test_render_file(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = 'tmp_file'
@@ -33,6 +34,23 @@ class TestDevOpsTemplate(unittest.TestCase):
 
         self.assertEqual(content_list[:len(self.__ref_template_index_head)],
                          self.__ref_template_index_head)
+
+    def test_render_template(self):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            template = DevOpsTemplate(projectdirectory=tmpdirname)
+            tmp_fname = 'tmp_file'
+            tmp_fpath = os.path.join(tmpdirname, tmp_fname)
+            project_slug = 'project'
+            context = {'project_slug': project_slug}
+            template._DevOpsTemplate__render('{{project_slug}}/__init__.py',
+                                             tmp_fpath,
+                                             context=context)
+            with open(tmp_fpath, 'r') as tmp_fh:
+                contents = tmp_fh.read()
+                content_list = contents.splitlines()
+        ref_template_list = ref_template_head(project_slug)
+        self.assertEqual(content_list[:len(ref_template_list)],
+                         ref_template_list)
 
     def test_render_exists(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
