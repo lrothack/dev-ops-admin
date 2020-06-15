@@ -51,7 +51,7 @@ class DevOpsTemplate():
         common_file_list = self.__template_dict['common']
         for template_fpath in common_file_list:
             project_fpath = Template(template_fpath).render(**projectconfig)
-            self.__render(template_fpath, project_fpath)
+            self.__render(template_fpath, project_fpath, projectconfig)
 
     def manage(self, add_gitignore, add_readme, add_scripts,
                add_docs, add_sonar, add_docker):
