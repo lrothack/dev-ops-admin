@@ -37,7 +37,7 @@ def create(args):
                               skip_exists=args.skip_exists,
                               dry_run=args.dry_run)
     args_dict = vars(args)
-    key_list = ['projectname',
+    key_list = ['project_name',
                 'project_slug',
                 'project_version',
                 'project_url',
@@ -50,6 +50,8 @@ def create(args):
                 'no_readme_file',
                 'no_sonar',
                 'no_docker']
+    # Set project name
+    args_dict['project_name'] = args.projectname
     # Define project package name
     project_slug = args.projectname
     project_slug = project_slug.replace(' ', '_').replace('-', '_')
