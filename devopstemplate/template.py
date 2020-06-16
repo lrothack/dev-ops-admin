@@ -86,7 +86,7 @@ class DevOpsTemplate():
             self.__install('readme', projectconfig)
         logger.debug('  SonarQube support: %s',
                      projectconfig['use_sonar'])
-        if projectconfig['use_sonar']:
+        if projectconfig['add_sonar']:
             self.__install('sonar', projectconfig)
             projectconfig['no_sonar'] = False
             self.__configure_makefile(projectconfig)
