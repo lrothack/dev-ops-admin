@@ -46,7 +46,6 @@ class DevOpsTemplate():
             self.__mkdir('docs')
         # Install 'common' files which are part of every template
         self.__install('common', projectconfig)
-        self.__configure_makefile(projectconfig)
         # Install files from components that are defined in template.json
         logger.debug('  .gitignore file:   %s',
                      not projectconfig['no_gitignore_file'])
@@ -58,8 +57,10 @@ class DevOpsTemplate():
             self.__install('readme', projectconfig)
         logger.debug('  SonarQube support: %s',
                      not projectconfig['no_sonar'])
-        if not projectconfig['no_sonar']:
+        use_sonar = not projectconfig['no_sonar']
+        if use_sonar:
             self.__install('sonar', projectconfig)
+        self.__configure_makefile(use_sonar=use_sonar)
 
     def cookiecutter(self, projectconfig):
         pass
@@ -85,11 +86,10 @@ class DevOpsTemplate():
         if projectconfig['add_readme_file']:
             self.__install('readme', projectconfig)
         logger.debug('  SonarQube support: %s',
-                     projectconfig['use_sonar'])
+                     projectconfig['add_sonar'])
         if projectconfig['add_sonar']:
             self.__install('sonar', projectconfig)
-            projectconfig['no_sonar'] = False
-            self.__configure_makefile(projectconfig)
+            self.__configure_makefile(use_sonar=True)
 
     def __install(self, template_component, context):
         """Copy and render files for a template component
@@ -163,11 +163,9 @@ class DevOpsTemplate():
                 template.stream(**context).dump(project_fh)
         logger.info('template:%s  ->  project:%s', pkg_fname, project_fpath)
 
-    def __configure_makefile(self, projectconfig):
+    def __configure_makefile(self, use_sonar):
         var_value_dict = {}
-        no_sonar = projectconfig['no_sonar']
-        if no_sonar:
-            var_value_dict['DOCKERSONAR'] = 'False'
+        var_value_dict['DOCKERSONAR'] = 'True' if use_sonar else 'False'
         # Load installed Makefile
         with open(os.path.join(self.__projectdir, 'Makefile'), 'r+') as fh:
             mktemplate = MakefileTemplate(fh)
