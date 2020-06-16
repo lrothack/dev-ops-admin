@@ -48,8 +48,7 @@ def create(args):
                 'add_docs_dir',
                 'no_gitignore_file',
                 'no_readme_file',
-                'no_sonar',
-                'no_docker']
+                'no_sonar']
     # Set project name
     args_dict['project_name'] = args.projectname
     # Define project package name
