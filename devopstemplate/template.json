@@ -13,6 +13,9 @@
     "git": [
         ".gitignore"
     ],
+    "readme": [
+        "README.md"
+    ],
     "docker": [
         ".dockerignore",
         "Dockerfile",
