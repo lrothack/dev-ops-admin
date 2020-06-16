@@ -65,7 +65,31 @@ class DevOpsTemplate():
         pass
 
     def manage(self, projectconfig):
-        pass
+        logger = logging.getLogger('DevOpsTemplate.manage')
+        # Create empty directories for now. Could be replaced with files
+        # defined in template.json in future.
+        logger.debug('  scripts directory: %s',
+                     projectconfig['add_scripts_dir'])
+        if projectconfig['add_scripts_dir']:
+            self.__mkdir('scripts')
+        logger.debug('  docs directory:    %s',
+                     projectconfig['add_docs_dir'])
+        if projectconfig['add_docs_dir']:
+            self.__mkdir('docs')
+        logger.debug('  .gitignore file:   %s',
+                     projectconfig['add_gitignore_file'])
+        if projectconfig['add_gitignore_file']:
+            self.__install('git', projectconfig)
+        logger.debug('  README.md file:    %s',
+                     projectconfig['add_readme_file'])
+        if projectconfig['add_readme_file']:
+            self.__install('readme', projectconfig)
+        logger.debug('  SonarQube support: %s',
+                     projectconfig['use_sonar'])
+        if projectconfig['use_sonar']:
+            self.__install('sonar', projectconfig)
+            projectconfig['no_sonar'] = False
+            self.__configure_makefile(projectconfig)
 
     def __install(self, template_component, context):
         """Copy and render files for a template component

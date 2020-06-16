@@ -190,7 +190,7 @@ def parse_args(args_list):
                                help='Add .gitignore file')
     manage_parser.add_argument('--add-readme-file', action='store_true',
                                help='Add README.md file')
-    manage_parser.add_argument('--add-sonar', action='store_true',
+    manage_parser.add_argument('--use-sonar', action='store_true',
                                help='Add SonarQube support')
     # If the manage subparser has been activated by the 'manage' command,
     # override the func attribute with a pointer to the 'manage' function
