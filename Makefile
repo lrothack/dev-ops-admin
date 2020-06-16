@@ -156,7 +156,7 @@ install-dev: $(SETUPTOOLSFILES)
 ## test:         Run Python unit tests with pytest and analyse coverage
 test:
 	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) $(TESTS)
-	$(COVERAGE) report -m --omit="*{{*}}*"
+	$(COVERAGE) report -m --omit="*/template/*"
 
 ## lint:         Run Python linter (bandit, pylint) and print output to terminal
 lint:
@@ -181,7 +181,7 @@ sonar: $(SETUPTOOLSFILES)
 	-$(BANDIT) -r $(PACKAGE)
 	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
 	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) --junit-xml=$(PYTESTREP) -o junit_family=xunit2 $(TESTS)
-	$(COVERAGE) xml -o $(COVERAGEREP) --omit="*{{*}}*"
+	$(COVERAGE) xml -o $(COVERAGEREP) --omit="*/template/*"
 	$(SONARSCANNER) -Dsonar.host.url=http://$(SONARHOST):$(SONARPORT) \
               -Dsonar.projectKey=$(NAME) \
               -Dsonar.projectVersion=$(VERSION) \
