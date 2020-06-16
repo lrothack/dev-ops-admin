@@ -175,8 +175,6 @@ def parse_args(args_list):
                                help='Do not add README.md file')
     create_cmpnts.add_argument('--no-sonar', action='store_true',
                                help='Do not add SonarQube support')
-    create_cmpnts.add_argument('--no-docker', action='store_true',
-                               help='Do not add Docker support')
     # If the create subparser has been activated by the 'create' command,
     # override the func attribute with a pointer to the 'create' function
     # (defined above) --> overrides default defined for the main parser.
@@ -195,8 +193,6 @@ def parse_args(args_list):
                                help='Add README.md file')
     manage_parser.add_argument('--add-sonar', action='store_true',
                                help='Add SonarQube support')
-    manage_parser.add_argument('--add-docker', action='store_true',
-                               help='Add Docker support')
     # If the manage subparser has been activated by the 'manage' command,
     # override the func attribute with a pointer to the 'manage' function
     # (defined above) --> overrides default defined for the main parser.
@@ -239,8 +235,6 @@ def parse_args(args_list):
                            help='Do not add README.md file')
     cc_cmpnts.add_argument('--no-sonar', action='store_true',
                            help='Do not add SonarQube support')
-    cc_cmpnts.add_argument('--no-docker', action='store_true',
-                           help='Do not add Docker support')
     # If the cookiecutter subparser has been activated by the 'cookiecutter'
     # command, override the func attribute with a pointer to the 'cookiecutter'
     # function (defined above) --> overrides default for the main parser.
