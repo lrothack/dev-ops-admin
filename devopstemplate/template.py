@@ -8,8 +8,8 @@ import logging
 import json
 from jinja2 import Environment, PackageLoader, select_autoescape
 from jinja2 import Template
-# import devopstemplate
 import devopstemplate.pkg as pkg
+from devopstemplate.makefile import MakefileTemplate
 
 
 class DevOpsTemplate():
@@ -34,28 +34,54 @@ class DevOpsTemplate():
         logger = logging.getLogger('DevOpsTemplate.create')
         logger.info('Create project from template')
         logger.info('Project name: %s', projectconfig['project_name'])
+        # Create empty directories for now. Could be replaced with files
+        # defined in template.json in future.
         logger.debug('  scripts directory: %s',
                      projectconfig['add_scripts_dir'])
+        if projectconfig['add_scripts_dir']:
+            self.__mkdir('scripts')
         logger.debug('  docs directory:    %s',
                      projectconfig['add_docs_dir'])
+        if projectconfig['add_docs_dir']:
+            self.__mkdir('docs')
+        # Install 'common' files which are part of every template
+        self.__install('common', projectconfig)
+        self.__configure_makefile(projectconfig)
+        # Install files from components that are defined in template.json
         logger.debug('  .gitignore file:   %s',
                      not projectconfig['no_gitignore_file'])
+        if not projectconfig['no_gitignore_file']:
+            self.__install('git', projectconfig)
         logger.debug('  README.md file:    %s',
                      not projectconfig['no_readme_file'])
+        if not projectconfig['no_readme_file']:
+            self.__install('readme', projectconfig)
         logger.debug('  SonarQube support: %s',
                      not projectconfig['no_sonar'])
-        logger.debug('  Docker support:    %s',
-                     not projectconfig['no_docker'])
+        if not projectconfig['no_sonar']:
+            self.__install('sonar', projectconfig)
 
-        # Install 'common' files
-        common_file_list = self.__template_dict['common']
-        for template_fpath in common_file_list:
-            project_fpath = Template(template_fpath).render(**projectconfig)
-            self.__render(template_fpath, project_fpath, projectconfig)
-
-    def manage(self, add_gitignore, add_readme, add_scripts,
-               add_docs, add_sonar, add_docker):
+    def cookiecutter(self, projectconfig):
         pass
+
+    def manage(self, projectconfig):
+        pass
+
+    def __install(self, template_component, context):
+        """Copy and render files for a template component
+        Components, i.e., file to install, are defined in 'template.json' which
+        is represented by __template_dict.
+
+        Params:
+            template_component: String specifying the component to install.
+            context: Dictionary with the context for rendering Jinja2
+                templates.
+        """
+        file_list = self.__template_dict[template_component]
+        for template_fpath in file_list:
+            # Render file path (paths can contain template variables)
+            project_fpath = Template(template_fpath).render(**context)
+            self.__render(template_fpath, project_fpath, context)
 
     def __mkdir(self, project_dname):
         """Create a directory within the project if not present
@@ -111,28 +137,17 @@ class DevOpsTemplate():
             template = self.__env.get_template(pkg_fname)
             with open(project_fpath, 'w') as project_fh:
                 template.stream(**context).dump(project_fh)
-        logger.debug('template:%s  ->  project:%s', pkg_fname, project_fpath)
+        logger.info('template:%s  ->  project:%s', pkg_fname, project_fpath)
 
-    def __render_file(self):
-        pass
-
-    def __render_string(self, contents):
-        return Template(contents)
-
-    def __add_gitignore(self):
-        pass
-
-    def __add_readme(self):
-        pass
-
-    def __add_scripts(self):
-        pass
-
-    def __add_docs(self):
-        pass
-
-    def __add_sonar(self):
-        pass
-
-    def __add_docker(self):
-        pass
+    def __configure_makefile(self, projectconfig):
+        var_value_dict = {}
+        no_sonar = projectconfig['no_sonar']
+        if no_sonar:
+            var_value_dict['DOCKERSONAR'] = 'False'
+        # Load installed Makefile
+        with open(os.path.join(self.__projectdir, 'Makefile'), 'r+') as fh:
+            mktemplate = MakefileTemplate(fh)
+            fh.seek(0)
+            mktemplate.write(fh,
+                             var_value_dict=var_value_dict)
+            fh.truncate()
