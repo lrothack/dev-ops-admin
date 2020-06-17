@@ -114,8 +114,7 @@ class TestDevOpsTemplate(unittest.TestCase):
                          'add_docs_dir': True,
                          'no_gitignore_file': False,
                          'no_readme_file': False,
-                         'no_sonar': False,
-                         'no_docker': False}
+                         'no_sonar': False}
         # Generate reference data
         project_file_list = []
         with pkg.stream('template.json') as fh:
@@ -147,6 +146,12 @@ class Jinja2RenderTest(unittest.TestCase):
         context = {'project_slug': 'projectname', 'project_name': 'Name'}
         text = Template('{{project_slug}}/__init__.py').render(**context)
         self.assertEqual(text, 'projectname/__init__.py')
+
+    def test_render_cc_templatevar(self):
+        context = {'project_slug': '{{cookiecutter.project_name}}',
+                   'project_name': 'Name'}
+        text = Template('{{project_slug}}/__init__.py').render(**context)
+        self.assertEqual(text, '{{cookiecutter.project_name}}/__init__.py')
 
 
 if __name__ == "__main__":
