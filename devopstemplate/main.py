@@ -9,6 +9,7 @@ import argparse
 import subprocess
 import shutil
 import devopstemplate
+from devopstemplate.config import ProjectConfig
 from devopstemplate.template import DevOpsTemplate
 
 
@@ -32,47 +33,13 @@ def create(args):
         args: argparse.Namespace object with argument parser attributes
     """
 
-    template = DevOpsTemplate(projectdirectory=args.project_dir,
-                              overwrite_exists=args.overwrite_exists,
-                              skip_exists=args.skip_exists,
-                              dry_run=args.dry_run)
-    args_dict = vars(args)
-    key_list = ['project_name',
-                'project_slug',
-                'project_version',
-                'project_url',
-                'project_description',
-                'author_name',
-                'author_email',
-                'add_scripts_dir',
-                'add_docs_dir',
-                'no_gitignore_file',
-                'no_readme_file',
-                'no_sonar']
-    # Set project name
-    args_dict['project_name'] = args.projectname
-    # Define project package name
-    project_slug = args.projectname
-    project_slug = project_slug.replace(' ', '_').replace('-', '_')
-    args_dict['project_slug'] = project_slug
+    config = ProjectConfig(args)
+    template = DevOpsTemplate(projectdirectory=config.project_dir,
+                              overwrite_exists=config.overwrite_exists,
+                              skip_exists=config.skip_exists,
+                              dry_run=config.dry_run)
 
-    # Define configurate dict for creating project
-    params = {key: args_dict[key] for key in key_list}
-
-    # Override values in interactive mode
-    if args.interactive:
-        for key in key_list:
-            value = params[key]
-            key_disp = key.replace('_', '-')
-            if isinstance(value, bool):
-                value = 'y' if value else 'n'
-                value_user = input(f'{key_disp} [ {value} ] : ')
-                value_user = True if value_user == 'y' else False
-            else:
-                value_user = input(f'{key_disp} [ "{value}" ] : ')
-                value_user = value if value_user == '' else value_user
-            params[key] = value_user
-
+    params = config.create()
     template.create(projectconfig=params)
 
 
@@ -82,7 +49,14 @@ def manage(args):
     Params:
         args: argparse.Namespace object with argument parser attributes
     """
-    pass
+    config = ProjectConfig(args)
+    template = DevOpsTemplate(projectdirectory=config.project_dir,
+                              overwrite_exists=config.overwrite_exists,
+                              skip_exists=config.skip_exists,
+                              dry_run=config.dry_run)
+
+    params = config.manage()
+    template.manage(projectconfig=params)
 
 
 def cookiecutter(args):
@@ -223,17 +197,6 @@ def parse_args(args_list):
     cc_prms.add_argument('--author-email',
                          default='',
                          help=('default ""'))
-    cc_cmpnts = cc_parser.add_argument_group('project components')
-    cc_cmpnts.add_argument('--add-scripts-dir', action='store_true',
-                           help='Add scripts directory')
-    cc_cmpnts.add_argument('--add-docs-dir', action='store_true',
-                           help='Add docs directory')
-    cc_cmpnts.add_argument('--no-gitignore-file', action='store_true',
-                           help='Do not add .gitignore file')
-    cc_cmpnts.add_argument('--no-readme-file', action='store_true',
-                           help='Do not add README.md file')
-    cc_cmpnts.add_argument('--no-sonar', action='store_true',
-                           help='Do not add SonarQube support')
     # If the cookiecutter subparser has been activated by the 'cookiecutter'
     # command, override the func attribute with a pointer to the 'cookiecutter'
     # function (defined above) --> overrides default for the main parser.
