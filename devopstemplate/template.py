@@ -99,7 +99,8 @@ class DevOpsTemplate():
 
     def cookiecutter(self, projectconfig):
         """Create a new cookiecutter template from the DevOps template given
-        config options.
+        config options. Config options only affect the default values for the
+        cookiecutter template, which are provided in cookiecutter.json
 
         Generates components which are defined in template.json
 
@@ -119,7 +120,7 @@ class DevOpsTemplate():
             self.__check_project_file(cookiecutter_json_fpath)
             if not self.__dry_run:
                 with open(cookiecutter_json_fpath, 'w') as fh:
-                    json.dump(projectconfig, fh)
+                    json.dump(projectconfig, fh, indent=2)
             logger.info('project:%s', cookiecutter_json_fpath)
         except SkipFileError:
             logger.warning('File %s exists, skipping', cookiecutter_json_fpath)
