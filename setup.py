@@ -48,6 +48,7 @@ with open('README.md', 'r') as fh:
 # change.
 setup(name='devopstemplate',
       version=version,
+      python_requires='>= 3.6',
       # Import package
       packages=['devopstemplate'],
       # Installation dependencies
@@ -92,6 +93,7 @@ setup(name='devopstemplate',
       license='MIT',
       classifiers=['Intended Audience :: Developers',
                    'License :: OSI Approved :: MIT License',
+                   'Programming Language :: Python :: 3.6'
                    'Programming Language :: Python :: 3.7'
                    'Programming Language :: Python :: 3.8'
                    'Environment :: Console',
