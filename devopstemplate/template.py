@@ -31,7 +31,7 @@ class DevOpsTemplate():
             skip_exists: boolean specifying if existing files should be
                 skipped/ignores. An error is raised otherwise.
             dry_run: boolean specifying whether to not perform any actions in
-                order to see (in the log) what would have happend. 
+                order to see (in the log) what would have happend.
         """
         self.__projectdir = projectdirectory
         self.__overwrite = overwrite_exists
