@@ -125,17 +125,14 @@ class DevOpsTemplate():
         except SkipFileError:
             logger.warning('File %s exists, skipping', cookiecutter_json_fpath)
 
-        # Generate cookiecutter README.md
+        # Only generate cookiecutter README.md if not present already
         readme_fpath = os.path.join(self.__projectdir, 'README.md')
-        try:
-            self.__check_project_file(readme_fpath)
+        if not os.path.exists(readme_fpath):
             if not self.__dry_run:
                 with open(readme_fpath, 'w') as fh:
-                    readme_content_list = ['# Cookiecutter Template']
+                    readme_content_list = ['# Cookiecutter PyDevops']
                     fh.writelines(readme_content_list)
             logger.info('project:%s', readme_fpath)
-        except SkipFileError:
-            logger.warning('File %s exists, skipping', readme_fpath)
 
         # Generate hooks directory with pre/post generation scripts if required
         # (might be useful in future)
