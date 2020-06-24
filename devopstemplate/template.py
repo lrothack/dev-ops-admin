@@ -1,6 +1,6 @@
 """Create new projects from template and administer existing projects
-    - defines which files will be installed for specific user requests
-    - defines how files will be installed according to user requests
+    - defines which components/files will be installed for user requests
+    - defines how components/files will be installed according to user requests
 """
 import os
 import logging
@@ -12,9 +12,27 @@ from devopstemplate.makefile import MakefileTemplate
 
 
 class DevOpsTemplate():
+    """Create and modify instances of the DevOps template:
+
+    create: new instance of the template
+    manage: modify an existing instance of the template
+    cookiecutter: generate cookiecutter template from the devops template
+    """
 
     def __init__(self, projectdirectory='.',
                  overwrite_exists=False, skip_exists=False, dry_run=False):
+        """Provide configurations that are common to all DevOpsTemplate actions
+
+        Params:
+            projectdirectory: string with a (relative) path to the directory
+                that contains the instance of the template.
+            overwrite_exists: boolean specifying if existing files should be
+                overwritten. An error is raised otherwise.
+            skip_exists: boolean specifying if existing files should be
+                skipped/ignores. An error is raised otherwise.
+            dry_run: boolean specifying whether to not perform any actions in
+                order to see (in the log) what would have happend. 
+        """
         self.__projectdir = projectdirectory
         self.__overwrite = overwrite_exists
         self.__skip = skip_exists
