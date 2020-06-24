@@ -14,6 +14,14 @@ from devopstemplate.template import DevOpsTemplate
 
 
 def git_user():
+    """Obtain git user name and email from git config.
+
+    The function expects that the command 'git' is found on the PATH.
+
+    Returns:
+        name: string with git user name, empty string if no 'git' command
+        email: string with git user email, empty string if no 'git' command
+    """
     name = ''
     email = ''
     if shutil.which('git'):
@@ -65,7 +73,14 @@ def cookiecutter(args):
     Params:
         args: argparse.Namespace object with argument parser attributes
     """
-    pass
+    config = ProjectConfig(args)
+    template = DevOpsTemplate(projectdirectory=config.project_dir,
+                              overwrite_exists=config.overwrite_exists,
+                              skip_exists=config.skip_exists,
+                              dry_run=config.dry_run)
+
+    params = config.cookiecutter()
+    template.cookiecutter(projectconfig=params)
 
 
 def parse_args(args_list):
