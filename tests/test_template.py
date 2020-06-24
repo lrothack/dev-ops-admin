@@ -121,14 +121,53 @@ class TestDevOpsTemplate(unittest.TestCase):
             template_dict = json.load(fh)
             for fpath in itertools.chain(*template_dict.values()):
                 # Render path
-                fpath_template = Template('{{project_slug}}/__init__.py')
-                fpath = fpath_template.render(**projectconfig)
-                project_file_list.append(fpath)
+                fpath_template = Template(fpath)
+                fpath_rendered = fpath_template.render(**projectconfig)
+                project_file_list.append(fpath_rendered)
 
         # Create test project
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             template.create(projectconfig)
+            # Make sure all files exist
+            for fpath in project_file_list:
+                fpath = os.path.join(tmpdirname, fpath)
+                print(f'checking {fpath}')
+                self.assertTrue(os.path.exists(fpath))
+            # Check additional dirs
+            self.assertTrue(os.path.exists(os.path.join(tmpdirname,
+                                                        'scripts')))
+            self.assertTrue(os.path.exists(os.path.join(tmpdirname,
+                                                        'docs')))
+
+    def test_manage(self):
+
+        # Define test project
+        projectconfig = {'project_description': '',
+                         'add_scripts_dir': True,
+                         'add_docs_dir': True,
+                         'add_gitignore_file': True,
+                         'add_readme_file': True,
+                         'add_sonar': True}
+        # Generate reference data
+        project_file_list = []
+        with pkg.stream('template.json') as fh:
+            template_dict = json.load(fh)
+            template_components = ['git', 'readme', 'sonar']
+            for fpath in itertools.chain(*(template_dict[comp]
+                                           for comp in template_components)):
+                # Render path
+                fpath_template = Template(fpath)
+                fpath_rendered = fpath_template.render(**projectconfig)
+                project_file_list.append(fpath_rendered)
+
+        # Create test project
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            template = DevOpsTemplate(projectdirectory=tmpdirname)
+            # Create 'make' component which is required to test 'manage'
+            template._DevOpsTemplate__install('make', projectconfig)
+            # Run 'manage'
+            template.manage(projectconfig)
             # Make sure all files exist
             for fpath in project_file_list:
                 fpath = os.path.join(tmpdirname, fpath)

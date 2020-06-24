@@ -1,25 +1,31 @@
 {
-    "common": [
+    "src": [
         "{{project_slug}}/__init__.py",
         "{{project_slug}}/log.py",
-        "{{project_slug}}/main.py",
+        "{{project_slug}}/main.py"
+    ],
+    "tests": [
         "tests/__init__.py",
-        "tests/test_{{project_slug}}.py",
-        "Makefile",
+        "tests/test_{{project_slug}}.py"
+    ],
+    "make": [
+        "Makefile"
+    ],
+    "setuptools": [
         "MANIFEST.in",
         "setup.py",
         "requirements.txt"
+    ],
+    "docker": [
+        ".dockerignore",
+        "Dockerfile",
+        "entrypoint.sh"
     ],
     "git": [
         ".gitignore"
     ],
     "readme": [
         "README.md"
-    ],
-    "docker": [
-        ".dockerignore",
-        "Dockerfile",
-        "entrypoint.sh"
     ],
     "sonar": [
         "sonarqube/README.md",

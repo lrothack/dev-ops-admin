@@ -29,8 +29,9 @@ class DevOpsTemplate():
         self.__mkdir(projectdirectory)
 
     def create(self, projectconfig):
-        """Create a new project from the DevOps template given configuration
-        options.
+        """Create a new project from the DevOps template given config options.
+
+        Installs components which are defined in template.json
 
         Params:
             projectconfig: Dictionary with configuration flags supported by the
@@ -49,9 +50,14 @@ class DevOpsTemplate():
                      projectconfig['add_docs_dir'])
         if projectconfig['add_docs_dir']:
             self.__mkdir('docs')
-        # Install 'common' files which are part of every template
-        self.__install('common', projectconfig)
-        # Install files from components that are defined in template.json
+        # Install files from components which are part of every template
+        self.__install('src', projectconfig)
+        self.__install('tests', projectconfig)
+        self.__install('make', projectconfig)
+        self.__install('setuptools', projectconfig)
+        self.__install('docker', projectconfig)
+        # Install files from components according to config options provided
+        # by user
         logger.debug('  .gitignore file:   %s',
                      not projectconfig['no_gitignore_file'])
         if not projectconfig['no_gitignore_file']:
