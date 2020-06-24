@@ -132,7 +132,6 @@ class TestDevOpsTemplate(unittest.TestCase):
             # Make sure all files exist
             for fpath in project_file_list:
                 fpath = os.path.join(tmpdirname, fpath)
-                print(f'checking {fpath}')
                 self.assertTrue(os.path.exists(fpath))
             # Check additional dirs
             self.assertTrue(os.path.exists(os.path.join(tmpdirname,
@@ -177,6 +176,72 @@ class TestDevOpsTemplate(unittest.TestCase):
                                                         'scripts')))
             self.assertTrue(os.path.exists(os.path.join(tmpdirname,
                                                         'docs')))
+
+    def test_cookiecutter(self):
+
+        # Define test project
+        project_slug = ''.join(["{{ ",
+                                "cookiecutter.project_name.lower()",
+                                ".replace(' ', '_')",
+                                ".replace('-', '_')",
+                                " }}"])
+        projectconfig = {'project_name': '',
+                         'project_slug': project_slug,
+                         'project_version': '0.1.0',
+                         'project_url': '',
+                         'project_description': '',
+                         'author_name': 'full name',
+                         'author_email': 'full.name@mail.com'}
+        # Generate reference data
+        cookiecutterconfig = {key: '{{cookiecutter.%s}}' % key
+                              for key in projectconfig.keys()}
+        project_file_list = []
+        with pkg.stream('template.json') as fh:
+            template_dict = json.load(fh)
+            for fpath in itertools.chain(*template_dict.values()):
+                # Render path
+                fpath_template = Template(fpath)
+                fpath_rendered = fpath_template.render(**cookiecutterconfig)
+                project_file_list.append(fpath_rendered)
+
+        # Create test cookiecutter template
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            template = DevOpsTemplate(projectdirectory=tmpdirname)
+            template.cookiecutter(projectconfig)
+            # Make sure all files exist
+            projectdirname = os.path.join(tmpdirname,
+                                          '{{cookiecutter.project_slug}}')
+            for fpath in project_file_list:
+                fpath = os.path.join(projectdirname, fpath)
+                self.assertTrue(os.path.exists(fpath))
+
+            # Check template __init__.py
+            pkgdirname = os.path.join(projectdirname,
+                                      '{{cookiecutter.project_slug}}')
+            init_fpath = os.path.join(pkgdirname, '__init__.py')
+            with open(init_fpath, 'r') as fh:
+                init_contents = fh.read()
+            tests_dpath = os.path.dirname(__file__)
+            init_ref_fpath = os.path.join(tests_dpath, 'template_init.ref')
+            with open(init_ref_fpath, 'r') as fh:
+                init_ref_contents = fh.read()
+            self.assertEqual(init_contents, init_ref_contents)
+
+            # Check cookiecutter files
+            cookiecutter_json_fpath = os.path.join(tmpdirname,
+                                                   'cookiecutter.json')
+            self.assertTrue(os.path.exists(cookiecutter_json_fpath))
+            with open(cookiecutter_json_fpath, 'r') as fh:
+                cookiecutter_json = json.load(fh)
+                self.assertEqual(cookiecutter_json, projectconfig)
+
+            self.assertTrue(os.path.exists(os.path.join(tmpdirname,
+                                                        'README.md')))
+
+            # Check that the DevOps template project directory is the unittest
+            # tmp directory
+            self.assertEqual(template._DevOpsTemplate__projectdir,
+                             tmpdirname)
 
 
 class Jinja2RenderTest(unittest.TestCase):

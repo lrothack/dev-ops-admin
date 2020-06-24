@@ -11,6 +11,12 @@ import devopstemplate.pkg as pkg
 from devopstemplate.makefile import MakefileTemplate
 
 
+class SkipFileError(FileExistsError):
+    """Will be raised if a file that is to be created already exists and should
+    be skipped according to user flags.
+    """
+
+
 class DevOpsTemplate():
     """Create and modify instances of the DevOps template:
 
@@ -92,7 +98,73 @@ class DevOpsTemplate():
         self.__configure_makefile(use_sonar=use_sonar)
 
     def cookiecutter(self, projectconfig):
-        pass
+        """Create a new cookiecutter template from the DevOps template given
+        config options.
+
+        Generates components which are defined in template.json
+
+        Params:
+            projectconfig: Dictionary with configuration flags supported by the
+                template (flags are defined in ProjectConfig.cookiecutter and
+                can be modified based on command-line args, see
+                main.cookiecutter)
+        """
+        logger = logging.getLogger('DevOpsTemplate.cookiecutter')
+        logger.info('Generate cookiecutter template')
+        # Generate cookiecutter.json
+        # configuration is provided by the projectconfig dictionary
+        cookiecutter_json_fpath = os.path.join(self.__projectdir,
+                                               'cookiecutter.json')
+        try:
+            self.__check_project_file(cookiecutter_json_fpath)
+            if not self.__dry_run:
+                with open(cookiecutter_json_fpath, 'w') as fh:
+                    json.dump(projectconfig, fh)
+            logger.info('project:%s', cookiecutter_json_fpath)
+        except SkipFileError:
+            logger.warning('File %s exists, skipping', cookiecutter_json_fpath)
+
+        # Generate cookiecutter README.md
+        readme_fpath = os.path.join(self.__projectdir, 'README.md')
+        try:
+            self.__check_project_file(readme_fpath)
+            if not self.__dry_run:
+                with open(readme_fpath, 'w') as fh:
+                    readme_content_list = ['# Cookiecutter Template']
+                    fh.writelines(readme_content_list)
+            logger.info('project:%s', readme_fpath)
+        except SkipFileError:
+            logger.warning('File %s exists, skipping', readme_fpath)
+
+        # Generate hooks directory with pre/post generation scripts if required
+        # (might be useful in future)
+        #
+        # Generate project template
+        cookiecutter_project_dname = '{{cookiecutter.project_slug}}/'
+        self.__mkdir(cookiecutter_project_dname)
+        # Adjust projectdirectory such that __install installs to the correct
+        # directory (projectdirectory represents cookiecutter template root)
+        cookiecutter_rootdir = self.__projectdir
+        self.__projectdir = os.path.join(self.__projectdir,
+                                         cookiecutter_project_dname)
+        # Generate cookiecutterconfig for rendering cookiecutter template
+        # variables
+        cookiecutterconfig = {key: '{{cookiecutter.%s}}' % key
+                              for key in projectconfig.keys()}
+        # Install all template components
+        components = ['src',
+                      'tests',
+                      'make',
+                      'setuptools',
+                      'git',
+                      'readme',
+                      'docker',
+                      'sonar']
+        for comp in components:
+            self.__install(comp, cookiecutterconfig)
+
+        # Revert project directory to cookiecutter root directory
+        self.__projectdir = cookiecutter_rootdir
 
     def manage(self, projectconfig):
         """Add functionality/components to an existing project that has been
@@ -178,13 +250,11 @@ class DevOpsTemplate():
             raise FileNotFoundError(f'File {pkg_fpath} not available in '
                                     'distribution package')
         project_fpath = os.path.join(self.__projectdir, project_fname)
-        if os.path.exists(project_fpath) and self.__skip:
+        try:
+            self.__check_project_file(project_fpath)
+        except SkipFileError:
             logger.warning('File %s exists, skipping', project_fpath)
             return
-        if os.path.exists(project_fpath) and not self.__overwrite:
-            raise FileExistsError(f'File {project_fpath} already exists, exit.'
-                                  ' (use --skip-exists or --overwrite-exists'
-                                  ' to control behavior)')
         if not self.__dry_run:
             # Create parent directories if not present
             parent_dname = os.path.dirname(project_fpath)
@@ -198,6 +268,28 @@ class DevOpsTemplate():
             with open(project_fpath, 'w') as project_fh:
                 template.stream(**context).dump(project_fh)
         logger.info('template:%s  ->  project:%s', pkg_fname, project_fpath)
+
+    def __check_project_file(self, project_fpath):
+        """Check whether the given file can be created in the project without
+        conflict. A conflict arises if the file exists and should not be
+        skipped or overwritten.
+
+        Params:
+            project_fpath: String specifying the path to the file in the
+                project.
+        Returns: True if the file can be created without conflict.
+        Raises:
+            SkipFileError: if the creation of the new file should be skipped.
+            FileExistsError: if the file that should be created already exists
+                and should not be overwritten.
+        """
+        if os.path.exists(project_fpath) and self.__skip:
+            raise SkipFileError(f'File {project_fpath} already exists, skip.')
+        if os.path.exists(project_fpath) and not self.__overwrite:
+            raise FileExistsError(f'File {project_fpath} already exists, exit.'
+                                  ' (use --skip-exists or --overwrite-exists'
+                                  ' to control behavior)')
+        return True
 
     def __configure_makefile(self, use_sonar):
         """Re-writes Makefile with configuration options:
