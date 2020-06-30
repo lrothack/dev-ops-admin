@@ -1,0 +1,98 @@
+{
+    "create": {
+        "template": [
+            "src",
+            "tests",
+            "make",
+            "setuptools",
+            "docker"
+        ],
+        "parameters": [
+            {
+                "name": "projectname",
+                "default": null,
+                "positional": true,
+                "help": "Name of the Python package / top-level import directory"
+            },
+            {
+                "name": "project-version",
+                "default": "0.1.0",
+                "positional": false,
+                "help": "default: \"0.1.0\""
+            },
+            {
+                "name": "project-url",
+                "default": "",
+                "positional": false,
+                "help": "default: \"\""
+            },
+            {
+                "name": "project-description",
+                "default": "",
+                "positional": false,
+                "help": "default: \"\""
+            },
+            {
+                "name": "author-name",
+                "default": "{{git.config.name}}",
+                "positional": false,
+                "help": "default (from git): \"{{git.config.name}}\""
+            },
+            {
+                "name": "author-email",
+                "default": "{{git.config.email}}",
+                "positional": false,
+                "help": "default (from git): \"{{git.config.email}}\""
+            }
+        ],
+        "components": [
+            {
+                "name": "add-scripts-dir",
+                "default": false,
+                "positional": false,
+                "help": "Add scripts directory",
+                "template": [
+                    "scripts"
+                ]
+            },
+            {
+                "name": "add-docs-dir",
+                "default": false,
+                "positional": false,
+                "help": "Add docs directory",
+                "template": [
+                    "docs"
+                ]
+            },
+            {
+                "name": "no-gitignore-file",
+                "default": true,
+                "positional": false,
+                "help": "Do not add .gitignore file",
+                "template": [
+                    "git"
+                ]
+            },
+            {
+                "name": "no-readme-file",
+                "default": true,
+                "positional": false,
+                "help": "Do not add README.md file",
+                "template": [
+                    "readme"
+                ]
+            },
+            {
+                "name": "no-sonar",
+                "default": true,
+                "positional": false,
+                "help": "Do not add SonarQube support",
+                "template": [
+                    "sonar"
+                ]
+            }
+        ]
+    },
+    "manage": {},
+    "cookiecutter": {}
+}
