@@ -30,5 +30,11 @@
     "sonar": [
         "sonarqube/README.md",
         "sonarqube/docker-compose.yml"
+    ],
+    "docs": [
+        "docs/"
+    ],
+    "scripts": [
+        "scripts/"
     ]
 }
