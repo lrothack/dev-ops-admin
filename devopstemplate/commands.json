@@ -9,65 +9,35 @@
         ],
         "parameters": [
             {
-                "name": "projectname",
-                "default": null,
-                "positional": true,
-                "help": "Name of the Python package / top-level import directory"
-            },
-            {
                 "name": "project-version",
                 "default": "0.1.0",
-                "positional": false,
                 "help": "default: \"0.1.0\""
             },
             {
                 "name": "project-url",
                 "default": "",
-                "positional": false,
                 "help": "default: \"\""
             },
             {
                 "name": "project-description",
                 "default": "",
-                "positional": false,
                 "help": "default: \"\""
             },
             {
                 "name": "author-name",
-                "default": "{{git.config.name}}",
-                "positional": false,
-                "help": "default (from git): \"{{git.config.name}}\""
+                "default": "{{git_name}}",
+                "help": "default (from git): \"{{git_name}}\""
             },
             {
                 "name": "author-email",
-                "default": "{{git.config.email}}",
-                "positional": false,
-                "help": "default (from git): \"{{git.config.email}}\""
+                "default": "{{git_email}}",
+                "help": "default (from git): \"{{git_email}}\""
             }
         ],
         "components": [
             {
-                "name": "add-scripts-dir",
-                "default": false,
-                "positional": false,
-                "help": "Add scripts directory",
-                "template": [
-                    "scripts"
-                ]
-            },
-            {
-                "name": "add-docs-dir",
-                "default": false,
-                "positional": false,
-                "help": "Add docs directory",
-                "template": [
-                    "docs"
-                ]
-            },
-            {
                 "name": "no-gitignore-file",
-                "default": true,
-                "positional": false,
+                "default": false,
                 "help": "Do not add .gitignore file",
                 "template": [
                     "git"
@@ -75,8 +45,7 @@
             },
             {
                 "name": "no-readme-file",
-                "default": true,
-                "positional": false,
+                "default": false,
                 "help": "Do not add README.md file",
                 "template": [
                     "readme"
@@ -84,8 +53,7 @@
             },
             {
                 "name": "no-sonar",
-                "default": true,
-                "positional": false,
+                "default": false,
                 "help": "Do not add SonarQube support",
                 "template": [
                     "sonar"
@@ -93,6 +61,76 @@
             }
         ]
     },
-    "manage": {},
-    "cookiecutter": {}
+    "manage": {
+        "components": [
+            {
+                "name": "add-gitignore-file",
+                "default": false,
+                "help": "Add .gitignore file",
+                "template": [
+                    "git"
+                ]
+            },
+            {
+                "name": "add-readme-file",
+                "default": false,
+                "help": "Add README.md file",
+                "template": [
+                    "readme"
+                ]
+            },
+            {
+                "name": "add-sonar",
+                "default": false,
+                "help": "Add SonarQube support",
+                "template": [
+                    "sonar"
+                ]
+            }
+        ]
+    },
+    "cookiecutter": {
+        "template": [
+            "src",
+            "tests",
+            "make",
+            "setuptools",
+            "git",
+            "readme",
+            "docker",
+            "sonar"
+        ],
+        "parameters": [
+            {
+                "name": "project-name",
+                "default": "",
+                "help": "default: \"\""
+            },
+            {
+                "name": "project-version",
+                "default": "0.1.0",
+                "help": "default: \"0.1.0\""
+            },
+            {
+                "name": "project-url",
+                "default": "",
+                "help": "default: \"\""
+            },
+            {
+                "name": "project-description",
+                "default": "",
+                "help": "default: \"\""
+            },
+            {
+                "name": "author-name",
+                "default": "",
+                "help": "default: \"\""
+            },
+            {
+                "name": "author-email",
+                "default": "",
+                "help": "default: \"\""
+            }
+        ]
+    }
 }

@@ -8,19 +8,16 @@ class TestMain(unittest.TestCase):
 
     @patch('devopstemplate.main.create')
     def test_parse_create(self, mock_create):
-        arg_list = ['create', 'test']
+        arg_list = ['create']
         devopstemplate.main.parse_args(arg_list)
         args_ns = Namespace()
         args_ns.project_dir = '.'
-        args_ns.projectname = 'test'
         args_ns.project_version = '0.1.0'
         args_ns.project_url = ''
         args_ns.project_description = ''
         user, email = devopstemplate.main.git_user()
         args_ns.author_name = user
         args_ns.author_email = email
-        args_ns.add_scripts_dir = False
-        args_ns.add_docs_dir = False
         args_ns.no_gitignore_file = False
         args_ns.no_readme_file = False
         args_ns.no_sonar = False
@@ -45,8 +42,6 @@ class TestMain(unittest.TestCase):
         devopstemplate.main.parse_args(arg_list)
         args_ns = Namespace()
         args_ns.project_dir = '.'
-        args_ns.add_scripts_dir = False
-        args_ns.add_docs_dir = False
         args_ns.add_gitignore_file = False
         args_ns.add_readme_file = False
         args_ns.add_sonar = False
