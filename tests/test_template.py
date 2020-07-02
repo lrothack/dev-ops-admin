@@ -198,10 +198,6 @@ class TestDevOpsTemplate(unittest.TestCase):
         project_file_list = []
         with pkg.stream('template.json') as fh:
             template_dict = json.load(fh)
-            # Remove 'docs' and 'scripts' components:
-            # empty directories will not be included in cookiecutter
-            del template_dict['docs']
-            del template_dict['scripts']
             for fpath in itertools.chain(*template_dict.values()):
                 # Render path
                 fpath_template = Template(fpath)
