@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from argparse import Namespace
+from devopstemplate.config import CommandsConfig
 import devopstemplate.main
 
 
@@ -17,11 +18,10 @@ class TestMain(unittest.TestCase):
         args_ns.project_version = '0.1.0'
         args_ns.project_url = ''
         args_ns.project_description = ''
-        user, email = devopstemplate.main.git_user()
+        user, email = CommandsConfig.git_user()
         args_ns.author_name = user
         args_ns.author_email = email
         args_ns.no_gitignore_file = False
-        args_ns.no_readme_file = False
         args_ns.no_sonar = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
@@ -48,7 +48,6 @@ class TestMain(unittest.TestCase):
         args_ns = Namespace()
         args_ns.project_dir = '.'
         args_ns.add_gitignore_file = False
-        args_ns.add_readme_file = False
         args_ns.add_sonar = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False

@@ -6,35 +6,9 @@ import sys
 import platform
 import logging
 import argparse
-import subprocess
-import shutil
-import json
-from jinja2 import Template
 import devopstemplate
-import devopstemplate.pkg as pkg
-from devopstemplate.config import ProjectConfig
+from devopstemplate.config import CommandsConfig, ProjectConfig
 from devopstemplate.template import DevOpsTemplate
-
-
-def git_user():
-    """Obtain git user name and email from git config.
-
-    The function expects that the command 'git' is found on the PATH.
-
-    Returns:
-        name: string with git user name, empty string if no 'git' command
-        email: string with git user email, empty string if no 'git' command
-    """
-    name = ''
-    email = ''
-    if shutil.which('git'):
-        name = subprocess.check_output(['git', 'config', 'user.name'],
-                                       stderr=subprocess.STDOUT,
-                                       encoding='utf-8')
-        email = subprocess.check_output(['git', 'config', 'user.email'],
-                                        stderr=subprocess.STDOUT,
-                                        encoding='utf-8')
-    return name.strip(), email.strip()
 
 
 def create(args):
@@ -50,8 +24,8 @@ def create(args):
                               skip_exists=config.skip_exists,
                               dry_run=config.dry_run)
 
-    params = config.create()
-    template.create(projectconfig=params)
+    param_dict, comp_list = config.create()
+    template.create(context=param_dict, components=comp_list)
 
 
 def manage(args):
@@ -66,8 +40,8 @@ def manage(args):
                               skip_exists=config.skip_exists,
                               dry_run=config.dry_run)
 
-    params = config.manage()
-    template.manage(projectconfig=params)
+    param_dict, comp_list = config.manage()
+    template.manage(context=param_dict, components=comp_list)
 
 
 def cookiecutter(args):
@@ -82,8 +56,8 @@ def cookiecutter(args):
                               skip_exists=config.skip_exists,
                               dry_run=config.dry_run)
 
-    params = config.cookiecutter()
-    template.cookiecutter(projectconfig=params)
+    param_dict, comp_list = config.cookiecutter()
+    template.cookiecutter(context=param_dict, components=comp_list)
 
 
 def arg_command_group(parser, group_name, group_argument_list):
@@ -91,11 +65,11 @@ def arg_command_group(parser, group_name, group_argument_list):
 
     Params:
         parser: argparse.ArgumentParser where the argument group will be added.
-        group_name: string with the name of the argument group.
-        group_argument_list: list of dict objects where each dict specifies an
+        group_name: String with the name of the argument group.
+        group_argument_list: List of dict objects where each dict specifies an
             argument.
     Returns:
-        group: the argument group object that has been created for the parser.
+        group: The argument group object that has been created for the parser.
     Raises:
         ValueError: if the group_argument_list is empty
     """
@@ -111,9 +85,11 @@ def arg_command_group(parser, group_name, group_argument_list):
         arg_name = f'--{arg_name}'
         arg_help = arg_dict['help']
         arg_value = arg_dict['default']
-        if isinstance(arg_value, bool) and arg_value:
-            group.add_argument(arg_name, action='store_false', help=arg_help)
-        elif isinstance(arg_value, bool) and not arg_value:
+        if isinstance(arg_value, bool):
+            # Attention: always interpret boolean flag in a positive sense
+            # The arg_value specifies where to add the corresponding template
+            # component by default. The presence of a boolean flag negates the
+            # corresponding boolean action.
             group.add_argument(arg_name, action='store_true', help=arg_help)
         else:
             group.add_argument(arg_name, default=arg_value, help=arg_help)
@@ -133,20 +109,12 @@ def parse_args(args_list):
     with func is executed.
 
     Params:
-        args_list: list of strings with command-line flags (sys.argv[1:])
+        args_list: List of strings with command-line flags (sys.argv[1:])
     """
     logger = logging.getLogger('main.parse_args')
 
-    # Load commands.json that contains definitions for command-line arguments
-    # -> sub-commands, their arguments, defaults and help messages
-    commands_fname = 'commands.json'
-    commands_str = pkg.string(commands_fname)
-    # Define context for substituting default values in the commands file in
-    # order to be substituted with Jinja2
-    # git user and email as default for author data
-    name, email = git_user()
-    context = {'git_name': name, 'git_email': email}
-    commands_dict = json.loads(Template(commands_str).render(**context))
+    # Initiate CommandsConfig in order to obtain command definitions
+    cfg = CommandsConfig()
 
     descr = ''.join(['Create and manage dev-ops template projects. ',
                      'The project name is the name of the project directory. ',
@@ -177,7 +145,6 @@ def parse_args(args_list):
     # Subparser commands for project creation and management
     subparsers = parser.add_subparsers(help='Commands')
 
-    create_commands_dict = commands_dict['create']
     create_parser = subparsers.add_parser('create',
                                           help=('Create a new project based '
                                                 'on the dev-ops template'))
@@ -186,26 +153,24 @@ def parse_args(args_list):
                                      ' interactively'))
 
     arg_command_group(create_parser, 'project parameters',
-                      group_argument_list=create_commands_dict['parameters'])
+                      group_argument_list=cfg.values('create', 'parameters'))
     arg_command_group(create_parser, 'project components',
-                      group_argument_list=create_commands_dict['components'])
+                      group_argument_list=cfg.values('create', 'components'))
     # If the create subparser has been activated by the 'create' command,
     # override the func attribute with a pointer to the 'create' function
     # (defined above) --> overrides default defined for the main parser.
     create_parser.set_defaults(func=create)
 
-    manage_commands_dict = commands_dict['manage']
     manage_parser = subparsers.add_parser('manage',
                                           help=('Add individual components of '
                                                 'the dev-ops template'))
     arg_command_group(manage_parser, 'project components',
-                      group_argument_list=manage_commands_dict['components'])
+                      group_argument_list=cfg.values('manage', 'components'))
     # If the manage subparser has been activated by the 'manage' command,
     # override the func attribute with a pointer to the 'manage' function
     # (defined above) --> overrides default defined for the main parser.
     manage_parser.set_defaults(func=manage)
 
-    cc_commands_dict = commands_dict['cookiecutter']
     cc_parser = subparsers.add_parser('cookiecutter',
                                       help=('Create a cookiecutter'
                                             ' template'))
@@ -213,7 +178,8 @@ def parse_args(args_list):
                            help=('Configure project parameters/components'
                                  ' interactively'))
     arg_command_group(cc_parser, 'project parameters',
-                      group_argument_list=cc_commands_dict['parameters'])
+                      group_argument_list=cfg.values('cookiecutter',
+                                                     'parameters'))
     # If the cookiecutter subparser has been activated by the 'cookiecutter'
     # command, override the func attribute with a pointer to the 'cookiecutter'
     # function (defined above) --> overrides default for the main parser.
