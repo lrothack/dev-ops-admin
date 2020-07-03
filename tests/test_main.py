@@ -8,10 +8,12 @@ class TestMain(unittest.TestCase):
 
     @patch('devopstemplate.main.create')
     def test_parse_create(self, mock_create):
+        # test with default parameters
         arg_list = ['create']
         devopstemplate.main.parse_args(arg_list)
         args_ns = Namespace()
         args_ns.project_dir = '.'
+        args_ns.package_name = None
         args_ns.project_version = '0.1.0'
         args_ns.project_url = ''
         args_ns.project_description = ''
@@ -32,9 +34,12 @@ class TestMain(unittest.TestCase):
 
         mock_create.assert_called_with(args_ns)
 
-        # mock_create.assert_called()
-        # args, _ = mock_create.call_args
-        # self.assertEqual(vars(args[0]), vars(args_ns))
+        # test with package name provided by user
+        arg_list = ['create', '--package-name', 'test']
+        devopstemplate.main.parse_args(arg_list)
+        args_ns.package_name = 'test'
+
+        mock_create.assert_called_with(args_ns)
 
     @patch('devopstemplate.main.manage')
     def test_parse_manage(self, mock_manage):

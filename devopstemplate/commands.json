@@ -9,6 +9,11 @@
         ],
         "parameters": [
             {
+                "name": "package-name",
+                "default": null,
+                "help": "default: slug of the project directory name"
+            },
+            {
                 "name": "project-version",
                 "default": "0.1.0",
                 "help": "default: \"0.1.0\""
@@ -37,7 +42,7 @@
         "components": [
             {
                 "name": "no-gitignore-file",
-                "default": false,
+                "default": true,
                 "help": "Do not add .gitignore file",
                 "template": [
                     "git"
@@ -45,7 +50,7 @@
             },
             {
                 "name": "no-readme-file",
-                "default": false,
+                "default": true,
                 "help": "Do not add README.md file",
                 "template": [
                     "readme"
@@ -53,7 +58,7 @@
             },
             {
                 "name": "no-sonar",
-                "default": false,
+                "default": true,
                 "help": "Do not add SonarQube support",
                 "template": [
                     "sonar"
