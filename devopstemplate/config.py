@@ -190,15 +190,20 @@ class ProjectConfig():
             comp_list: List of template components that will be installed
                 according to template.json
         """
+        # Set default for package_name if not present
+        project_name = os.path.basename(self.project_dir)
+        if not self.__args_dict['package_name']:
+            # Slugify project_name and use as default for package_name
+            project_slug = project_name.replace(' ', '_').replace('-', '_')
+            project_slug = project_slug.lower()
+            self.__args_dict['package_name'] = project_slug
+
         # Parameters
         param_dict = self.__param_dict(command='create')
         # Set project name
-        param_dict['project_name'] = os.path.basename(self.project_dir)
-        # Define project package name
-        if self.__args_dict['package_name']:
-            project_slug = self.__args_dict['package_name']
-        else:
-            project_slug = param_dict['project_name']
+        param_dict['project_name'] = project_name
+        # Define project package name: slugify given package_name
+        project_slug = self.__args_dict['package_name']
         project_slug = project_slug.replace(' ', '_').replace('-', '_')
         param_dict['project_slug'] = project_slug.lower()
 
