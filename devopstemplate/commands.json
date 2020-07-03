@@ -5,6 +5,7 @@
             "tests",
             "make",
             "setuptools",
+            "readme",
             "docker"
         ],
         "parameters": [
@@ -49,14 +50,6 @@
                 ]
             },
             {
-                "name": "no-readme-file",
-                "default": true,
-                "help": "Do not add README.md file",
-                "template": [
-                    "readme"
-                ]
-            },
-            {
                 "name": "no-sonar",
                 "default": true,
                 "help": "Do not add SonarQube support",
@@ -74,14 +67,6 @@
                 "help": "Add .gitignore file",
                 "template": [
                     "git"
-                ]
-            },
-            {
-                "name": "add-readme-file",
-                "default": false,
-                "help": "Add README.md file",
-                "template": [
-                    "readme"
                 ]
             },
             {
