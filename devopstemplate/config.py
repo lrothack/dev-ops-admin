@@ -37,10 +37,12 @@ class CommandsConfig():
             the section is not available
         """
         cmd_dict = self.__commands_dict[command]
-        if section in cmd_dict:
-            return cmd_dict[section]
-        else:
-            return []
+        try:
+            result_list = cmd_dict[section]
+        except KeyError:
+            result_list = []
+
+        return result_list
 
     @staticmethod
     def __load_commands_dict():
