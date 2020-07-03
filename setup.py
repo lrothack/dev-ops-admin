@@ -74,7 +74,7 @@ setup(name='devopstemplate',
           # Include data files in devopstemplate package
           # the file template.index specifies file paths relative to
           # devopstemplate/template directory
-          'devopstemplate': (['template.json'] +
+          'devopstemplate': (['template.json', 'commands.json'] +
                              [f'template/{fpath}'
                               for fpath in template_index]),
       },
@@ -85,7 +85,7 @@ setup(name='devopstemplate',
       author='Leonard Rothacker',
       author_email='leonard.rothacker@googlemail.com',
       description=('This package provides a command-line interface for ' +
-                   'setting up a Python project based on a DevOps template'),
+                   'setting up a Python project based on a dev-ops template'),
       long_description=long_description,
       long_description_content_type='text/markdown',
       keywords='devops template sonarqube docker code-analysis',
