@@ -20,8 +20,8 @@ class TestDevOpsTemplate(unittest.TestCase):
         import devopstemplate
         version = devopstemplate.__version__
         ver_parts = version.split('.')
-        self.assertEqual(len(ver_parts), 3)
-        for part in ver_parts:
+        self.assertGreaterEqual(len(ver_parts), 2)
+        for part in ver_parts[:2]:
             self.assertGreaterEqual(int(part), 0)
 
     def test_render_file(self):
