@@ -11,10 +11,9 @@ def exists(resource_name):
     """Package resource wrapper for checking if resource exists
 
     Params:
-        resource_name: relative path to the resource in the package (from the
+        resource_name: Relative path to the resource in the package (from the
             package root)
-    Returns:
-        boolean specifying existence
+    Returns: boolean specifying existence
     """
     return pkg_resources.resource_exists(__name__,
                                          resource_name)
@@ -24,10 +23,9 @@ def isdir(resource_name):
     """Package resource wrapper for checking if resource is a directory
 
     Params:
-        resource_name: relative path to the resource in the package (from the
+        resource_name: Relative path to the resource in the package (from the
             package root)
-    Returns:
-        boolean specifying is resource is directory
+    Returns: boolean specifying is resource is directory
     """
     return pkg_resources.resource_isdir(__name__,
                                         resource_name)
@@ -40,10 +38,9 @@ def filepath(resource_name):
     obtain a path in the file system. Rather work with the resource directly.
 
     Params:
-        resource_name: relative path to the resource in the package (from the
+        resource_name: Relative path to the resource in the package (from the
             package root)
-    Returns:
-        absolute path to the resource in the file system
+    Returns: absolute path to the resource in the file system
     """
     return pkg_resources.resource_filename(__name__,
                                            resource_name)
@@ -56,12 +53,12 @@ def string(resource_name, encoding='utf-8'):
     string using the given encoding.
 
     Params:
-        resource_name: relative path to the resource in the package (from the
+        resource_name: Relative path to the resource in the package (from the
             package root).
-        encoding: string defining the encoding for interpreting the binary
+        encoding: String defining the encoding for interpreting the binary
             string. None refers to the default encoding (typically UTF-8).
-    Returns:
-        contents of of resource interpreted as text string (default encoding)
+    Returns: contents of of resource interpreted as text string (default
+        encoding)
     """
     resource_string = pkg_resources.resource_string(__name__, resource_name)
     return resource_string.decode(encoding)
@@ -75,13 +72,12 @@ def string_list(resource_name, encoding='utf-8'):
     in lines.
 
     Params:
-        resource_name: relative path to the resource in the package (from the
+        resource_name: Relative path to the resource in the package (from the
             package root)
-        encoding: string defining the encoding for interpreting the binary
+        encoding: String defining the encoding for interpreting the binary
             string. None refers to the default encoding (typically UTF-8).
-    Returns:
-        contents of of resource interpreted as list of text strings (default
-            encoding)
+    Returns: contents of of resource interpreted as list of text strings
+        (default encoding)
     """
     return string(resource_name, encoding).splitlines()
 
@@ -91,9 +87,8 @@ def stream(resource_name):
     resource contents.
 
     Params:
-        resource_name: relative path to the resource in the package (from the
+        resource_name: Relative path to the resource in the package (from the
             package root)
-    Returns:
-        file object for reading resource contents in binary mode
+    Returns: file object for reading resource contents in binary mode
     """
     return pkg_resources.resource_stream(__name__, resource_name)

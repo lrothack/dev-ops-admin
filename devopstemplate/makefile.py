@@ -9,18 +9,18 @@ class MakefileSection():
     """Represents a section of a Makefile
 
     Attributes:
-        title: (declared) title of the section, string or None. None for the
+        title: (Declared) title of the section, string or None. None for the
             first section that contains lines not belonging to any explicitly
             declared section.
-        content_list: list of strings representing the lines of the section
+        content_list: List of strings representing the lines of the section
     """
 
     def __init__(self, section_title, first_line=None):
         """Initialize section with title and optional first line
 
         Params:
-            section_title: string or None
-            first_list: string (without line break) or None. Represents first
+            section_title: String or None
+            first_list: String (without line break) or None. Represents first
                 text line of section (title). content_list will be empty
                 if None.
         """
@@ -33,7 +33,7 @@ class MakefileSection():
         """Add a line to the content_list of this section
 
         Params:
-            line: string representing a text line (without line break)
+            line: String representing a text line (without line break)
         """
         self.content_list.append(line)
 
@@ -55,10 +55,10 @@ class MakefileTemplate():
         See 'generate' method for detailed description (method and parameters).
 
         Params:
-            filehandle: file object that the Makefile will be written to.
-            section_keyword_blacklist: list of strings with keywords for
+            filehandle: File object that the Makefile will be written to.
+            section_keyword_blacklist: List of strings with keywords for
                 filtering sections by their titles. (optional)
-            var_value_dict: dict mapping from variable names to variable
+            var_value_dict: Dict mapping from variable names to variable
                 values. (optional)
         """
         content_list = self.generate(self.__mk_section_list,
@@ -76,10 +76,10 @@ class MakefileTemplate():
         list if no such lines have been found.
 
         Params:
-            content_list: list of strings specifying the Makefile template
+            content_list: List of strings specifying the Makefile template
                 contents such that each list element corresponds to a line.
         Returns:
-            mk_section_list: list of MakefileSection objects
+            mk_section_list: List of MakefileSection objects
                 defining the sections of the Makefile. Concatenating the
                 content_list elements results in the original inputs.
                 Note: any lines before the first declared section will be
@@ -127,19 +127,19 @@ class MakefileTemplate():
         variable_value_dict.
 
         Params:
-            mk_section_list: list of MakefileSection objects. First element
+            mk_section_list: List of MakefileSection objects. First element
                 refers to pseudo-section (section title is None) containing
                 lines in front of the first section declaration.
-            section_keyword_blacklist: list of strings with keywords for
+            section_keyword_blacklist: List of strings with keywords for
                 filtering sections by their titles. (optional)
-            var_value_dict: dict mapping from variable names to variable
+            var_value_dict: Dict mapping from variable names to variable
                 values. Existing variable assignments will be modified if a
                 line begins with the variable name and is followed by any
                 Makefile assignment operator. In this case the entire line will
                 be replaced with the new variable-value assignment. (optional)
 
         Returns:
-            content_list: list of strings with the generated Makefile template
+            content_list: List of strings with the generated Makefile template
                 contents such that each list element corresponds to a line.
         """
         if section_keyword_blacklist is None:
@@ -179,11 +179,11 @@ class MakefileTemplate():
         """Substitute variable assignments in content_list
 
         Params:
-            content_list: list of strings representing lines
-            variable_value_dict: dict mapping from variable names to variable
+            content_list: List of strings representing lines
+            variable_value_dict: Dict mapping from variable names to variable
                 values. Also see 'generate' method.
         Returns:
-            content_subst_list: list of strings, with adjusted assignments.
+            content_subst_list: List of strings, with adjusted assignments.
         """
         # New list for storing processed lines
         content_subst_list = []
