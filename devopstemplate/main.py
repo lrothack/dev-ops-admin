@@ -116,9 +116,7 @@ def parse_args(args_list):
     # Initiate CommandsConfig in order to obtain command definitions
     cfg = CommandsConfig()
 
-    descr = ''.join(['Create and manage dev-ops template projects. ',
-                     'The project name is the name of the project directory. ',
-                     'The package name is a slug of the project name.'])
+    descr = ''.join(['Create and manage dev-ops template projects. '])
     parser = argparse.ArgumentParser(description=descr)
     # top-level arguments (optional)
     parser.add_argument('--project-dir', default='.',
