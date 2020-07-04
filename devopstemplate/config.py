@@ -154,8 +154,7 @@ class ProjectConfig():
         # no-*,  default: true  -> add comp. by default, do not add with flag
         # 'template' is a list of template identifier for installing component
         # files defined in template.json
-        comp_dict = {key: def_dict for key, def_dict in zip(comp_key_list,
-                                                            comp_def_list)}
+        comp_dict = dict(zip(comp_key_list, comp_def_list))
 
         # Define comp_args dict for project component flags specified by user
         comp_args = {key: self.__args_dict[key] for key in comp_key_list}
