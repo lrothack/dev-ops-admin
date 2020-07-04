@@ -59,6 +59,19 @@ class ProjectConfigTest(unittest.TestCase):
         self.assertEqual(param_dict, params_ref)
         self.assertEqual(comp_list, comps_ref[:-1])
 
+        # Test without package_name
+        args_ns.no_sonar = False
+        args_ns.package_name = None
+        config = ProjectConfig(args_ns)
+        param_dict, comp_list = config.create()
+        project_name = os.path.basename(os.getcwd())
+        project_slug = project_name.replace(' ', '_').replace('-', '_')
+        project_slug = project_slug.lower()
+        params_ref['package_name'] = project_slug
+        params_ref['project_slug'] = project_slug
+        self.assertEqual(param_dict, params_ref)
+        self.assertEqual(comp_list, comps_ref)
+
     def test_manage(self):
         args_ns = Namespace()
         args_ns.project_dir = '.'
