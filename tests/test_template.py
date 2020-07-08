@@ -127,7 +127,8 @@ class TestDevOpsTemplate(unittest.TestCase):
         project_file_list = []
         with pkg.stream('template.json') as fh:
             template_dict = json.load(fh)
-            for fpath in itertools.chain(*template_dict.values()):
+            for fpath in itertools.chain(*(template_dict[comp]
+                                           for comp in components)):
                 # Render path
                 fpath_template = Template(fpath)
                 fpath_rendered = fpath_template.render(**context)
@@ -199,7 +200,8 @@ class TestDevOpsTemplate(unittest.TestCase):
         project_file_list = []
         with pkg.stream('template.json') as fh:
             template_dict = json.load(fh)
-            for fpath in itertools.chain(*template_dict.values()):
+            for fpath in itertools.chain(*(template_dict[comp]
+                                           for comp in components)):
                 # Render path
                 fpath_template = Template(fpath)
                 fpath_rendered = fpath_template.render(**cookiecutterconfig)
