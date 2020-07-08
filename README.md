@@ -72,7 +72,7 @@ The working directory is always the root directory of your project, for example:
 ```bash
 mkdir sampleproject
 cd sampleproject
-devopstemplate create sampleproject
+devopstemplate create
 ```
 
 ## Using the dev-ops template
