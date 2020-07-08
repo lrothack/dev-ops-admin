@@ -17,6 +17,7 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.author_email = 'full.name@mail.com'
         args_ns.no_gitignore_file = False
         args_ns.no_sonar = False
+        args_ns.add_mongo = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
         args_ns.verbose = False
@@ -77,6 +78,7 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.project_dir = '.'
         args_ns.add_gitignore_file = True
         args_ns.add_sonar = True
+        args_ns.add_mongo = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
         args_ns.verbose = False
@@ -114,6 +116,7 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.project_description = ''
         args_ns.author_name = 'full name'
         args_ns.author_email = 'full.name@mail.com'
+        args_ns.add_mongo = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
         args_ns.verbose = False

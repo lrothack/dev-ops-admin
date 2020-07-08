@@ -30,5 +30,10 @@
     "sonar": [
         "sonarqube/README.md",
         "sonarqube/docker-compose.yml"
+    ],
+    "mongo": [
+        "mongodb/README.md",
+        "mongodb/docker-compose.yml",
+        "mongodb/mongo_connection.py"
     ]
 }

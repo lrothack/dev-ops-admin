@@ -147,7 +147,7 @@ class TestDevOpsTemplate(unittest.TestCase):
 
         # Define test project
         context = {'project_name': 'project'}
-        components = ['git', 'sonar']
+        components = ['git', 'sonar', 'mongo']
         # Generate reference data
         project_file_list = []
         with pkg.stream('template.json') as fh:
