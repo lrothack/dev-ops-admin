@@ -160,7 +160,7 @@ test:
 
 ## lint:         Run Python linter (bandit, pylint) and print output to terminal
 lint:
-	-$(BANDIT) -r $(PACKAGE)
+	-$(BANDIT) -r $(PACKAGE) --exclude "*/venv/*"
 	$(PYLINT) --output-format=colorized --reports=n --exit-zero $(PACKAGE)
 
 
