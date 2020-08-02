@@ -27,6 +27,11 @@ Creation and management of the template:
 - configure the template with boolean command-line flags or in interactive mode,
 - resolves author information automatically with `git config`.
 
+Optional template components:
+
+- [MongoDB](https://www.mongodb.com)
+- [MlFlow](https://www.mlflow.org)
+
 ## Installation
 
 Install the latest version from [pypi.org](https://pypi.org/project/devopstemplate/):
@@ -90,3 +95,23 @@ After creating a new project or after switching to the project directory:
 - Run `make docker-build` in order to analyze, test, package, report to SonarQube and deploy in a multi-stage Docker build. Test your docker image with `docker run`. Make sure you have [Docker](https://www.docker.com) installed and the Docker daemon is running.
 
 Advanced configurations can be made in the *configuration* sections of `Makefile`. See [lrothack/dev-ops](https://github.com/lrothack/dev-ops) for more information.
+
+## Additional components
+
+- `mongodb`
+- `mlflow`
+
+Additional components can be installed when creating a new project or with the `manage` command at a later time (replace `<component>` with a component from the list above, also see `devopstemplate manage --help`):
+
+```bash
+cd sampleproject
+devopstemplate manage --add-<component>
+```
+
+Start the corresponding Docker containers with `docker-compose`:
+
+```bash
+docker-compose -p <component> -f <component>/docker-compose.yml up -d
+```
+
+Also check out the README file in the `<component>` directory and run the sample script.
