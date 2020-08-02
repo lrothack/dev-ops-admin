@@ -30,7 +30,7 @@ Creation and management of the template:
 Optional template components:
 
 - [MongoDB](https://www.mongodb.com)
-- [MlFlow](https://www.mlflow.org)
+- [MlFlow](https://www.mlflow.org) (with [PostgreSQL](https://www.postgresql.org) and [MinIO](https://min.io) backends)
 
 ## Installation
 
