@@ -151,7 +151,7 @@ dist: $(SETUPTOOLSFILES)
 ##                recommended)
 ##               (application sources will be symlinked to PYTHONPATH)
 install-dev: $(SETUPTOOLSFILES)
-	$(PIP) install -r requirements.txt
+	$(PIP) install -e .[dev]
 
 ## test:         Run Python unit tests with pytest and analyse coverage
 test:

@@ -4,8 +4,6 @@ import itertools
 import json
 from setuptools import setup
 
-# Parse version
-
 
 def parse_version():
     """Parse version number from __init__.py in top-level import package
@@ -38,11 +36,20 @@ def parse_template_index():
     return template_index
 
 
+# Parse version
 version = parse_version()
+# Read list of template files that will be packaged for installation with the
+# devopstemplate tool
 template_index = parse_template_index()
 
+# Read Readme that will be used as long package description
 with open('README.md', 'r') as fh:
     long_description = fh.read()
+
+# Read list of Python package dependencies
+with open('requirements.txt', 'r') as fh:
+    install_requires = fh.read().splitlines()
+
 # setup.py defines the Python package. The build process is triggered from
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
 # change.
@@ -55,7 +62,7 @@ setup(name='devopstemplate',
       setup_requires=['setuptools >= 40.9.0',
                       'wheel'],
       # Package dependencies
-      install_requires=['Jinja2'],
+      install_requires=install_requires,
       # Defines dev environment containing development dependencies
       # (for linting, testing, etc.)
       extras_require={'dev': ['pip >= 20.1.1',
