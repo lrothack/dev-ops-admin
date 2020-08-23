@@ -64,6 +64,14 @@
                 "template": [
                     "mongo"
                 ]
+            },
+            {
+                "name": "add-mlflow",
+                "default": false,
+                "help": "Add MLflow service",
+                "template": [
+                    "mlflow"
+                ]
             }
         ]
     },
@@ -91,6 +99,14 @@
                 "help": "Add MongoDB service",
                 "template": [
                     "mongo"
+                ]
+            },
+            {
+                "name": "add-mlflow",
+                "default": false,
+                "help": "Add MLflow service",
+                "template": [
+                    "mlflow"
                 ]
             }
         ]
@@ -145,6 +161,14 @@
                 "help": "Add MongoDB service",
                 "template": [
                     "mongo"
+                ]
+            },
+            {
+                "name": "add-mlflow",
+                "default": false,
+                "help": "Add MLflow service",
+                "template": [
+                    "mlflow"
                 ]
             }
         ]

@@ -34,6 +34,11 @@
     "mongo": [
         "mongodb/README.md",
         "mongodb/docker-compose.yml",
-        "mongodb/mongo_connection.py"
+        "mongodb/mongo_sample.py"
+    ],
+    "mlflow": [
+        "mlflow/README.md",
+        "mlflow/docker-compose.yml",
+        "mlflow/mlflow_sample.py"
     ]
 }

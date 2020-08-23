@@ -24,6 +24,7 @@ class TestMain(unittest.TestCase):
         args_ns.no_gitignore_file = False
         args_ns.no_sonar = False
         args_ns.add_mongo = False
+        args_ns.add_mlflow = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
         args_ns.verbose = False
@@ -51,6 +52,7 @@ class TestMain(unittest.TestCase):
         args_ns.add_gitignore_file = False
         args_ns.add_sonar = False
         args_ns.add_mongo = False
+        args_ns.add_mlflow = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
         args_ns.verbose = False
