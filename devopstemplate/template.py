@@ -71,8 +71,6 @@ class DevOpsTemplate():
             logger.debug(' # %s', component)
             self.__install(component, context)
 
-        self.__configure_makefile(use_sonar=('sonar' in components))
-
     def cookiecutter(self, context, components):
         """Create a new cookiecutter template from the DevOps template given
         config options. Config options only affect the default values for the
@@ -151,8 +149,6 @@ class DevOpsTemplate():
         for component in components:
             logger.debug(' # %s', component)
             self.__install(component, context)
-            if component == 'sonar':
-                self.__configure_makefile(use_sonar=True)
 
     def __install(self, template_component, context):
         """Copy and render files for a template component
@@ -245,26 +241,3 @@ class DevOpsTemplate():
                                   ' (use --skip-exists or --overwrite-exists'
                                   ' to control behavior)')
         return True
-
-    def __configure_makefile(self, use_sonar):
-        """Re-writes Makefile with configuration options:
-
-        Params:
-            use_sonar: Boolean setting whether to use SonarQube reporting
-                during multi-stage docker build (within first 'build' stage)
-        """
-        logger = logging.getLogger('DevOpsTemplate.__configure_makefile')
-        var_value_dict = {}
-        var_value_dict['DOCKERSONAR'] = 'True' if use_sonar else 'False'
-        var_value_strlist = [f'{k}: {v}'
-                             for k, v in sorted(var_value_dict.items())]
-        logger.info('Makefile config:\n%s', '\n'.join(var_value_strlist))
-        if self.__dry_run:
-            return
-        # Load installed Makefile
-        with open(os.path.join(self.__projectdir, 'Makefile'), 'r+') as fh:
-            mktemplate = MakefileTemplate(fh)
-            fh.seek(0)
-            mktemplate.write(fh,
-                             var_value_dict=var_value_dict)
-            fh.truncate()
