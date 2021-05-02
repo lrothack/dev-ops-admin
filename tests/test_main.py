@@ -75,6 +75,8 @@ class TestMain(unittest.TestCase):
         args_ns.project_description = ''
         args_ns.author_name = ''
         args_ns.author_email = ''
+        args_ns.add_mongo = False
+        args_ns.add_mlflow = False
         args_ns.overwrite_exists = False
         args_ns.skip_exists = False
         args_ns.verbose = False
