@@ -32,6 +32,8 @@ Optional template components:
 - [MongoDB](https://www.mongodb.com)
 - [MlFlow](https://www.mlflow.org) (with [PostgreSQL](https://www.postgresql.org) and [MinIO](https://min.io) backends)
 
+These components have been developed in [jkortner/ml-ops](https://github.com/jkortner/ml-ops).
+
 ## Installation
 
 Install the latest version from [pypi.org](https://pypi.org/project/devopstemplate/):
