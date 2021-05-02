@@ -8,7 +8,7 @@ from devopstemplate.log import LoggerConfig
 
 # Version can be parsed from setup.py or managed globally,
 # e.g., with bumpversion
-__version__ = '0.7.0.dev2'
+__version__ = '0.7.0'
 
 
 # Global module variable that stores a singelton of the LoggerConfig
