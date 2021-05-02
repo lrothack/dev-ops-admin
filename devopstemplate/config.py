@@ -191,6 +191,7 @@ class ProjectConfig():
         """
         # Set default for package_name if not present
         project_name = os.path.basename(self.project_dir)
+        # If package_name is not given as CLI argument
         if not self.__args_dict['package_name']:
             # Slugify project_name and use as default for package_name
             project_slug = project_name.replace(' ', '_').replace('-', '_')
@@ -202,7 +203,10 @@ class ProjectConfig():
         # Set project name
         param_dict['project_name'] = project_name
         # Define project package name: slugify given package_name
-        project_slug = self.__args_dict['package_name']
+        # Default package_name is defined above or given as CLI arg
+        # and can be overwritten in interactive mode in __param_dict func
+        # --> define project_slug based on package_name in param_dict var
+        project_slug = param_dict['package_name']
         project_slug = project_slug.replace(' ', '_').replace('-', '_')
         param_dict['project_slug'] = project_slug.lower()
 
