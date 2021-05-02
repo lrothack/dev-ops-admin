@@ -178,6 +178,9 @@ def parse_args(args_list):
     arg_command_group(cc_parser, 'project parameters',
                       group_argument_list=cfg.values('cookiecutter',
                                                      'parameters'))
+    arg_command_group(cc_parser, 'project components',
+                      group_argument_list=cfg.values('cookiecutter',
+                                                     'components'))
     # If the cookiecutter subparser has been activated by the 'cookiecutter'
     # command, override the func attribute with a pointer to the 'cookiecutter'
     # function (defined above) --> overrides default for the main parser.
