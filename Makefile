@@ -85,7 +85,7 @@ DOCKER = docker
 # running `make docker-build`, i.e., variables will be passed to Docker build
 # as build arguments
 # Enable/disable SonarQube reporting during Docker build
-DOCKERSONAR=True
+DOCKERSONAR=False
 # Report to sonar host (when running in Docker build)
 DOCKERSONARHOST=sonarqube
 # Report to sonar port (when running in Docker build)
@@ -155,7 +155,7 @@ install-dev: $(SETUPTOOLSFILES)
 
 ## test:         Run Python unit tests with pytest and analyse coverage
 test:
-	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) $(TESTS)
+	$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) $(TESTS)
 	$(COVERAGE) report -m --omit="*/template/*"
 
 ## lint:         Run Python linter (bandit, pylint) and print output to terminal
