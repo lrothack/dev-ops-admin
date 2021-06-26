@@ -45,8 +45,11 @@ class DevOpsTemplate():
         with pkg.stream('template.json') as fh:
             self.__template_dict = json.load(fh)
         self.__template_dname = 'template'
-        self.__env = Environment(loader=PackageLoader(__name__,
-                                                      self.__template_dname),
+        # ATTENTION: using __package__ may only work as long as this module
+        # (template.py) is located in the top-level import directory
+        loader = PackageLoader(__package__,
+                               self.__template_dname)
+        self.__env = Environment(loader=loader,
                                  autoescape=select_autoescape(default=True))
         # Create project base directory if not present
         self.__mkdir(projectdirectory)
