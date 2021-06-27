@@ -4,6 +4,8 @@
 # Use only one statement per line and do not mix statements and comments on a
 # single line in order to allow for automatic editing.
 
+# ATTENTION: Running `make <target>` is only supported from the project directory
+#
 
 # --- Common ---
 #
@@ -13,11 +15,11 @@
 # Note that a single '=' is only evaluated when accessing the variable 
 #
 # Current working directory 
-CWD := ${CURDIR}
+CWD := "${CURDIR}"
 # Relative path to Makefile (from current working directory)
 MKFILE_PATH := $(lastword $(MAKEFILE_LIST))
 # Absolute path to Makefile's parent directory (project root)
-ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+ROOT := "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))"
 
 
 # --- Python ---
@@ -72,6 +74,8 @@ SONARHOST=localhost
 SONARPORT=9000
 # DISABLE/enable whether to include SCM (git) meta info in sonarqube report
 SONARNOSCM=False
+# Authentication
+SONARTOKEN=<auth_token>
 
 
 # --- Docker configuration ---
@@ -91,7 +95,7 @@ DOCKERSONARHOST=sonarqube
 # Report to sonar port (when running in Docker build)
 DOCKERSONARPORT=9000
 # DISABLE/enable sonarqube SCM (git) support (when running in Docker build)
-DOCKERSONARNOSCM=False
+DOCKERSONARNOSCM=True
 # Docker network for running the Docker build. Sonarqube server must be hosted
 # in the same network at $DOCKERSONARHOST:$DOCKERSONARPORT
 # Only evaluated if $DOCKERSONAR==True
@@ -109,6 +113,8 @@ DOCKERENTRYPOINTEXEC=$(NAME)
 ## 
 ## MAKEFILE for building and testing Python package including
 ## code analysis and reporting to SonarQube in a dockerized build environment
+## 
+## ATTENTION: Running `make <target>` is only supported from the project directory
 ## 
 ## Targets:
 ## 
@@ -178,11 +184,12 @@ lint:
 # `make` would fail if test case fails or linter reports infos/warnings/errors.
 sonar: $(SETUPTOOLSFILES)
 	@mkdir -p $(REPDIR)
-	-$(BANDIT) -r $(PACKAGE) --exclude "*/venv/*"
+	-$(BANDIT) -r $(PACKAGE) --exclude "*/venv/*" --format json >$(BANDITREP)
 	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
 	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) --junit-xml=$(PYTESTREP) -o junit_family=xunit2 $(TESTS)
 	$(COVERAGE) xml -o $(COVERAGEREP) --omit="*/template/*"
 	$(SONARSCANNER) -Dsonar.host.url=http://$(SONARHOST):$(SONARPORT) \
+              -Dsonar.login=$(SONARTOKEN) \
               -Dsonar.projectKey=$(NAME) \
               -Dsonar.projectVersion=$(VERSION) \
               -Dsonar.sourceEncoding=UTF-8 \
@@ -191,16 +198,16 @@ sonar: $(SETUPTOOLSFILES)
               -Dsonar.scm.disabled=$(SONARNOSCM) \
               -Dsonar.python.xunit.reportPath=$(PYTESTREP) \
               -Dsonar.python.coverage.reportPaths=$(COVERAGEREP) \
-              -Dsonar.python.pylint.reportPath=$(PYLINTREP)
+              -Dsonar.python.pylint.reportPaths=$(PYLINTREP) \
+              -Dsonar.python.bandit.reportPaths=$(BANDITREP)
 
 
 # --- Docker targets ---
 
-## docker-build: Build docker image for Python application including
-##               code analysis and reporting to SonarQube (multi-stage build)
+## docker-build: Build docker image for Python application with code analysis
+##               (SonarQube reporting during Docker build can be enabled
+##                with `make docker-build DOCKERSONAR=True`)
 ##               (requires SonarQube server, see target 'sonar' above)
-##               (SonarQube reporting during Docker build can be disabled
-##                with `make docker-build DOCKERSONAR=False`)
 #                (WARNING: do not run in Docker, Docker-in-Docker!)
 # The if-statement is required in order to determine if we have to run the
 # build in the $(DOCKERNET) network
@@ -214,7 +221,7 @@ ifeq ($(DOCKERSONAR), True)
 	$(info building Docker image within Docker network $(DOCKERNET))
 	$(info (make sure SonarQube is running in the same network))
 	$(info (run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d`))
-	$(DOCKER) build --rm --network=$(DOCKERNET) -t $(NAME) $(ROOT) \
+	DOCKER_BUILDKIT=0 $(DOCKER) build --rm --network=$(DOCKERNET) -t $(NAME) $(ROOT) \
 		--build-arg ENTRYPOINT=$(DOCKERENTRYPOINTEXEC) \
 		--build-arg SONARHOST=$(DOCKERSONARHOST) \
 		--build-arg SONARPORT=$(DOCKERSONARPORT) \
