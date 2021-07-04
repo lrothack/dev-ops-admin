@@ -93,9 +93,10 @@ After creating a new project or after switching to the project directory:
 - Run `make lint` in order to run code analysis with pylint and bandit.
 - Run `make test` in order to run unit tests with pytest and coverage.
 - Run `make dist` in order to build a Python package (binary and source).
-- Run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d` in order to start a SonarQube server.
-- Run `make sonar` in order to locally run `sonar-scanner` and report results to your local SonarQube server. Requires a local installation of [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/).
-- Run `make docker-build` in order to analyze, test, package and deploy in a multi-stage Docker build. Test your docker image with `docker run`. Make sure you have [Docker](https://www.docker.com) installed and the Docker daemon is running. Optional: Set `DOCKERSONAR=True` in `Makefile` in order to activate Sonarqube reporting in the first stage of the Docker build.
+- Make sure you have [Docker](https://www.docker.com) installed and the Docker daemon is running. Allocate at least 4GB RAM in the Docker resource configuration.
+- Run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d` in order to start a SonarQube server. Configure your server through its web interface and obtain an authentication token. The SonarQube URL and the authentication token can be configured through the `Makefile` variables `SONARURL` and `SONARTOKEN`.
+- Run `make sonar` in order to run `sonar-scanner` and report results to your SonarQube server.
+- Run `make docker-build` in order to analyze, test, package and deploy in a multi-stage Docker build. Analysis results and test results are shown after the build.
 
 Advanced configurations can be made in the *configuration* sections of `Makefile`. See [lrothack/dev-ops](https://github.com/lrothack/dev-ops) for more information.
 
