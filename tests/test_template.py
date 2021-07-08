@@ -5,8 +5,8 @@ import tempfile
 import json
 from pathlib import Path
 from jinja2 import Template
-from tests.conftest import ref_file_head
-from tests.conftest import ref_template_head
+from conftest import ref_file_head
+from conftest import ref_template_head
 import devopstemplate.pkg as pkg
 from devopstemplate.template import DevOpsTemplate
 

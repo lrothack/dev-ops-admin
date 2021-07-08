@@ -2,7 +2,7 @@ import unittest
 import os
 import json
 import itertools
-from tests.conftest import ref_file_head
+from conftest import ref_file_head
 import devopstemplate.pkg as pkg
 
 
