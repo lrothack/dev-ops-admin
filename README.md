@@ -94,7 +94,7 @@ After creating a new project or after switching to the project directory:
 - Run `make test` in order to run unit tests with pytest and coverage.
 - Run `make dist` in order to build a Python package (binary and source).
 - Make sure you have [Docker](https://www.docker.com) installed and the Docker daemon is running. Allocate at least 4GB RAM in the Docker resource configuration.
-- Run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d` in order to start a SonarQube server. Configure your server through its web interface and obtain an authentication token. The SonarQube URL and the authentication token can be configured through the `Makefile` variables `SONARURL` and `SONARTOKEN`.
+- Run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d` in order to start a SonarQube server. Configure your server through its web interface and obtain an authentication token. The SonarQube URL can be configured through the `Makefile` variable `SONARURL`. The authentication token can be stored in the local file `.sonartoken`.
 - Run `make sonar` in order to run `sonar-scanner` and report results to your SonarQube server.
 - Run `make docker-build` in order to analyze, test, package and deploy in a multi-stage Docker build. Analysis results and test results are shown after the build.
 

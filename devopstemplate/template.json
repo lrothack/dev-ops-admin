@@ -5,7 +5,6 @@
         "{{project_slug}}/main.py"
     ],
     "tests": [
-        "tests/__init__.py",
         "tests/test_{{project_slug}}.py"
     ],
     "make": [
@@ -28,6 +27,7 @@
         "README.md"
     ],
     "sonar": [
+        ".sonartoken",
         "sonarqube/README.md",
         "sonarqube/docker-compose.yml"
     ],
