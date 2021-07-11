@@ -42,8 +42,8 @@ class DevOpsTemplate():
         self.__overwrite = overwrite_exists
         self.__skip = skip_exists
         self.__dry_run = dry_run
-        with pkg.stream('template.json') as fh:
-            self.__template_dict = json.load(fh)
+        with pkg.stream('template.json') as handle:
+            self.__template_dict = json.load(handle)
         self.__template_dname = 'template'
         # ATTENTION: using __package__ may only work as long as this module
         # (template.py) is located in the top-level import directory
@@ -96,8 +96,8 @@ class DevOpsTemplate():
         try:
             self.__check_project_file(cookiecutter_json_fpath)
             if not self.__dry_run:
-                with open(cookiecutter_json_fpath, 'w') as fh:
-                    json.dump(context, fh, indent=2)
+                with open(cookiecutter_json_fpath, 'w') as handle:
+                    json.dump(context, handle, indent=2)
             logger.info('project:%s', cookiecutter_json_fpath)
         except SkipFileError:
             logger.warning('File %s exists, skipping', cookiecutter_json_fpath)
@@ -108,9 +108,9 @@ class DevOpsTemplate():
         readme_fpath = os.path.join(self.__projectdir, 'README.md')
         if not os.path.exists(readme_fpath):
             if not self.__dry_run:
-                with open(readme_fpath, 'w') as fh:
+                with open(readme_fpath, 'w') as handle:
                     readme_content_list = ['# Cookiecutter PyDevops']
-                    fh.writelines(readme_content_list)
+                    handle.writelines(readme_content_list)
             logger.info('project:%s', readme_fpath)
 
         # Generate hooks directory with pre/post generation scripts if required
@@ -213,10 +213,7 @@ class DevOpsTemplate():
             parent_dname = os.path.dirname(project_fpath)
             if not os.path.exists(parent_dname):
                 os.makedirs(parent_dname)
-            # Copy file in binary mode
-            # with pkg.stream(pkg_fname) as pkg_fh:
-            #     with open(project_fpath, 'wb') as project_fh:
-            #         shutil.copyfileobj(pkg_fh, project_fh)
+            # Load and instantiate template
             template = self.__env.get_template(pkg_fname)
             with open(project_fpath, 'w') as project_fh:
                 template.stream(**context).dump(project_fh)
