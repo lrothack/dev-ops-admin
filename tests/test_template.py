@@ -213,7 +213,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             template.cookiecutter(context, components)
             # Make sure all files exist
             projectdirname = os.path.join(tmpdirname,
-                                          '{{cookiecutter.project_slug}}')
+                                          '{{cookiecutter.project_name}}')
             for fpath in project_file_list:
                 fpath = os.path.join(projectdirname, fpath)
                 self.assertTrue(os.path.exists(fpath))

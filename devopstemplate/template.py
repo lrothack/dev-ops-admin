@@ -117,7 +117,7 @@ class DevOpsTemplate():
         # (might be useful in future)
         #
         # Generate project template
-        cookiecutter_project_dname = '{{cookiecutter.project_slug}}/'
+        cookiecutter_project_dname = '{{cookiecutter.project_name}}/'
         self.__mkdir(cookiecutter_project_dname)
         # Adjust projectdirectory such that __install installs to the correct
         # directory (projectdirectory represents cookiecutter template root)
