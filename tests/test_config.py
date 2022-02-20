@@ -1,3 +1,9 @@
+"""Check that CLI arguments are correctly represented
+
+WARNING: use unittest framework, pytest conflicts with test templates:
+template/tests/test_*.py ( {{ }} syntax)
+or exclude these tests
+"""
 import unittest
 import os
 from argparse import Namespace
@@ -5,8 +11,12 @@ from devopstemplate.config import ProjectConfig
 
 
 class ProjectConfigTest(unittest.TestCase):
+    """Check that CLI arguments are correctly represented in ProjectConfig
+    """
 
     def test_create(self):
+        """Check the CLI arguments are correctly represented in ProjectConfig
+        """
         args_ns = Namespace()
         args_ns.project_dir = '.'
         args_ns.package_name = 'test-Project'
@@ -75,10 +85,15 @@ class ProjectConfigTest(unittest.TestCase):
         self.assertEqual(comp_list, comps_ref)
 
     def test_manage(self):
+        """Check config representation for manage sub-command"""
         args_ns = Namespace()
         args_ns.project_dir = '.'
-        args_ns.add_gitignore_file = True
+        args_ns.add_gitignore = True
         args_ns.add_sonar = True
+        args_ns.add_makefile = False
+        args_ns.add_makefile_min = False
+        args_ns.add_setuptools = False
+        args_ns.add_docker = False
         args_ns.add_mongo = False
         args_ns.add_mlflow = False
         args_ns.overwrite_exists = False

@@ -1,3 +1,9 @@
+"""Check CLI argument parsing
+
+WARNING: use unittest framework, pytest conflicts with test templates:
+template/tests/test_*.py ( {{ }} syntax)
+or exclude these tests
+"""
 import unittest
 from unittest.mock import patch
 from argparse import Namespace
@@ -6,6 +12,8 @@ import devopstemplate.main
 
 
 class TestMain(unittest.TestCase):
+    """Check parsing argument list for main.py parser
+    """
 
     @patch('devopstemplate.main.create')
     def test_parse_create(self, mock_create):
@@ -45,11 +53,17 @@ class TestMain(unittest.TestCase):
 
     @patch('devopstemplate.main.manage')
     def test_parse_manage(self, mock_manage):
+        """Check parsing (default) argument list for manage sub-command
+        """
         arg_list = ['manage']
         devopstemplate.main.parse_args(arg_list)
         args_ns = Namespace()
         args_ns.project_dir = '.'
-        args_ns.add_gitignore_file = False
+        args_ns.add_gitignore = False
+        args_ns.add_makefile = False
+        args_ns.add_makefile_min = False
+        args_ns.add_setuptools = False
+        args_ns.add_docker = False
         args_ns.add_sonar = False
         args_ns.add_mongo = False
         args_ns.add_mlflow = False

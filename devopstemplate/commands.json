@@ -86,6 +86,14 @@
                 ]
             },
             {
+                "name": "add-makefile-min",
+                "default": false,
+                "help": "Add minimal Makefile",
+                "template": [
+                    "make-minimal"
+                ]
+            },
+            {
                 "name": "add-setuptools",
                 "default": false,
                 "help": "Add setuptools files",

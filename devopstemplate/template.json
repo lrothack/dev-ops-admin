@@ -10,6 +10,9 @@
     "make": [
         "Makefile"
     ],
+    "make-minimal": [
+        "setup.mk"
+    ],
     "setuptools": [
         "MANIFEST.in",
         "setup.py",
