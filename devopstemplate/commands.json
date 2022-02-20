@@ -78,7 +78,31 @@
     "manage": {
         "components": [
             {
-                "name": "add-gitignore-file",
+                "name": "add-makefile",
+                "default": false,
+                "help": "Add Makefile",
+                "template": [
+                    "make"
+                ]
+            },
+            {
+                "name": "add-setuptools",
+                "default": false,
+                "help": "Add setuptools files",
+                "template": [
+                    "setuptools"
+                ]
+            },
+            {
+                "name": "add-docker",
+                "default": false,
+                "help": "Add Docker files",
+                "template": [
+                    "docker"
+                ]
+            },
+            {
+                "name": "add-gitignore",
                 "default": false,
                 "help": "Add .gitignore file",
                 "template": [
