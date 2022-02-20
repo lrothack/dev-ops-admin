@@ -1,3 +1,9 @@
+"""Check writing template files to project directory
+
+WARNING: use unittest framework, pytest conflicts with test templates:
+template/tests/test_*.py ( {{ }} syntax)
+or exclude these tests
+"""
 import unittest
 import os
 import itertools

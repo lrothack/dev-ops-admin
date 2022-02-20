@@ -193,6 +193,8 @@ class MakefileTemplate():
             for variable, value in variable_value_dict.items():
                 # check if any variable assignment is present at the beginning
                 # of the line
+                # pylint: disable=consider-using-f-string
+                # simplifies handling of regular expression (r-string)
                 if re.match(r'^%s\s*=' % variable, line):
                     # if so, generate a new line and break the loop as the
                     # current line cannot match with any other variable

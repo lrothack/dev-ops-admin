@@ -6,7 +6,7 @@ import subprocess
 import shutil
 import json
 from jinja2 import Template
-import devopstemplate.pkg as pkg
+from devopstemplate import pkg
 
 
 class CommandsConfig():

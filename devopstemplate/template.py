@@ -7,7 +7,7 @@ import logging
 import json
 from jinja2 import Environment, PackageLoader, select_autoescape
 from jinja2 import Template
-import devopstemplate.pkg as pkg
+from devopstemplate import pkg
 
 
 class SkipFileError(FileExistsError):
@@ -96,7 +96,8 @@ class DevOpsTemplate():
         try:
             self.__check_project_file(cookiecutter_json_fpath)
             if not self.__dry_run:
-                with open(cookiecutter_json_fpath, 'w') as handle:
+                with open(cookiecutter_json_fpath, 'w',
+                          encoding='utf-8') as handle:
                     json.dump(context, handle, indent=2)
             logger.info('project:%s', cookiecutter_json_fpath)
         except SkipFileError:
@@ -108,7 +109,7 @@ class DevOpsTemplate():
         readme_fpath = os.path.join(self.__projectdir, 'README.md')
         if not os.path.exists(readme_fpath):
             if not self.__dry_run:
-                with open(readme_fpath, 'w') as handle:
+                with open(readme_fpath, 'w', encoding='utf-8') as handle:
                     readme_content_list = ['# Cookiecutter PyDevops']
                     handle.writelines(readme_content_list)
             logger.info('project:%s', readme_fpath)
@@ -126,6 +127,8 @@ class DevOpsTemplate():
                                          cookiecutter_project_dname)
         # Generate cookiecutterconfig for rendering cookiecutter template
         # variables
+        # pylint: disable=consider-using-f-string
+        # simplifies handling of jinja2 template syntax {{ }}
         cookiecutterconfig = {key: '{{cookiecutter.%s}}' % key
                               for key in context.keys()}
         # Install all template components
@@ -215,7 +218,7 @@ class DevOpsTemplate():
                 os.makedirs(parent_dname)
             # Load and instantiate template
             template = self.__env.get_template(pkg_fname)
-            with open(project_fpath, 'w') as project_fh:
+            with open(project_fpath, 'w', encoding='utf-8') as project_fh:
                 template.stream(**context).dump(project_fh)
         logger.info('template:%s  ->  project:%s', pkg_fname, project_fpath)
 

@@ -1,3 +1,9 @@
+"""Check Makefile parsing (allows selection of sections)
+
+WARNING: use unittest framework, pytest conflicts with test templates:
+template/tests/test_*.py ( {{ }} syntax)
+or exclude these tests
+"""
 import unittest
 from itertools import chain
 import tempfile
