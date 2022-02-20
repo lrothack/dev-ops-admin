@@ -1,3 +1,5 @@
+"""Setup.py configuration file
+"""
 import os
 import re
 import itertools
@@ -18,51 +20,59 @@ def parse_version():
         ValueError if the parser could not match the version definition
     """
     init_fpath = os.path.join('devopstemplate', '__init__.py')
-    with open(init_fpath, 'r') as fh:
-        init_contents = fh.read()
+    with open(init_fpath, 'r', encoding='utf-8') as handle:
+        init_contents = handle.read()
         ver_re = r"^__version__ ?= ?['\"]([^'\"]*)['\"]"
         match = re.search(ver_re, init_contents, re.M)
         if match:
             version = match.group(1)
             return version
-        else:
-            raise ValueError('Could not parse version string')
+        raise ValueError('Could not parse version string')
 
 
 def parse_template_index():
-    with open('devopstemplate/template.json', 'r') as fh:
-        template_dict = json.load(fh)
+    """Load json that defines template structure
+    """
+    with open('devopstemplate/template.json', 'r', encoding='utf-8') as handle:
+        template_dict = json.load(handle)
         template_index = list(itertools.chain(*template_dict.values()))
     return template_index
 
 
+def read_file(filepath):
+    """Read file as text
+
+    Params:
+        filename: relative/absolute path to the file
+    Returns:
+        contents as str
+    """
+    with open(filepath, 'r', encoding='utf-8') as handle:
+        return handle.read()
+
+
 # Parse version
-version = parse_version()
+VERSION = parse_version()
 # Read list of template files that will be packaged for installation with the
 # devopstemplate tool
-template_index = parse_template_index()
+TEMPLATE_INDEX = parse_template_index()
 
 # Read Readme that will be used as long package description
-with open('README.md', 'r') as fh:
-    long_description = fh.read()
+DESCRIPTION_LONG = read_file('README.md')
 
 # Read list of Python package dependencies
-with open('requirements.txt', 'r') as fh:
-    install_requires = fh.read().splitlines()
+INSTALL_REQUIRES = read_file('requirements.txt').splitlines()
 
 # setup.py defines the Python package. The build process is triggered from
 # Makefile. Adapt Makefile variable SETUPTOOLSFILES if build file dependencies
 # change.
 setup(name='devopstemplate',
-      version=version,
+      version=VERSION,
       python_requires='>= 3.6',
       # Import package
       packages=['devopstemplate'],
-      # Installation dependencies
-      setup_requires=['setuptools >= 40.9.0',
-                      'wheel'],
       # Package dependencies
-      install_requires=install_requires,
+      install_requires=INSTALL_REQUIRES,
       # Defines dev environment containing development dependencies
       # (for linting, testing, etc.)
       extras_require={'dev': ['pip >= 20.1.1',
@@ -83,7 +93,7 @@ setup(name='devopstemplate',
           # devopstemplate/template directory
           'devopstemplate': (['template.json', 'commands.json'] +
                              [f'template/{fpath}'
-                              for fpath in template_index]),
+                              for fpath in TEMPLATE_INDEX]),
       },
       # Generally do not assume that the package can safely be run as a zip
       # archive
@@ -93,7 +103,7 @@ setup(name='devopstemplate',
       author_email='leonard.rothacker@googlemail.com',
       description=('This package provides a command-line interface for ' +
                    'setting up a Python project based on a dev-ops template'),
-      long_description=long_description,
+      long_description=DESCRIPTION_LONG,
       long_description_content_type='text/markdown',
       keywords='devops template sonarqube docker code-analysis',
       url='https://github.com/lrothack/dev-ops-admin',
