@@ -16,9 +16,9 @@ class LoggerConfig():
         """
         # Default log level: info
         # logging.basicConfig(level=logging.INFO,
-        #                     format='%(message)s')
-        self.__format_plain = '%(message)s'
-        self.__format_debug = '%(asctime)-15s: [%(name)s] %(message)s'
+        #                     format="%(message)s")
+        self.__format_plain = "%(message)s"
+        self.__format_debug = "%(asctime)-15s: [%(name)s] %(message)s"
         self.__handler = logging.StreamHandler()
         logging.getLogger().addHandler(self.__handler)
         self.info()

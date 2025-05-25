@@ -17,6 +17,8 @@ class TestMain(unittest.TestCase):
 
     @patch('devopstemplate.main.create')
     def test_parse_create(self, mock_create):
+        """Check parsing (default) argument list for create sub-command
+        """
         # test with default parameters
         arg_list = ['create']
         devopstemplate.main.parse_args(arg_list)
@@ -79,6 +81,8 @@ class TestMain(unittest.TestCase):
 
     @patch('devopstemplate.main.cookiecutter')
     def test_parse_cookiecutter(self, mock_cookiecutter):
+        """Check parsing (default) argument list for cookiecutter sub-command
+        """
         arg_list = ['cookiecutter']
         devopstemplate.main.parse_args(arg_list)
         args_ns = Namespace()

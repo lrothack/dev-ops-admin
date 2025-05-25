@@ -44,7 +44,7 @@ class MakefileTemplate():
 
     def __init__(self, filehandle):
         # Read file contents and split text lines such that lines are not
-        # terminated by 'newline' anymore.
+        # terminated by "newline" anymore.
         content_list = filehandle.read().splitlines()
         self.__mk_section_list = self.parse(content_list)
 
@@ -52,7 +52,7 @@ class MakefileTemplate():
               var_value_dict=None):
         """Generate and write Makefile *without* contents of specified sections
 
-        See 'generate' method for detailed description (method and parameters).
+        See "generate" method for detailed description (method and parameters).
 
         Params:
             filehandle: File object that the Makefile will be written to.
@@ -64,7 +64,7 @@ class MakefileTemplate():
         content_list = self.generate(self.__mk_section_list,
                                      section_keyword_blacklist,
                                      var_value_dict)
-        filehandle.write('\n'.join(content_list))
+        filehandle.write("\n".join(content_list))
 
     @staticmethod
     def parse(content_list):
@@ -95,9 +95,9 @@ class MakefileTemplate():
         mk_section = MakefileSection(section_title=None)
         mk_section_list.append(mk_section)
         # Regex for detecting a section title in a line
-        # Matches variants of '# --- section ---' with different amounts of
+        # Matches variants of "# --- section ---" with different amounts of
         # whitespace. () groups the section title for easy access.
-        p_sec = re.compile(r'^#\s*---\s*(.*?)\s*---')
+        p_sec = re.compile(r"^#\s*---\s*(.*?)\s*---")
         for line in content_list:
             # Match only matches at the *beginning* of the string
             # --> using ^ in the regex would not strictly be necessary
@@ -181,7 +181,7 @@ class MakefileTemplate():
         Params:
             content_list: List of strings representing lines
             variable_value_dict: Dict mapping from variable names to variable
-                values. Also see 'generate' method.
+                values. Also see "generate" method.
         Returns:
             content_subst_list: List of strings, with adjusted assignments.
         """
@@ -195,10 +195,10 @@ class MakefileTemplate():
                 # of the line
                 # pylint: disable=consider-using-f-string
                 # simplifies handling of regular expression (r-string)
-                if re.match(r'^%s\s*=' % variable, line):
+                if re.match(r"^%s\s*=" % variable, line):
                     # if so, generate a new line and break the loop as the
                     # current line cannot match with any other variable
-                    line = f'{variable} = {value}'
+                    line = f"{variable} = {value}"
                     break
             # add the processed line to the result list
             content_subst_list.append(line)

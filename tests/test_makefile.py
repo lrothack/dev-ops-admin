@@ -13,21 +13,21 @@ from devopstemplate.makefile import MakefileTemplate as MkTemplate
 class TestMakefileTemplate(unittest.TestCase):
 
     def setUp(self):
-        self.__test_str_list = ['# this',
-                                '#  is a comment',
-                                '# --- section 1 --- text',
-                                'VAR  = test',
-                                ' ',
-                                '#---  section2   ---',
-                                '#--sec3 test---',
-                                '# ---section  3---',
-                                '',
-                                'VAR1=int',
-                                '#---test',
-                                'VAR2=bool',
-                                '#---section2---',
-                                'target: dep',
-                                '   cmd']
+        self.__test_str_list = ["# this",
+                                "#  is a comment",
+                                "# --- section 1 --- text",
+                                "VAR  = test",
+                                " ",
+                                "#---  section2   ---",
+                                "#--sec3 test---",
+                                "# ---section  3---",
+                                "",
+                                "VAR1=int",
+                                "#---test",
+                                "VAR2=bool",
+                                "#---section2---",
+                                "target: dep",
+                                "   cmd"]
 
     def __section_title_list(self):
         mk_section_list = MkTemplate.parse(self.__test_str_list)
@@ -47,10 +47,10 @@ class TestMakefileTemplate(unittest.TestCase):
     def test_parse_sections(self):
         section_list = self.__section_title_list()
         self.assertListEqual(section_list, [None,
-                                            'section 1',
-                                            'section2',
-                                            'section  3',
-                                            'section2'])
+                                            "section 1",
+                                            "section2",
+                                            "section  3",
+                                            "section2"])
 
     def test_parse_contents(self):
         section_content_list = self.__section_content_list()
@@ -75,7 +75,7 @@ class TestMakefileTemplate(unittest.TestCase):
 
     def test_generate_blacklist(self):
         mk_section_list = MkTemplate.parse(self.__test_str_list)
-        section_keyword_blacklist = ['section2']
+        section_keyword_blacklist = ["section2"]
         gen_str_list = MkTemplate.generate(mk_section_list,
                                            section_keyword_blacklist)
         expected_str_list = (self.__test_str_list[:5] +
@@ -85,38 +85,38 @@ class TestMakefileTemplate(unittest.TestCase):
     def test_generate_subst(self):
         mk_section_list = MkTemplate.parse(self.__test_str_list)
         gen_str_list = MkTemplate.generate(mk_section_list,
-                                           var_value_dict={'VAR': 'value',
-                                                           'VAR1': 5})
+                                           var_value_dict={"VAR": "value",
+                                                           "VAR1": 5})
         expected_str_list = (self.__test_str_list[:3] +
-                             ['VAR = value'] +
+                             ["VAR = value"] +
                              self.__test_str_list[4:9] +
-                             ['VAR1 = 5'] +
+                             ["VAR1 = 5"] +
                              self.__test_str_list[10:])
         self.assertListEqual(gen_str_list, expected_str_list)
 
     def test_generate_subst_invalidvar(self):
         mk_section_list = MkTemplate.parse(self.__test_str_list)
         gen_str_list = MkTemplate.generate(mk_section_list,
-                                           var_value_dict={'VAR3': 'value'})
+                                           var_value_dict={"VAR3": "value"})
         self.assertListEqual(gen_str_list, self.__test_str_list)
 
     def test_makefiletemplate(self):
         # Create tmp file
-        with tempfile.TemporaryFile('r+') as fh:
+        with tempfile.TemporaryFile("r+") as fh:
             # write test data to tmp file
-            fh.write('\n'.join(self.__test_str_list))
+            fh.write("\n".join(self.__test_str_list))
             # reset file pointer
             fh.seek(0)
             # read contents into MakefileTemplate object
             mktemp = MkTemplate(fh)
 
         # Create a new tmp file for writing generated Makefile
-        with tempfile.TemporaryFile('r+') as fh:
+        with tempfile.TemporaryFile("r+") as fh:
             # Generate according to modifiers and write Makefile
             mktemp.write(fh,
-                         section_keyword_blacklist=['section 1'],
-                         var_value_dict={'VAR': 'value',
-                                         'VAR1': 5})
+                         section_keyword_blacklist=["section 1"],
+                         var_value_dict={"VAR": "value",
+                                         "VAR1": 5})
             # Reset file pointer and read results
             fh.seek(0)
             mktemp_str_list = fh.read().splitlines()
@@ -124,7 +124,7 @@ class TestMakefileTemplate(unittest.TestCase):
         # Compare expected results with generated results
         expected_str_list = (self.__test_str_list[:2] +
                              self.__test_str_list[5:9] +
-                             ['VAR1 = 5'] +
+                             ["VAR1 = 5"] +
                              self.__test_str_list[10:])
         self.assertListEqual(mktemp_str_list, expected_str_list)
 

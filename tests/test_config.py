@@ -18,13 +18,13 @@ class ProjectConfigTest(unittest.TestCase):
         """Check the CLI arguments are correctly represented in ProjectConfig
         """
         args_ns = Namespace()
-        args_ns.project_dir = '.'
-        args_ns.package_name = 'test-Project'
-        args_ns.project_version = '0.1.0'
-        args_ns.project_url = ''
-        args_ns.project_description = ''
-        args_ns.author_name = 'full name'
-        args_ns.author_email = 'full.name@mail.com'
+        args_ns.project_dir = "."
+        args_ns.package_name = "test-Project"
+        args_ns.project_version = "0.1.0"
+        args_ns.project_url = ""
+        args_ns.project_description = ""
+        args_ns.author_name = "full name"
+        args_ns.author_email = "full.name@mail.com"
         args_ns.no_gitignore_file = False
         args_ns.no_sonar = False
         args_ns.add_mongo = False
@@ -37,22 +37,22 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.dry_run = False
         args_ns.interactive = False
 
-        params_ref = {'project_name': os.path.basename(os.getcwd()),
-                      'package_name': 'test-Project',
-                      'project_slug': 'test_project',
-                      'project_version': '0.1.0',
-                      'project_url': '',
-                      'project_description': '',
-                      'author_name': 'full name',
-                      'author_email': 'full.name@mail.com'}
-        comps_ref = ['src',
-                     'tests',
-                     'make',
-                     'setuptools',
-                     'readme',
-                     'docker',
-                     'git',
-                     'sonar']
+        params_ref = {"project_name": os.path.basename(os.getcwd()),
+                      "package_name": "test-Project",
+                      "project_slug": "test_project",
+                      "project_version": "0.1.0",
+                      "project_url": "",
+                      "project_description": "",
+                      "author_name": "full name",
+                      "author_email": "full.name@mail.com"}
+        comps_ref = ["src",
+                     "tests",
+                     "make",
+                     "setuptools",
+                     "readme",
+                     "docker",
+                     "git",
+                     "sonar"]
 
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.create()
@@ -77,17 +77,17 @@ class ProjectConfigTest(unittest.TestCase):
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.create()
         project_name = os.path.basename(os.getcwd())
-        project_slug = project_name.replace(' ', '_').replace('-', '_')
+        project_slug = project_name.replace(" ", "_").replace("-", "_")
         project_slug = project_slug.lower()
-        params_ref['package_name'] = project_slug
-        params_ref['project_slug'] = project_slug
+        params_ref["package_name"] = project_slug
+        params_ref["project_slug"] = project_slug
         self.assertEqual(param_dict, params_ref)
         self.assertEqual(comp_list, comps_ref)
 
     def test_manage(self):
         """Check config representation for manage sub-command"""
         args_ns = Namespace()
-        args_ns.project_dir = '.'
+        args_ns.project_dir = "."
         args_ns.add_gitignore = True
         args_ns.add_sonar = True
         args_ns.add_makefile = False
@@ -103,9 +103,9 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.version = False
         args_ns.dry_run = False
 
-        params_ref = {'project_name': os.path.basename(os.getcwd())}
-        comps_ref = ['git',
-                     'sonar']
+        params_ref = {"project_name": os.path.basename(os.getcwd())}
+        comps_ref = ["git",
+                     "sonar"]
 
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.manage()
@@ -126,13 +126,13 @@ class ProjectConfigTest(unittest.TestCase):
 
     def test_cookiecutter(self):
         args_ns = Namespace()
-        args_ns.project_dir = '.'
-        args_ns.project_name = 'test'
-        args_ns.project_version = '0.1.0'
-        args_ns.project_url = ''
-        args_ns.project_description = ''
-        args_ns.author_name = 'full name'
-        args_ns.author_email = 'full.name@mail.com'
+        args_ns.project_dir = "."
+        args_ns.project_name = "test"
+        args_ns.project_version = "0.1.0"
+        args_ns.project_url = ""
+        args_ns.project_description = ""
+        args_ns.author_name = "full name"
+        args_ns.author_email = "full.name@mail.com"
         args_ns.add_mongo = False
         args_ns.add_mlflow = False
         args_ns.overwrite_exists = False
@@ -143,26 +143,26 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.dry_run = False
         args_ns.interactive = False
 
-        project_slug = ''.join(["{{ ",
+        project_slug = "".join(["{{ ",
                                 "cookiecutter.project_name.lower()",
-                                ".replace(' ', '_')",
-                                ".replace('-', '_')",
+                                ".replace(" ", "_")",
+                                ".replace("-", "_")",
                                 " }}"])
-        params_ref = {'project_name': 'test',
-                      'project_slug': project_slug,
-                      'project_version': '0.1.0',
-                      'project_url': '',
-                      'project_description': '',
-                      'author_name': 'full name',
-                      'author_email': 'full.name@mail.com'}
-        comps_ref = ['src',
-                     'tests',
-                     'make',
-                     'setuptools',
-                     'git',
-                     'readme',
-                     'docker',
-                     'sonar']
+        params_ref = {"project_name": "test",
+                      "project_slug": project_slug,
+                      "project_version": "0.1.0",
+                      "project_url": "",
+                      "project_description": "",
+                      "author_name": "full name",
+                      "author_email": "full.name@mail.com"}
+        comps_ref = ["src",
+                     "tests",
+                     "make",
+                     "setuptools",
+                     "git",
+                     "readme",
+                     "docker",
+                     "sonar"]
 
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.cookiecutter()
