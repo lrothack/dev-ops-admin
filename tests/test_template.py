@@ -4,6 +4,7 @@ WARNING: use unittest framework, pytest conflicts with test templates:
 template/tests/test_*.py ( {{ }} syntax)
 or exclude these tests
 """
+
 import unittest
 import os
 import itertools
@@ -24,6 +25,7 @@ class TestDevOpsTemplate(unittest.TestCase):
 
     def test_version(self):
         import devopstemplate
+
         version = devopstemplate.__version__
         ver_parts = version.split(".")
         self.assertGreaterEqual(len(ver_parts), 2)
@@ -35,14 +37,15 @@ class TestDevOpsTemplate(unittest.TestCase):
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = "tmp_file"
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
-            template._DevOpsTemplate__render("MANIFEST.in", tmp_fpath,
-                                             context={})
+            template._DevOpsTemplate__render("MANIFEST.in", tmp_fpath, context={})
             with open(tmp_fpath, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
 
-        self.assertEqual(content_list[:len(self.__ref_template_index_head)],
-                         self.__ref_template_index_head)
+        self.assertEqual(
+            content_list[: len(self.__ref_template_index_head)],
+            self.__ref_template_index_head,
+        )
 
     def test_render_template(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -51,15 +54,14 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
             project_slug = "project"
             context = {"project_slug": project_slug}
-            template._DevOpsTemplate__render("{{project_slug}}/__init__.py",
-                                             tmp_fpath,
-                                             context=context)
+            template._DevOpsTemplate__render(
+                "{{project_slug}}/__init__.py", tmp_fpath, context=context
+            )
             with open(tmp_fpath, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
         ref_template_list = ref_template_head(project_slug)
-        self.assertEqual(content_list[:len(ref_template_list)],
-                         ref_template_list)
+        self.assertEqual(content_list[: len(ref_template_list)], ref_template_list)
 
     def test_render_exists(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -68,73 +70,74 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             with self.assertRaises(FileExistsError):
-                template._DevOpsTemplate__render("MANIFEST.in", tmp_path,
-                                                 context={})
+                template._DevOpsTemplate__render("MANIFEST.in", tmp_path, context={})
 
     def test_render_skip(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
-            template = DevOpsTemplate(projectdirectory=tmpdirname,
-                                      skip_exists=True)
+            template = DevOpsTemplate(projectdirectory=tmpdirname, skip_exists=True)
             tmp_fname = "tmp_file"
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__render("MANIFEST.in", tmp_path,
-                                             context={})
+            template._DevOpsTemplate__render("MANIFEST.in", tmp_path, context={})
             with open(tmp_path, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 self.assertEqual(contents, "")
 
     def test_render_overwrite(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
-            template = DevOpsTemplate(projectdirectory=tmpdirname,
-                                      overwrite_exists=True)
+            template = DevOpsTemplate(
+                projectdirectory=tmpdirname, overwrite_exists=True
+            )
             tmp_fname = "tmp_file"
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__render("MANIFEST.in", tmp_path,
-                                             context={})
+            template._DevOpsTemplate__render("MANIFEST.in", tmp_path, context={})
             with open(tmp_path, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
 
-        self.assertEqual(content_list[:len(self.__ref_template_index_head)],
-                         self.__ref_template_index_head)
+        self.assertEqual(
+            content_list[: len(self.__ref_template_index_head)],
+            self.__ref_template_index_head,
+        )
 
     def test_render_pkgexists(self):
         template = DevOpsTemplate(projectdirectory=".")
         with self.assertRaises(FileNotFoundError):
-            template._DevOpsTemplate__render("non_existing_file", None,
-                                             context={})
+            template._DevOpsTemplate__render("non_existing_file", None, context={})
 
     def test_create(self):
 
         # Define test project
-        context = {"project_name": "project",
-                   "project_slug": "project",
-                   "project_version": "0.1.0",
-                   "project_url": "",
-                   "project_description": "",
-                   "author_name": "full name",
-                   "author_email": "full.name@mail.com",
-                   "add_scripts_dir": True,
-                   "add_docs_dir": True,
-                   "no_gitignore_file": False,
-                   "no_readme_file": False,
-                   "no_sonar": False}
-        components = ["src",
-                      "tests",
-                      "make",
-                      "setuptools",
-                      "readme",
-                      "docker",
-                      "git",
-                      "sonar"]
+        context = {
+            "project_name": "project",
+            "project_slug": "project",
+            "project_version": "0.1.0",
+            "project_url": "",
+            "project_description": "",
+            "author_name": "full name",
+            "author_email": "full.name@mail.com",
+            "add_scripts_dir": True,
+            "add_docs_dir": True,
+            "no_gitignore_file": False,
+            "no_readme_file": False,
+            "no_sonar": False,
+        }
+        components = [
+            "src",
+            "tests",
+            "make",
+            "setuptools",
+            "readme",
+            "docker",
+            "git",
+            "sonar",
+        ]
         # Generate reference data
         project_file_list = []
         with pkg.stream("template.json") as fh:
             template_dict = json.load(fh)
-            for fpath in itertools.chain(*(template_dict[comp]
-                                           for comp in components)):
+            for fpath in itertools.chain(*(template_dict[comp] for comp in components)):
                 # Render path
                 fpath_template = Template(fpath)
                 fpath_rendered = fpath_template.render(**context)
@@ -158,8 +161,7 @@ class TestDevOpsTemplate(unittest.TestCase):
         project_file_list = []
         with pkg.stream("template.json") as fh:
             template_dict = json.load(fh)
-            for fpath in itertools.chain(*(template_dict[comp]
-                                           for comp in components)):
+            for fpath in itertools.chain(*(template_dict[comp] for comp in components)):
                 # Render path
                 fpath_template = Template(fpath)
                 fpath_rendered = fpath_template.render(**context)
@@ -180,34 +182,42 @@ class TestDevOpsTemplate(unittest.TestCase):
     def test_cookiecutter(self):
 
         # Define test project
-        project_slug = "".join(["{{ ",
-                                "cookiecutter.project_name.lower()",
-                                ".replace(" ", "_")",
-                                ".replace("-", "_")",
-                                " }}"])
-        context = {"project_name": "",
-                   "project_slug": project_slug,
-                   "project_version": "0.1.0",
-                   "project_url": "",
-                   "project_description": "",
-                   "author_name": "full name",
-                   "author_email": "full.name@mail.com"}
-        components = ["src",
-                      "tests",
-                      "make",
-                      "setuptools",
-                      "readme",
-                      "docker",
-                      "git",
-                      "sonar"]
+        project_slug = "".join(
+            [
+                "{{ ",
+                "cookiecutter.project_name.lower()",
+                '.replace(" ", "_")',
+                '.replace("-", "_")',
+                " }}",
+            ]
+        )
+        context = {
+            "project_name": "",
+            "project_slug": project_slug,
+            "project_version": "0.1.0",
+            "project_url": "",
+            "project_description": "",
+            "author_name": "full name",
+            "author_email": "full.name@mail.com",
+        }
+        components = [
+            "src",
+            "tests",
+            "make",
+            "setuptools",
+            "readme",
+            "docker",
+            "git",
+            "sonar",
+        ]
         # Generate reference data
-        cookiecutterconfig = {key: "{{cookiecutter.%s}}" % key
-                              for key in context.keys()}
+        cookiecutterconfig = {
+            key: "{{cookiecutter.%s}}" % key for key in context.keys()
+        }
         project_file_list = []
         with pkg.stream("template.json") as fh:
             template_dict = json.load(fh)
-            for fpath in itertools.chain(*(template_dict[comp]
-                                           for comp in components)):
+            for fpath in itertools.chain(*(template_dict[comp] for comp in components)):
                 # Render path
                 fpath_template = Template(fpath)
                 fpath_rendered = fpath_template.render(**cookiecutterconfig)
@@ -218,15 +228,13 @@ class TestDevOpsTemplate(unittest.TestCase):
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             template.cookiecutter(context, components)
             # Make sure all files exist
-            projectdirname = os.path.join(tmpdirname,
-                                          "{{cookiecutter.project_name}}")
+            projectdirname = os.path.join(tmpdirname, "{{cookiecutter.project_name}}")
             for fpath in project_file_list:
                 fpath = os.path.join(projectdirname, fpath)
                 self.assertTrue(os.path.exists(fpath))
 
             # Check template __init__.py
-            pkgdirname = os.path.join(projectdirname,
-                                      "{{cookiecutter.project_slug}}")
+            pkgdirname = os.path.join(projectdirname, "{{cookiecutter.project_slug}}")
             init_fpath = os.path.join(pkgdirname, "__init__.py")
             with open(init_fpath, "r") as fh:
                 init_contents = fh.read()
@@ -237,20 +245,17 @@ class TestDevOpsTemplate(unittest.TestCase):
             self.assertEqual(init_contents, init_ref_contents)
 
             # Check cookiecutter files
-            cookiecutter_json_fpath = os.path.join(tmpdirname,
-                                                   "cookiecutter.json")
+            cookiecutter_json_fpath = os.path.join(tmpdirname, "cookiecutter.json")
             self.assertTrue(os.path.exists(cookiecutter_json_fpath))
             with open(cookiecutter_json_fpath, "r") as fh:
                 cookiecutter_json = json.load(fh)
                 self.assertEqual(cookiecutter_json, context)
 
-            self.assertTrue(os.path.exists(os.path.join(tmpdirname,
-                                                        "README.md")))
+            self.assertTrue(os.path.exists(os.path.join(tmpdirname, "README.md")))
 
             # Check that the DevOps template project directory is the unittest
             # tmp directory
-            self.assertEqual(template._DevOpsTemplate__projectdir,
-                             tmpdirname)
+            self.assertEqual(template._DevOpsTemplate__projectdir, tmpdirname)
 
 
 class Jinja2RenderTest(unittest.TestCase):
@@ -261,8 +266,10 @@ class Jinja2RenderTest(unittest.TestCase):
         self.assertEqual(text, "projectname/__init__.py")
 
     def test_render_cc_templatevar(self):
-        context = {"project_slug": "{{cookiecutter.project_name}}",
-                   "project_name": "Name"}
+        context = {
+            "project_slug": "{{cookiecutter.project_name}}",
+            "project_name": "Name",
+        }
         text = Template("{{project_slug}}/__init__.py").render(**context)
         self.assertEqual(text, "{{cookiecutter.project_name}}/__init__.py")
 
