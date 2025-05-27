@@ -1,5 +1,4 @@
-"""Defines template creation and modification wrt user configurations.
-"""
+"""Defines template creation and modification wrt user configurations."""
 
 import os
 import subprocess

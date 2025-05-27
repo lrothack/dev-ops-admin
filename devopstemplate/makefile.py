@@ -2,10 +2,11 @@
 - divide Makefile in sections
 - combine sections according to user request to new Makefile
 """
+
 import re
 
 
-class MakefileSection():
+class MakefileSection:
     """Represents a section of a Makefile
 
     Attributes:
@@ -38,9 +39,8 @@ class MakefileSection():
         self.content_list.append(line)
 
 
-class MakefileTemplate():
-    """Parse Makefile template into sections and generate Makefile for project.
-    """
+class MakefileTemplate:
+    """Parse Makefile template into sections and generate Makefile for project."""
 
     def __init__(self, filehandle):
         # Read file contents and split text lines such that lines are not
@@ -48,8 +48,7 @@ class MakefileTemplate():
         content_list = filehandle.read().splitlines()
         self.__mk_section_list = self.parse(content_list)
 
-    def write(self, filehandle, section_keyword_blacklist=None,
-              var_value_dict=None):
+    def write(self, filehandle, section_keyword_blacklist=None, var_value_dict=None):
         """Generate and write Makefile *without* contents of specified sections
 
         See "generate" method for detailed description (method and parameters).
@@ -61,9 +60,9 @@ class MakefileTemplate():
             var_value_dict: Dict mapping from variable names to variable
                 values. (optional)
         """
-        content_list = self.generate(self.__mk_section_list,
-                                     section_keyword_blacklist,
-                                     var_value_dict)
+        content_list = self.generate(
+            self.__mk_section_list, section_keyword_blacklist, var_value_dict
+        )
         filehandle.write("\n".join(content_list))
 
     @staticmethod
@@ -117,8 +116,7 @@ class MakefileTemplate():
         return mk_section_list
 
     @staticmethod
-    def generate(mk_section_list, section_keyword_blacklist=None,
-                 var_value_dict=None):
+    def generate(mk_section_list, section_keyword_blacklist=None, var_value_dict=None):
         """Generate Makefile *without* contents of specified sections
 
         A section will not be included if a keyword from the
@@ -154,8 +152,7 @@ class MakefileTemplate():
         # add all lines that have been found before the first declared section
         sec_cont_list = mk_section_list[0].content_list
         # substitute variable assignments
-        sub_list = MakefileTemplate.__subst_var_assign(sec_cont_list,
-                                                       var_value_dict)
+        sub_list = MakefileTemplate.__subst_var_assign(sec_cont_list, var_value_dict)
         content_list.extend(sub_list)
 
         # start with the second element, i.e., with declared section
@@ -168,8 +165,9 @@ class MakefileTemplate():
             # Add the section contents to the content_list
             sec_cont_list = section.content_list
             # substitute variable assignments
-            sub_list = MakefileTemplate.__subst_var_assign(sec_cont_list,
-                                                           var_value_dict)
+            sub_list = MakefileTemplate.__subst_var_assign(
+                sec_cont_list, var_value_dict
+            )
             content_list.extend(sub_list)
 
         return content_list

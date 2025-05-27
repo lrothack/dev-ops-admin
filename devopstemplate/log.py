@@ -1,8 +1,9 @@
 """Initialize the Python logging system"""
+
 import logging
 
 
-class LoggerConfig():
+class LoggerConfig:
     """
     Useful log message formats:
     LOGGING_FORMAT = '%(asctime)-15s: [%(name)s] %(message)s'

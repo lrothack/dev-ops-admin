@@ -1,7 +1,8 @@
 """Create new projects from template and administer existing projects
-    - defines which components/files will be installed for user requests
-    - defines how components/files will be installed according to user requests
+- defines which components/files will be installed for user requests
+- defines how components/files will be installed according to user requests
 """
+
 import os
 import logging
 import json
@@ -16,7 +17,7 @@ class SkipFileError(FileExistsError):
     """
 
 
-class DevOpsTemplate():
+class DevOpsTemplate:
     """Create and modify instances of the DevOps template:
 
     create: New instance of the template
@@ -24,8 +25,9 @@ class DevOpsTemplate():
     cookiecutter: generate cookiecutter template from the devops template
     """
 
-    def __init__(self, projectdirectory,
-                 overwrite_exists=False, skip_exists=False, dry_run=False):
+    def __init__(
+        self, projectdirectory, overwrite_exists=False, skip_exists=False, dry_run=False
+    ):
         """Provide configurations that are common to all DevOpsTemplate actions
 
         Params:
@@ -47,10 +49,10 @@ class DevOpsTemplate():
         self.__template_dname = "template"
         # ATTENTION: using __package__ may only work as long as this module
         # (template.py) is located in the top-level import directory
-        loader = PackageLoader(__package__,
-                               self.__template_dname)
-        self.__env = Environment(loader=loader,
-                                 autoescape=select_autoescape(default=True))
+        loader = PackageLoader(__package__, self.__template_dname)
+        self.__env = Environment(
+            loader=loader, autoescape=select_autoescape(default=True)
+        )
         # Create project base directory if not present
         self.__mkdir(projectdirectory)
 
@@ -91,13 +93,11 @@ class DevOpsTemplate():
         logger.info("Generate cookiecutter template")
         # Generate cookiecutter.json
         # configuration is provided by the context dictionary
-        cookiecutter_json_fpath = os.path.join(self.__projectdir,
-                                               "cookiecutter.json")
+        cookiecutter_json_fpath = os.path.join(self.__projectdir, "cookiecutter.json")
         try:
             self.__check_project_file(cookiecutter_json_fpath)
             if not self.__dry_run:
-                with open(cookiecutter_json_fpath, "w",
-                          encoding="utf-8") as handle:
+                with open(cookiecutter_json_fpath, "w", encoding="utf-8") as handle:
                     json.dump(context, handle, indent=2)
             logger.info("project:%s", cookiecutter_json_fpath)
         except SkipFileError:
@@ -123,14 +123,14 @@ class DevOpsTemplate():
         # Adjust projectdirectory such that __install installs to the correct
         # directory (projectdirectory represents cookiecutter template root)
         cookiecutter_rootdir = self.__projectdir
-        self.__projectdir = os.path.join(self.__projectdir,
-                                         cookiecutter_project_dname)
+        self.__projectdir = os.path.join(self.__projectdir, cookiecutter_project_dname)
         # Generate cookiecutterconfig for rendering cookiecutter template
         # variables
         # pylint: disable=consider-using-f-string
         # simplifies handling of jinja2 template syntax {{ }}
-        cookiecutterconfig = {key: "{{cookiecutter.%s}}" % key
-                              for key in context.keys()}
+        cookiecutterconfig = {
+            key: "{{cookiecutter.%s}}" % key for key in context.keys()
+        }
         # Install all template components
         for comp in components:
             self.__install(comp, cookiecutterconfig)
@@ -203,8 +203,9 @@ class DevOpsTemplate():
         logger = logging.getLogger("DevOpsTemplate.__render")
         pkg_fpath = os.path.join(self.__template_dname, pkg_fname)
         if not pkg.exists(pkg_fpath):
-            raise FileNotFoundError(f"File {pkg_fpath} not available in "
-                                    "distribution package")
+            raise FileNotFoundError(
+                f"File {pkg_fpath} not available in " "distribution package"
+            )
         project_fpath = os.path.join(self.__projectdir, project_fname)
         try:
             self.__check_project_file(project_fpath)
@@ -239,7 +240,9 @@ class DevOpsTemplate():
         if os.path.exists(project_fpath) and self.__skip:
             raise SkipFileError(f"File {project_fpath} already exists, skip.")
         if os.path.exists(project_fpath) and not self.__overwrite:
-            raise FileExistsError(f"File {project_fpath} already exists, exit."
-                                  " (use --skip-exists or --overwrite-exists"
-                                  " to control behavior)")
+            raise FileExistsError(
+                f"File {project_fpath} already exists, exit."
+                " (use --skip-exists or --overwrite-exists"
+                " to control behavior)"
+            )
         return True

@@ -2,6 +2,7 @@
 
 Defines module functions for sub-commands
 """
+
 import sys
 import platform
 import logging
@@ -19,10 +20,12 @@ def create(args):
     """
 
     config = ProjectConfig(args)
-    template = DevOpsTemplate(projectdirectory=config.project_dir,
-                              overwrite_exists=config.overwrite_exists,
-                              skip_exists=config.skip_exists,
-                              dry_run=config.dry_run)
+    template = DevOpsTemplate(
+        projectdirectory=config.project_dir,
+        overwrite_exists=config.overwrite_exists,
+        skip_exists=config.skip_exists,
+        dry_run=config.dry_run,
+    )
 
     param_dict, comp_list = config.create()
     template.create(context=param_dict, components=comp_list)
@@ -35,10 +38,12 @@ def manage(args):
         args: argparse.Namespace object with argument parser attributes
     """
     config = ProjectConfig(args)
-    template = DevOpsTemplate(projectdirectory=config.project_dir,
-                              overwrite_exists=config.overwrite_exists,
-                              skip_exists=config.skip_exists,
-                              dry_run=config.dry_run)
+    template = DevOpsTemplate(
+        projectdirectory=config.project_dir,
+        overwrite_exists=config.overwrite_exists,
+        skip_exists=config.skip_exists,
+        dry_run=config.dry_run,
+    )
 
     param_dict, comp_list = config.manage()
     template.manage(context=param_dict, components=comp_list)
@@ -51,10 +56,12 @@ def cookiecutter(args):
         args: argparse.Namespace object with argument parser attributes
     """
     config = ProjectConfig(args)
-    template = DevOpsTemplate(projectdirectory=config.project_dir,
-                              overwrite_exists=config.overwrite_exists,
-                              skip_exists=config.skip_exists,
-                              dry_run=config.dry_run)
+    template = DevOpsTemplate(
+        projectdirectory=config.project_dir,
+        overwrite_exists=config.overwrite_exists,
+        skip_exists=config.skip_exists,
+        dry_run=config.dry_run,
+    )
 
     param_dict, comp_list = config.cookiecutter()
     template.cookiecutter(context=param_dict, components=comp_list)
@@ -119,22 +126,29 @@ def parse_args(args_list):
     descr = "".join(["Create and manage dev-ops template projects. "])
     parser = argparse.ArgumentParser(description=descr)
     # top-level arguments (optional)
-    parser.add_argument("--project-dir", default=".",
-                        help="Project directory, default: current directory")
-    parser.add_argument("--skip-exists", action="store_true",
-                        help=("Skip copying files if they already "
-                              "exist in the project directory"))
-    parser.add_argument("--overwrite-exists", action="store_true",
-                        help=("Overwrite files if they already "
-                              "exist in the project directory"))
-    parser.add_argument("--quiet", action="store_true",
-                        help="Print only warning/error messages")
-    parser.add_argument("--verbose", action="store_true",
-                        help="Print debug messages")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Pretend to perform actions")
-    parser.add_argument("--version", action="store_true",
-                        help="Print version")
+    parser.add_argument(
+        "--project-dir",
+        default=".",
+        help="Project directory, default: current directory",
+    )
+    parser.add_argument(
+        "--skip-exists",
+        action="store_true",
+        help=("Skip copying files if they already " "exist in the project directory"),
+    )
+    parser.add_argument(
+        "--overwrite-exists",
+        action="store_true",
+        help=("Overwrite files if they already " "exist in the project directory"),
+    )
+    parser.add_argument(
+        "--quiet", action="store_true", help="Print only warning/error messages"
+    )
+    parser.add_argument("--verbose", action="store_true", help="Print debug messages")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Pretend to perform actions"
+    )
+    parser.add_argument("--version", action="store_true", help="Print version")
     # Default for printing help message if no command is provided
     # attribute "func" is set to a lambda function
     # --> if attribute func keeps the lambda function until the entire parser
@@ -143,44 +157,63 @@ def parse_args(args_list):
     # Subparser commands for project creation and management
     subparsers = parser.add_subparsers(help="Commands")
 
-    create_parser = subparsers.add_parser("create",
-                                          help=("Create a new project based "
-                                                "on the dev-ops template"))
-    create_parser.add_argument("-i", "--interactive", action="store_true",
-                               help=("Configure project parameters/components"
-                                     " interactively"))
+    create_parser = subparsers.add_parser(
+        "create", help=("Create a new project based " "on the dev-ops template")
+    )
+    create_parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true",
+        help=("Configure project parameters/components" " interactively"),
+    )
 
-    arg_command_group(create_parser, "project parameters",
-                      group_argument_list=cfg.values("create", "parameters"))
-    arg_command_group(create_parser, "project components",
-                      group_argument_list=cfg.values("create", "components"))
+    arg_command_group(
+        create_parser,
+        "project parameters",
+        group_argument_list=cfg.values("create", "parameters"),
+    )
+    arg_command_group(
+        create_parser,
+        "project components",
+        group_argument_list=cfg.values("create", "components"),
+    )
     # If the create subparser has been activated by the "create" command,
     # override the func attribute with a pointer to the "create" function
     # (defined above) --> overrides default defined for the main parser.
     create_parser.set_defaults(func=create)
 
-    manage_parser = subparsers.add_parser("manage",
-                                          help=("Add individual components of "
-                                                "the dev-ops template"))
-    arg_command_group(manage_parser, "project components",
-                      group_argument_list=cfg.values("manage", "components"))
+    manage_parser = subparsers.add_parser(
+        "manage", help=("Add individual components of " "the dev-ops template")
+    )
+    arg_command_group(
+        manage_parser,
+        "project components",
+        group_argument_list=cfg.values("manage", "components"),
+    )
     # If the manage subparser has been activated by the "manage" command,
     # override the func attribute with a pointer to the "manage" function
     # (defined above) --> overrides default defined for the main parser.
     manage_parser.set_defaults(func=manage)
 
-    cc_parser = subparsers.add_parser("cookiecutter",
-                                      help=("Create a cookiecutter"
-                                            " template"))
-    cc_parser.add_argument("-i", "--interactive", action="store_true",
-                           help=("Configure project parameters/components"
-                                 " interactively"))
-    arg_command_group(cc_parser, "project parameters",
-                      group_argument_list=cfg.values("cookiecutter",
-                                                     "parameters"))
-    arg_command_group(cc_parser, "project components",
-                      group_argument_list=cfg.values("cookiecutter",
-                                                     "components"))
+    cc_parser = subparsers.add_parser(
+        "cookiecutter", help=("Create a cookiecutter" " template")
+    )
+    cc_parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true",
+        help=("Configure project parameters/components" " interactively"),
+    )
+    arg_command_group(
+        cc_parser,
+        "project parameters",
+        group_argument_list=cfg.values("cookiecutter", "parameters"),
+    )
+    arg_command_group(
+        cc_parser,
+        "project components",
+        group_argument_list=cfg.values("cookiecutter", "components"),
+    )
     # If the cookiecutter subparser has been activated by the "cookiecutter"
     # command, override the func attribute with a pointer to the "cookiecutter"
     # function (defined above) --> overrides default for the main parser.
@@ -202,8 +235,9 @@ def parse_args(args_list):
 
     logger.debug("Command-line args: %s", args_list)
     args_dict = vars(args_ns)
-    logger.debug("Options:\n%s", ", ".join(f"{key} : {val}"
-                                           for key, val in args_dict.items()))
+    logger.debug(
+        "Options:\n%s", ", ".join(f"{key} : {val}" for key, val in args_dict.items())
+    )
     args_ns.func(args_ns)
 
 
