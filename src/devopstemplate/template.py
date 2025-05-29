@@ -3,11 +3,12 @@
 - defines how components/files will be installed according to user requests
 """
 
-import os
-import logging
 import json
-from jinja2 import Environment, PackageLoader, select_autoescape
-from jinja2 import Template
+import logging
+import os
+
+from jinja2 import Environment, PackageLoader, Template, select_autoescape
+
 from devopstemplate import pkg
 
 
@@ -186,7 +187,7 @@ class DevOpsTemplate:
         else:
             logger.debug("directory %s exists", project_dpath)
 
-    def __render(self, pkg_fname, project_fname, context):
+    def __render(self, pkg_fname: str, project_fname: str, context):
         """Render template to project according to overwrite/skip class members
         The source file will be used as a Jinja2 template and rendered before
         the rendering result will be written to the target file.
@@ -223,7 +224,7 @@ class DevOpsTemplate:
                 template.stream(**context).dump(project_fh)
         logger.info("template:%s  ->  project:%s", pkg_fname, project_fpath)
 
-    def __check_project_file(self, project_fpath):
+    def __check_project_file(self, project_fpath: str):
         """Check whether the given file can be created in the project without
         conflict. A conflict arises if the file exists and should not be
         skipped or overwritten.

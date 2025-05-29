@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster as build
+FROM python:3.12-slim AS build
 # The python base image contains python, pip, etc. in a slim Debian buster 
 
 # Variables defined with ARG can be modified when building the Docker image
@@ -24,15 +24,15 @@ COPY . .
 # Docker build fails if unit tests fail
 RUN make clean-all && \
     make install-dev && \
-    (make lint >${REPORTFILE} || exit 0) && \
-    make test >>${REPORTFILE}
+    make check && \
+    make report >${REPORTFILE}
 
 # Use Makefile in order to build a Python wheel from the app
-RUN make clean-all && make dist
+RUN make clean-all && make build
 
 # Start a new stage for the deployment image in order to minimize image size
 # --> libs for code analysis are not required in the final image
-FROM python:3.8-slim-buster
+FROM python:3.12-slim
 
 # Define value of ENTRYPOINT environment variable with build-arg ENTRYPOINT.
 # The environment variable will be available within the Docker container.
@@ -75,11 +75,11 @@ RUN chown user:user . ; \
 # Switch user/set user for running the app
 USER user
 # Specify entrypoint in json style 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["bash", "./entrypoint.sh"]
 # Provide default args with CMD. Default args are overridden by command-line
 # arguments to docker run on the command-line.
 # CMD ["--help"]
 # Important: both entrypoint and cmd have to be specified in json style
 # --> json style allows for better CLI interoperability when running the 
 # container. Most importantly users can provide command-line arguments for
-# the entrypoint script. 
+# the entrypoint script.

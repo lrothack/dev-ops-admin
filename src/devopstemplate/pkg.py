@@ -5,10 +5,12 @@ lists of strings, file names and binary stream for files stored in Python
 distribution packages.
 """
 
+from typing import BinaryIO
+
 import pkg_resources
 
 
-def exists(resource_name):
+def exists(resource_name: str) -> bool:
     """Package resource wrapper for checking if resource exists
 
     Params:
@@ -16,10 +18,10 @@ def exists(resource_name):
             package root)
     Returns: boolean specifying existence
     """
-    return pkg_resources.resource_exists(__package__, resource_name)
+    return pkg_resources.resource_exists(__package__, resource_name)  # type: ignore
 
 
-def isdir(resource_name):
+def isdir(resource_name: str) -> bool:
     """Package resource wrapper for checking if resource is a directory
 
     Params:
@@ -27,10 +29,10 @@ def isdir(resource_name):
             package root)
     Returns: boolean specifying is resource is directory
     """
-    return pkg_resources.resource_isdir(__package__, resource_name)
+    return pkg_resources.resource_isdir(__package__, resource_name)  # type: ignore
 
 
-def filepath(resource_name):
+def filepath(resource_name: str) -> str:
     """Package resource wrapper for obtaining resource filepath
 
     Attention: resource might have to be copied to a tmp folder in order to
@@ -41,10 +43,10 @@ def filepath(resource_name):
             package root)
     Returns: absolute path to the resource in the file system
     """
-    return pkg_resources.resource_filename(__package__, resource_name)
+    return pkg_resources.resource_filename(__package__, resource_name)  # type: ignore
 
 
-def string(resource_name, encoding="utf-8"):
+def string(resource_name: str, encoding: str = "utf-8") -> str:
     """Package resource wrapper for obtaining resource contents as string.
 
     Attention: The originally binary string will be interpreted as a text
@@ -58,11 +60,11 @@ def string(resource_name, encoding="utf-8"):
     Returns: contents of of resource interpreted as text string (default
         encoding)
     """
-    resource_string = pkg_resources.resource_string(__package__, resource_name)
+    resource_string = pkg_resources.resource_string(__package__, resource_name)  # type: ignore
     return resource_string.decode(encoding)
 
 
-def string_list(resource_name, encoding="utf-8"):
+def string_list(resource_name: str, encoding: str = "utf-8") -> list[str]:
     """Package resource wrapper for obtaining resource contents as list of
     strings.
 
@@ -80,7 +82,7 @@ def string_list(resource_name, encoding="utf-8"):
     return string(resource_name, encoding).splitlines()
 
 
-def stream(resource_name):
+def stream(resource_name: str) -> BinaryIO:
     """Package resource wrapper for obtaining file handle in order to read
     resource contents.
 
@@ -89,4 +91,4 @@ def stream(resource_name):
             package root)
     Returns: file object for reading resource contents in binary mode
     """
-    return pkg_resources.resource_stream(__package__, resource_name)
+    return pkg_resources.resource_stream(__package__, resource_name)  # type: ignore

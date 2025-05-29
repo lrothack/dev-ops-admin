@@ -3,10 +3,11 @@
 Defines module functions for sub-commands
 """
 
-import sys
-import platform
-import logging
 import argparse
+import logging
+import platform
+import sys
+
 import devopstemplate
 from devopstemplate.config import CommandsConfig, ProjectConfig
 from devopstemplate.template import DevOpsTemplate

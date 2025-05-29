@@ -11,9 +11,9 @@
 #
 # You can just use this script if
 #  - your executable has the same name as your Python package, i.e., the 'name'
-#    defined in setup.cfg/setup.py
+#    defined in pyproject.toml
 #  - your executable is available on the PATH (standard if you define/register
-#    your executable in setup.cfg/setup.py as 'entry_point' or 'script')
+#    your executable in pyproject.toml as 'project.scripts')
 #
 # ENTRYPOINT environment variable contains the name of the executable
 # and is expected to be on the PATH

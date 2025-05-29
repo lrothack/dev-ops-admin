@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "devopstemplate"
+authors = [
+    { name = "Leonard Rothacker", email = "leonard.rothacker@googlemail.com" },
+]
+description = "This package provides a command-line interface for setting up a Python project based on a dev-ops template."
+# Name of the project / library
+# Typically, the name of the top-level import package (directory) is the slug of the
+# project name, see Makefile variable NAME.
+requires-python = ">=3.12"
+license = "MIT"
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = ["Jinja2"]
+
+# Fields that will be loaded dynamically from files or code
+dynamic = ["version", "readme"]
+
+[project.optional-dependencies]
+dev = [
+    "bandit",
+    "black>=25.1.0",
+    "isort",
+    "mypy>=1.15.0",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pylint>=2.6.0",
+    "ruff",
+]
+
+[project.scripts]
+devopstemplate = "devopstemplate.main:main"
+
+[project.urls]
+Repository = "https://github.com/lrothack/dev-ops-admin"
+
+[tool.setuptools.packages.find]
+# where to find sources
+where = ["src"]
+
+# [tool.setuptools.package-data]
+# devopstemplate = [
+#     "*.json", 
+#     "*.yml", 
+#     "*.md", 
+#     "*.sh", 
+#     "*ignore", 
+#     "*.mk", 
+#     "Makefile", 
+#     "Dockerfile", 
+#     ".sonartoken",
+# ]
+
+[tool.setuptools.dynamic]
+# The version string will be included in your Python package
+version = { attr = "devopstemplate.__version__" }
+# Long description of the package
+readme = { file = "README.md", content-type = "text/markdown" }
+
+[tool.pylint.format]
+# Configure pylint to be compliant with black
+max-line-length = "88"

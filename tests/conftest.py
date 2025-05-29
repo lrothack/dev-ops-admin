@@ -1,5 +1,8 @@
 def ref_file_head():
-    ref_file_list = ["include LICENSE", "include README.md"]
+    ref_file_list = [
+        "# Comments: single '#' for ordinary comments, ",
+        "#           '## ' indicates text for 'help' target ",
+    ]
     return ref_file_list
 
 

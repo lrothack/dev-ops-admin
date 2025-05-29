@@ -25,26 +25,33 @@ MKFILE_PATH := $(lastword $(MAKEFILE_LIST))
 # Define names of executables used in make targets (and variables)
 PYTHON = python
 PIP = pip
-# Files required by setuptools (python setup.py, pip)
-# Note that setuptools can only supports running from the project root
-# --> SETUPTOOLSFILES must be present in the working directory
+META=$(PYTHON) $(SRC)/devopstemplate/template/meta.py
+# Files required by `python build` (pip, name/version discovery)
+# Note that building is only supported from the project root
+# --> BUILDTOOLSFILES must be present in the working directory
 # Adjust the list when your configuration changes, e.g., you use additional
 # files one of the files is not used anymore.
-SETUPTOOLSFILES = setup.py requirements.txt
+BUILDTOOLSFILES = pyproject.toml
+#
+# Directory where sources are located
+SRC=src
+# Directory where unit tests are located
+TESTS=tests
 #
 # Obtain Python package path, name and version
-# Lazy variable evualtion (with a single '=') is used in order to evaluate
-# variables only from inside make targets. This allows to check if SETUPTOOLSFILES
+# Lazy variable evaluation (with a single '=') is used in order to evaluate
+# variables only from inside make targets. This allows to check if BUILDTOOLSFILES
 # are present *before* executing the shell commands. 
 #
-# Name of the application defined in setup.py
-NAME=$(shell $(PYTHON) setup.py --name)
-# Version of the application defined in setup.py
-VERSION=$(shell $(PYTHON) setup.py --version)
-# Name of the directory where application sources are located
-PACKAGE=./$(NAME)
-# Directory where unittests are located
-TESTS=./tests
+# Name of the application defined via pyproject.toml
+NAME=$(shell $(META) --quiet --egginfo-path=$(SRC) --name)
+# Version of the application defined via pyproject.toml
+VERSION=$(shell $(META) --quiet --egginfo-path=$(SRC) --version)
+# Directory where metadata for the installed package is found
+EGGINFO=$(SRC)/$(NAME).egg-info
+# Files that contain package metadata, adding SRC*/__init__.py since top-level __init__.py
+# file contains version information (-> for reinstalling package if metadata changes)
+METADATAFILES = pyproject.toml $(wildcard $(SRC)/*/__init__.py) $(wildcard $(SRC)/*/__about__.py)
 
 
 # --- Linting/Testing configuration ---
@@ -54,6 +61,10 @@ PYTEST = pytest
 COVERAGE = coverage
 PYLINT = pylint
 BANDIT = bandit
+RUFF = ruff
+BLACK = black
+ISORT = isort
+MYPY = mypy
 # Directory where to save linting and testing reports
 REPDIR=./.codereports
 # Report result files
@@ -99,7 +110,7 @@ DOCKERNET=sonarqube_net
 SONARSCANNER=$(DOCKER) run \
     --network=$(DOCKERNET) \
     --rm -v $(CWD):/usr/src \
-    sonarsource/sonar-scanner-cli:4.6
+    sonarsource/sonar-scanner-cli:10
 #
 # Local sonar-scanner installation
 #
@@ -111,7 +122,7 @@ SONARSCANNER=$(DOCKER) run \
 
 # --- Common targets ---
 
-.PHONY: help clean clean-all dist install-dev test lint sonar docker-build docker-tag
+.PHONY: help clean clean-all build install-dev test lint report check sonar docker-build docker-tag
 
 ## 
 ## MAKEFILE for building and testing Python package including
@@ -137,59 +148,69 @@ clean:
 clean-all: clean
 	@rm -rf .coverage .scannerwork
 	@rm -rf .pytest_cache
-	@rm -rf $(REPDIR)
-	@rm -rf $(NAME).egg-info
-	@rm -rf $(PACKAGE)/$(NAME).egg-info
-	@rm -rf build
-	@rm -rf dist
+	@rm -rf ./$(REPDIR)
+	@rm -rf $(EGGINFO)
+	@rm -rf dist/*.whl dist/*.tar.gz
 
 
 # --- Python targets ---
 
-# Check if project files exist in current working directory, otherwise stop.
-$(PACKAGE):
-	$(error "Python project files missing in working directory ($@)")
+# Check if project source directory exists in current working directory, otherwise stop.
+$(SRC):
+	$(error "Python source directory missing in working directory ($@)")
 # Check if test files exist in current working directory, otherwise stop.
 $(TESTS):
 	$(error "Python test files missing in working directory ($@)")
-# Check if setuptools files exist in current working directory, otherwise stop.
-$(SETUPTOOLSFILES):
+# Check if files for building exist in current working directory, otherwise stop.
+$(BUILDTOOLSFILES):
 	$(error "Python packaging files missing in working directory ($@)")
 
-## dist:         Build a Python wheel with setuptools (based on setup.py)
-dist: $(SETUPTOOLSFILES)
-	$(PYTHON) setup.py sdist
-	$(PYTHON) setup.py bdist_wheel
+## build:        Build a Python wheel with `python build` (based on pyproject.toml)
+build: $(BUILDTOOLSFILES)
+	$(PIP) install build
+	$(PYTHON) -m build
 
-## install-dev:  Install development dependencies (based on setup.py)
+## install-dev:  Install development dependencies (based on pyproject.toml)
 ##               (installation within a Python virtual environment is
 ##                recommended)
 ##               (application sources will be symlinked to PYTHONPATH)
-install-dev: $(SETUPTOOLSFILES)
-	$(PIP) install -e .[dev]
+# along with PHONY target `install-dev` the rule generates the $(EGGINFO) directory
+# this distribution specification should be rebuilt whenever any package metadata changes
+# -> an updated $(EGGINFO) is required for successful package name/version discovery
+install-dev $(EGGINFO): $(BUILDTOOLSFILES) $(METADATAFILES)
+	$(PIP) install -e ".[dev]"
 
-## test:         Run Python unit tests with pytest and analyse coverage
-# check SETUPTOOLSFILES since setuptools is used to generate the PACKAGE name
-test: $(SETUPTOOLSFILES) $(PACKAGE) $(TESTS)
-	@echo "\n\nUnit Tests\n----------\n"
-	$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) $(TESTS)
-	@echo "\n\nUnit Test Code Coverage\n-----------------------\n"
-	$(COVERAGE) report -m  --omit="*/template/*"
+## test:         Run Python unit tests with pytest and coverage analysis
+test: $(SRC) $(TESTS)
+	@echo "\n\nUnit Tests with Coverage\n------------------------\n"
+	$(PYTEST) --cov=$(SRC) $(TESTS)
 
 ## lint:         Run Python linter (bandit, pylint) and print output to terminal
-# check SETUPTOOLSFILES since setuptools is used to generate the PACKAGE name
-lint: $(SETUPTOOLSFILES) $(PACKAGE)
+lint: $(SRC)
 	@echo "\n\nBandit Vulnerabilities\n----------------------\n"
-	-$(BANDIT) -r $(PACKAGE) --exclude "*/venv/*"
+	-$(BANDIT) -r --exclude "**/template/*,**/venv/*" $(SRC)
 	@echo "\n\nPylint Code Analysis\n--------------------\n"
-	$(PYLINT) --output-format=colorized --reports=n --exit-zero $(PACKAGE)
+	$(PYLINT) --ignore template,venv --output-format=colorized --reports=n --exit-zero $(SRC)
+
+## report:       Combines test and lint targets in order to create a report
+report: lint test
+
+## check:        Checks test coverage, black/isort formatting, ruff linting
+##               and mypy type hints
+check: $(SRC) $(TESTS)
+	$(PYTEST) --cov=$(SRC) --cov-fail-under=80 $(TESTS)
+	$(BLACK) --extend-exclude template --check $(SRC)
+	$(RUFF) check --extend-exclude "**/template/*" $(SRC)
+	# $(MYPY) --strict --exclude "/template/" $(SRC)
+	$(ISORT) --check $(SRC)
+
 
 
 # --- SonarQube targets ---
 
 ## sonar:        Report code analysis and test coverage results to SonarQube
 ##               (requires SonarQube server, to run server in Docker:
-##                `docker-compose -p sonarqube \
+##                `docker compose -p sonarqube \
 ##                                -f sonarqube/docker-compose.yml up -d`)
 #                (requires code analysis dependencies, 
 #                 intall with `make install-dev`
@@ -198,19 +219,19 @@ lint: $(SETUPTOOLSFILES) $(PACKAGE)
 #                 and sonar scanner containers simulataneously)
 # leading dash (in front of commands, not parameters) ignores error codes,
 # `make` would fail if test case fails or linter reports infos/warnings/errors.
-# check SETUPTOOLSFILES since setuptools is used to generate PACKAGE / NAME
-sonar: $(SETUPTOOLSFILES) $(PACKAGE) $(TESTS)
+# check EGGINFO that is required for package NAME discovery
+sonar: $(EGGINFO) $(SRC) $(TESTS)
 	@mkdir -p $(REPDIR)
-	-$(BANDIT) -r $(PACKAGE) --exclude "*/venv/*" --format json >$(BANDITREP)
-	$(PYLINT) $(PACKAGE) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
-	-$(COVERAGE) run --source $(PACKAGE) -m $(PYTEST) --junit-xml=$(PYTESTREP) -o junit_family=xunit2 $(TESTS)
-	$(COVERAGE) xml -o $(COVERAGEREP) --omit="*/template/*"
+	-$(BANDIT) -r $(SRC) --format json >$(BANDITREP)
+	$(PYLINT) $(SRC) --exit-zero --reports=n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > $(PYLINTREP)
+	-$(COVERAGE) run --source $(SRC) -m $(PYTEST) --junit-xml=$(PYTESTREP) -o junit_family=xunit2 $(TESTS)
+	$(COVERAGE) xml -o $(COVERAGEREP)
 	$(SONARSCANNER) -Dsonar.host.url=$(SONARURL) \
-              -Dsonar.login=$(SONARTOKEN) \
+              -Dsonar.token=$(SONARTOKEN) \
               -Dsonar.projectKey=$(NAME) \
               -Dsonar.projectVersion=$(VERSION) \
               -Dsonar.sourceEncoding=UTF-8 \
-              -Dsonar.sources=$(PACKAGE) \
+              -Dsonar.sources=$(SRC) \
               -Dsonar.tests=$(TESTS) \
               -Dsonar.scm.disabled=$(SONARNOSCM) \
               -Dsonar.python.xunit.reportPath=$(PYTESTREP) \
@@ -224,8 +245,8 @@ sonar: $(SETUPTOOLSFILES) $(PACKAGE) $(TESTS)
 ## docker-build: Build docker image for Python application with code analysis
 # Note: info is parsed and immediately printed by make, echo is executed in a
 # shell as are the other commands in the recipe.
-# check SETUPTOOLSFILES since setuptools is used to generate the package NAME
-docker-build: $(SETUPTOOLSFILES) $(DOCKERFILES)
+# check EGGINFO that is required for package NAME discovery
+docker-build: $(EGGINFO) $(DOCKERFILES)
 	$(info Running Docker build in context: ./ )
 	$(info ENTRYPOINT executable: $(DOCKERENTRYPOINTEXEC))
 	$(eval REPORTFILE:=code-analyses.txt)
@@ -237,7 +258,7 @@ docker-build: $(SETUPTOOLSFILES) $(DOCKERFILES)
 	@echo "\n\nbuild finished, run the container with \`docker run --rm $(NAME)\`"
 
 ## docker-tag:   Tag the 'latest' image created with `make docker-build` with
-##               the current version that is defined in setup.cfg/setup.py
-# check SETUPTOOLSFILES since setuptools is used to generate NAME and VERSION
-docker-tag: $(SETUPTOOLSFILES)
+##               the current version that is defined via pyproject.toml
+# check EGGINFO that is required for package NAME and VERSION discovery
+docker-tag: $(EGGINFO)
 	$(DOCKER) tag $(NAME) $(NAME):$(VERSION)

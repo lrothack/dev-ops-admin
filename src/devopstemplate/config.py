@@ -1,10 +1,12 @@
 """Defines template creation and modification wrt user configurations."""
 
-import os
-import subprocess
-import shutil
 import json
+import os
+import shutil
+import subprocess
+
 from jinja2 import Template
+
 from devopstemplate import pkg
 
 

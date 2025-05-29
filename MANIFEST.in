@@ -1,0 +1,14 @@
+recursive-include * *.json
+recursive-include * *.yml
+recursive-include * *.md
+recursive-include * *.sh
+recursive-include * *ignore
+recursive-include * *.mk
+recursive-include * Makefile
+recursive-include * Dockerfile
+recursive-include * .sonartoken
+
+recursive-exclude * *sampleproject*
+recursive-exclude * */sampleproject/**
+recursive-exclude * */venv/**
+

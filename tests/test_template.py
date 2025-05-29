@@ -37,8 +37,8 @@ class TestDevOpsTemplate(unittest.TestCase):
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = "tmp_file"
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
-            template._DevOpsTemplate__render("MANIFEST.in", tmp_fpath, context={})
-            with open(tmp_fpath, "r") as tmp_fh:
+            template._DevOpsTemplate__render("Makefile", tmp_fpath, context={})
+            with open(tmp_fpath, "r", encoding="utf-8") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
 
@@ -55,7 +55,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             project_slug = "project"
             context = {"project_slug": project_slug}
             template._DevOpsTemplate__render(
-                "{{project_slug}}/__init__.py", tmp_fpath, context=context
+                "src/{{project_slug}}/__init__.py", tmp_fpath, context=context
             )
             with open(tmp_fpath, "r") as tmp_fh:
                 contents = tmp_fh.read()
@@ -70,7 +70,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             with self.assertRaises(FileExistsError):
-                template._DevOpsTemplate__render("MANIFEST.in", tmp_path, context={})
+                template._DevOpsTemplate__render("Makefile", tmp_path, context={})
 
     def test_render_skip(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -78,7 +78,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = "tmp_file"
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__render("MANIFEST.in", tmp_path, context={})
+            template._DevOpsTemplate__render("Makefile", tmp_path, context={})
             with open(tmp_path, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 self.assertEqual(contents, "")
@@ -91,7 +91,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = "tmp_file"
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__render("MANIFEST.in", tmp_path, context={})
+            template._DevOpsTemplate__render("Makefile", tmp_path, context={})
             with open(tmp_path, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
@@ -234,7 +234,9 @@ class TestDevOpsTemplate(unittest.TestCase):
                 self.assertTrue(os.path.exists(fpath))
 
             # Check template __init__.py
-            pkgdirname = os.path.join(projectdirname, "{{cookiecutter.project_slug}}")
+            pkgdirname = os.path.join(
+                projectdirname, "src", "{{cookiecutter.project_slug}}"
+            )
             init_fpath = os.path.join(pkgdirname, "__init__.py")
             with open(init_fpath, "r") as fh:
                 init_contents = fh.read()

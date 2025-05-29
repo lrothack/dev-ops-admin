@@ -1,8 +1,8 @@
 {
     "src": [
-        "{{project_slug}}/__init__.py",
-        "{{project_slug}}/log.py",
-        "{{project_slug}}/main.py"
+        "src/{{project_slug}}/__init__.py",
+        "src/{{project_slug}}/log.py",
+        "src/{{project_slug}}/main.py"
     ],
     "tests": [
         "tests/test_{{project_slug}}.py"
@@ -14,9 +14,7 @@
         "setup.mk"
     ],
     "setuptools": [
-        "MANIFEST.in",
-        "setup.py",
-        "requirements.txt"
+        "pyproject.toml"
     ],
     "docker": [
         ".dockerignore",
