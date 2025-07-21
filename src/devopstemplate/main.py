@@ -1,4 +1,4 @@
-"""Command-line interface for creating and adminitrating template projects
+"""Command-line interface for creating and administrating template projects
 
 Defines module functions for sub-commands
 """
@@ -7,13 +7,14 @@ import argparse
 import logging
 import platform
 import sys
+from typing import Any
 
 import devopstemplate
 from devopstemplate.config import CommandsConfig, ProjectConfig
 from devopstemplate.template import DevOpsTemplate
 
 
-def create(args):
+def create(args: argparse.Namespace) -> None:
     """Wrapper for sub-command create
 
     Params:
@@ -32,7 +33,7 @@ def create(args):
     template.create(context=param_dict, components=comp_list)
 
 
-def manage(args):
+def manage(args: argparse.Namespace) -> None:
     """Wrapper for sub-command manage
 
     Params:
@@ -50,7 +51,7 @@ def manage(args):
     template.manage(context=param_dict, components=comp_list)
 
 
-def cookiecutter(args):
+def cookiecutter(args: argparse.Namespace) -> None:
     """Wrapper for sub-command manage
 
     Params:
@@ -68,7 +69,11 @@ def cookiecutter(args):
     template.cookiecutter(context=param_dict, components=comp_list)
 
 
-def arg_command_group(parser, group_name, group_argument_list):
+def arg_command_group(
+    parser: argparse.ArgumentParser,
+    group_name: str,
+    group_argument_list: list[dict[str, Any]],
+) -> Any:
     """Add a group of optional arguments to the parser.
 
     Params:
@@ -105,7 +110,7 @@ def arg_command_group(parser, group_name, group_argument_list):
     return group
 
 
-def parse_args(args_list):
+def parse_args(args_list: list[str]) -> None:
     """Parse command-line arguments and call a function for processing user
     request.
 
@@ -171,12 +176,12 @@ def parse_args(args_list):
     arg_command_group(
         create_parser,
         "project parameters",
-        group_argument_list=cfg.values("create", "parameters"),
+        group_argument_list=cfg.values_dict("create", "parameters"),
     )
     arg_command_group(
         create_parser,
         "project components",
-        group_argument_list=cfg.values("create", "components"),
+        group_argument_list=cfg.values_dict("create", "components"),
     )
     # If the create subparser has been activated by the "create" command,
     # override the func attribute with a pointer to the "create" function
@@ -189,7 +194,7 @@ def parse_args(args_list):
     arg_command_group(
         manage_parser,
         "project components",
-        group_argument_list=cfg.values("manage", "components"),
+        group_argument_list=cfg.values_dict("manage", "components"),
     )
     # If the manage subparser has been activated by the "manage" command,
     # override the func attribute with a pointer to the "manage" function
@@ -208,12 +213,12 @@ def parse_args(args_list):
     arg_command_group(
         cc_parser,
         "project parameters",
-        group_argument_list=cfg.values("cookiecutter", "parameters"),
+        group_argument_list=cfg.values_dict("cookiecutter", "parameters"),
     )
     arg_command_group(
         cc_parser,
         "project components",
-        group_argument_list=cfg.values("cookiecutter", "components"),
+        group_argument_list=cfg.values_dict("cookiecutter", "components"),
     )
     # If the cookiecutter subparser has been activated by the "cookiecutter"
     # command, override the func attribute with a pointer to the "cookiecutter"
@@ -242,7 +247,7 @@ def parse_args(args_list):
     args_ns.func(args_ns)
 
 
-def main():
+def main() -> None:
     """Entrypoint for starting the command-line interface.
     Control-flow continues depending on user arguments.
 

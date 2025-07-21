@@ -199,9 +199,9 @@ report: lint test
 ##               and mypy type hints
 check: $(SRC) $(TESTS)
 	$(PYTEST) --cov=$(SRC) --cov-fail-under=80 $(TESTS)
-	$(BLACK) --extend-exclude template --check $(SRC)
+	$(BLACK) --extend-exclude "/template/" --check $(SRC)
 	$(RUFF) check --extend-exclude "**/template/*" $(SRC)
-	# $(MYPY) --strict --exclude "/template/" $(SRC)
+	$(MYPY) --strict --exclude "/template/" $(SRC)
 	$(ISORT) --check $(SRC)
 
 

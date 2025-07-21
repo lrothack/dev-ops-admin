@@ -1,9 +1,11 @@
 """Defines template creation and modification wrt user configurations."""
 
+import argparse
 import json
 import os
 import shutil
 import subprocess
+from typing import Any, cast
 
 from jinja2 import Template
 
@@ -16,15 +18,28 @@ class CommandsConfig:
     """
 
     # Static variable storing the command definitions
-    __commands_dict = {}
+    __commands_dict: dict[str, Any] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Loads dictionary with command definitions, if not already present"""
         if not CommandsConfig.__commands_dict:
             CommandsConfig.__commands_dict = self.__load_commands_dict()
         self.__commands_dict = CommandsConfig.__commands_dict
 
-    def values(self, command, section):
+    def __values(self, command: str, section: str) -> list[Any]:
+        cmd_dict = self.__commands_dict[command]
+        try:
+            result_list = cmd_dict[section]
+        except KeyError:
+            result_list = []
+        if not isinstance(result_list, list):
+            raise TypeError(
+                f"Section '{section}' for command '{command}' " "must contain a list"
+            )
+
+        return result_list
+
+    def values_str(self, command: str, section: str) -> list[str]:
         """Obtain a section for a command from the json configuration
 
         Params:
@@ -32,20 +47,43 @@ class CommandsConfig:
                 cookiecutter)
             section: String specifying the configuration section (template,
                 parameters, components)
-        Returns: List of string xor dict objects containing the
+        Returns: List of strings containing the
+            components of the configurations section, empty list if
+            the section is not available
+        """
+        result_list = self.__values(command, section)
+
+        if any(not isinstance(item, str) for item in result_list):
+            raise TypeError(
+                f"Section '{section}' for command '{command}' "
+                "must contain a list of strings"
+            )
+
+        return result_list
+
+    def values_dict(self, command: str, section: str) -> list[dict[str, Any]]:
+        """Obtain a section for a command from the json configuration
+
+        Params:
+            command: String specifying the command (create, manage,
+                cookiecutter)
+            section: String specifying the configuration section (template,
+                parameters, components)
+        Returns: Dict objects containing the
             options/components of the configurations section, empty list if
             the section is not available
         """
-        cmd_dict = self.__commands_dict[command]
-        try:
-            result_list = cmd_dict[section]
-        except KeyError:
-            result_list = []
+        result_list = self.__values(command, section)
+        if any(not isinstance(item, dict) for item in result_list):
+            raise TypeError(
+                f"Section '{section}' for command '{command}' "
+                "must contain a list of dictionaries"
+            )
 
         return result_list
 
     @staticmethod
-    def __load_commands_dict():
+    def __load_commands_dict() -> dict[str, Any]:
         """Load commands definition from package resource
 
         Returns:
@@ -62,10 +100,16 @@ class CommandsConfig:
         context = {"git_name": name, "git_email": email}
         commands_str = Template(commands_str).render(**context)
         commands_dict = json.loads(commands_str)
-        return commands_dict
+        if not isinstance(commands_dict, dict) and any(
+            not isinstance(k, str) for k in commands_dict
+        ):
+            raise TypeError(
+                "commands.json must contain a dictionary of string keys / commands"
+            )
+        return cast(dict[str, Any], commands_dict)
 
     @staticmethod
-    def git_user():
+    def git_user() -> tuple[str, str]:
         """Obtain git user name and email from git config.
 
         The function expects that the command 'git' is found on the PATH.
@@ -98,7 +142,7 @@ class ProjectConfig:
     mode.
     """
 
-    def __init__(self, args):
+    def __init__(self, args: argparse.Namespace) -> None:
         """Initialize config with defaults that all template actions have in
         common
 
@@ -114,7 +158,7 @@ class ProjectConfig:
         # load definition for (sub-)commands
         self.__cfg = CommandsConfig()
 
-    def __param_dict(self, command):
+    def __param_dict(self, command: str) -> dict[str, Any]:
         """Generate project configuration for creating an instance of the
         devops template. Defines the context for rendering Jinja2 templates.
 
@@ -125,7 +169,7 @@ class ProjectConfig:
         Returns:
             param_dict: Dictionary with configurations
         """
-        param_def_list = self.__cfg.values(command, "parameters")
+        param_def_list = self.__cfg.values_dict(command, "parameters")
         param_key_list = [p["name"].replace("-", "_") for p in param_def_list]
         # Define param dict for project context
         param_dict = {key: self.__args_dict[key] for key in param_key_list}
@@ -134,7 +178,7 @@ class ProjectConfig:
             param_dict = self.__input(param_key_list, param_dict)
         return param_dict
 
-    def __comp_list(self, command):
+    def __comp_list(self, command: str) -> list[str]:
         """Generate list of project components that will be installed according
         to template.json
 
@@ -145,7 +189,7 @@ class ProjectConfig:
         Returns:
             comp_list: List of strings specifying template components
         """
-        comp_def_list = self.__cfg.values(command, "components")
+        comp_def_list = self.__cfg.values_dict(command, "components")
         # Generate internal identifiers (keys) for component by their names
         comp_key_list = [c["name"].replace("-", "_") for c in comp_def_list]
         # comp_dict: dict of project component dicts
@@ -167,7 +211,7 @@ class ProjectConfig:
         # Translate flags (pos and neg) to positive list of components
         # Initialize with default components for command
         # Create a copy since the list will be extended
-        comp_list = list(self.__cfg.values(command, "template"))
+        comp_list = list(self.__cfg.values_str(command, "template"))
         for key in comp_key_list:
             # Whether to add the component by default (when no user flag has
             # been set)
@@ -180,7 +224,7 @@ class ProjectConfig:
 
         return comp_list
 
-    def create(self):
+    def create(self) -> tuple[dict[str, Any], list[str]]:
         """Generate project configuration for action 'create'.
 
         Supports interactive mode.
@@ -217,7 +261,7 @@ class ProjectConfig:
 
         return param_dict, comp_list
 
-    def manage(self):
+    def manage(self) -> tuple[dict[str, Any], list[str]]:
         """Generate project configuration for action 'manage'.
 
         Returns:
@@ -234,7 +278,7 @@ class ProjectConfig:
 
         return param_dict, comp_list
 
-    def cookiecutter(self):
+    def cookiecutter(self) -> tuple[dict[str, Any], list[str]]:
         """Generate project configuration for action 'cookiecutter'.
 
         Returns:
@@ -263,7 +307,7 @@ class ProjectConfig:
         return param_dict, comp_list
 
     @staticmethod
-    def __input(key_list, params):
+    def __input(key_list: list[str], params: dict[str, Any]) -> dict[str, Any]:
         """Query the user for a list of configuration options over the
         command-line. Supports boolean options: User input [y]es and [n]o.
         Default values can be confirmed with 'enter'.
@@ -278,18 +322,17 @@ class ProjectConfig:
 
         """
         for key in key_list:
-            value = params[key]
+            value_default = params[key]
             key_disp = key.replace("_", "-")
-            if isinstance(value, bool):
+            if isinstance(value_default, bool):
                 # Convert boolean value to string
-                value = "y" if value else "n"
-                value_user = input(f"{key_disp} [ {value} ] : ")
+                value_default = "y" if value_default else "n"
+                value_user = input(f"{key_disp} [ {value_default} ] : ")
                 # Convert string value_user to boolean
-                value_user = value_user == "y"
+                params[key] = value_user == "y"
             else:
-                value_user = input(f'{key_disp} [ "{value}" ] : ')
+                value_user = input(f'{key_disp} [ "{value_default}" ] : ')
                 # Keep initial value if user just presses enter
                 # use the user input otherwise
-                value_user = value if value_user == "" else value_user
-            params[key] = value_user
+                params[key] = value_default if value_user == "" else value_user
         return params

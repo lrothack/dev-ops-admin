@@ -4,6 +4,7 @@
 """
 
 import re
+from typing import Any, TextIO
 
 
 class MakefileSection:
@@ -16,7 +17,11 @@ class MakefileSection:
         content_list: List of strings representing the lines of the section
     """
 
-    def __init__(self, section_title, first_line=None):
+    def __init__(
+        self,
+        section_title: str | None,
+        first_line: str | None = None,
+    ) -> None:
         """Initialize section with title and optional first line
 
         Params:
@@ -30,7 +35,7 @@ class MakefileSection:
         if first_line is not None:
             self.content_list.append(first_line)
 
-    def append_line(self, line):
+    def append_line(self, line: str) -> None:
         """Add a line to the content_list of this section
 
         Params:
@@ -42,31 +47,38 @@ class MakefileSection:
 class MakefileTemplate:
     """Parse Makefile template into sections and generate Makefile for project."""
 
-    def __init__(self, filehandle):
+    def __init__(self, file: TextIO) -> None:
         # Read file contents and split text lines such that lines are not
         # terminated by "newline" anymore.
-        content_list = filehandle.read().splitlines()
+        content_list = file.read().splitlines()
         self.__mk_section_list = self.parse(content_list)
 
-    def write(self, filehandle, section_keyword_blacklist=None, var_value_dict=None):
+    def write(
+        self,
+        file: TextIO,
+        section_keyword_blacklist: list[str] | None = None,
+        var_value_dict: dict[str, Any] | None = None,
+    ) -> None:
         """Generate and write Makefile *without* contents of specified sections
 
         See "generate" method for detailed description (method and parameters).
 
         Params:
-            filehandle: File object that the Makefile will be written to.
+            file: File object that the Makefile will be written to.
             section_keyword_blacklist: List of strings with keywords for
                 filtering sections by their titles. (optional)
             var_value_dict: Dict mapping from variable names to variable
                 values. (optional)
         """
         content_list = self.generate(
-            self.__mk_section_list, section_keyword_blacklist, var_value_dict
+            self.__mk_section_list,
+            section_keyword_blacklist,
+            var_value_dict,
         )
-        filehandle.write("\n".join(content_list))
+        file.write("\n".join(content_list))
 
     @staticmethod
-    def parse(content_list):
+    def parse(content_list: list[str]) -> list[MakefileSection]:
         """Parse the Makefile template and return Makefile divided in sections.
 
         The first section is a pseudo-section which contains all lines found
@@ -116,7 +128,11 @@ class MakefileTemplate:
         return mk_section_list
 
     @staticmethod
-    def generate(mk_section_list, section_keyword_blacklist=None, var_value_dict=None):
+    def generate(
+        mk_section_list: list[MakefileSection],
+        section_keyword_blacklist: list[str] | None = None,
+        var_value_dict: dict[str, Any] | None = None,
+    ) -> list[str]:
         """Generate Makefile *without* contents of specified sections
 
         A section will not be included if a keyword from the
@@ -158,8 +174,8 @@ class MakefileTemplate:
         # start with the second element, i.e., with declared section
         for section in mk_section_list[1:]:
             # Check if any keyword from the blacklist is in the section title
-            title = section.title.lower()
-            if any(kw in title for kw in keyword_set):
+            title = section.title.lower() if section.title is not None else None
+            if title is None or any(kw in title for kw in keyword_set):
                 continue
 
             # Add the section contents to the content_list
@@ -173,7 +189,10 @@ class MakefileTemplate:
         return content_list
 
     @staticmethod
-    def __subst_var_assign(content_list, variable_value_dict):
+    def __subst_var_assign(
+        content_list: list[str],
+        variable_value_dict: dict[str, Any],
+    ) -> list[str]:
         """Substitute variable assignments in content_list
 
         Params:

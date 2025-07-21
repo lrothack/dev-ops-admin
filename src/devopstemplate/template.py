@@ -6,6 +6,7 @@
 import json
 import logging
 import os
+from typing import Any
 
 from jinja2 import Environment, PackageLoader, Template, select_autoescape
 
@@ -27,8 +28,12 @@ class DevOpsTemplate:
     """
 
     def __init__(
-        self, projectdirectory, overwrite_exists=False, skip_exists=False, dry_run=False
-    ):
+        self,
+        projectdirectory: str,
+        overwrite_exists: bool = False,
+        skip_exists: bool = False,
+        dry_run: bool = False,
+    ) -> None:
         """Provide configurations that are common to all DevOpsTemplate actions
 
         Params:
@@ -39,7 +44,7 @@ class DevOpsTemplate:
             skip_exists: Boolean specifying if existing files should be
                 skipped/ignores. An error is raised otherwise.
             dry_run: Boolean specifying whether to not perform any actions in
-                order to see (in the log) what would have happend.
+                order to see (in the log) what would have happened.
         """
         self.__projectdir = projectdirectory
         self.__overwrite = overwrite_exists
@@ -57,7 +62,7 @@ class DevOpsTemplate:
         # Create project base directory if not present
         self.__mkdir(projectdirectory)
 
-    def create(self, context, components):
+    def create(self, context: dict[str, Any], components: list[str]) -> None:
         """Create a new project from the DevOps template given config options.
 
         Installs components which are defined in template.json
@@ -76,7 +81,7 @@ class DevOpsTemplate:
             logger.debug(" # %s", component)
             self.__install(component, context)
 
-    def cookiecutter(self, context, components):
+    def cookiecutter(self, context: dict[str, Any], components: list[str]) -> None:
         """Create a new cookiecutter template from the DevOps template given
         config options. Config options only affect the default values for the
         cookiecutter template, which are provided in cookiecutter.json
@@ -139,7 +144,7 @@ class DevOpsTemplate:
         # Revert project directory to cookiecutter root directory
         self.__projectdir = cookiecutter_rootdir
 
-    def manage(self, context, components):
+    def manage(self, context: dict[str, Any], components: list[str]) -> None:
         """Add functionality/components to an existing project that has been
         created from the DevOps template given configuration options.
 
@@ -156,7 +161,7 @@ class DevOpsTemplate:
             logger.debug(" # %s", component)
             self.__install(component, context)
 
-    def __install(self, template_component, context):
+    def __install(self, template_component: str, context: dict[str, Any]) -> None:
         """Copy and render files for a template component
         Components, i.e., file to install, are defined in "template.json" which
         is represented by __template_dict.
@@ -172,7 +177,7 @@ class DevOpsTemplate:
             project_fpath = Template(template_fpath).render(**context)
             self.__render(template_fpath, project_fpath, context)
 
-    def __mkdir(self, project_dname):
+    def __mkdir(self, project_dname: str) -> None:
         """Create a directory within the project if not present
 
         Params:
@@ -187,7 +192,12 @@ class DevOpsTemplate:
         else:
             logger.debug("directory %s exists", project_dpath)
 
-    def __render(self, pkg_fname: str, project_fname: str, context):
+    def __render(
+        self,
+        pkg_fname: str,
+        project_fname: str,
+        context: dict[str, Any],
+    ) -> None:
         """Render template to project according to overwrite/skip class members
         The source file will be used as a Jinja2 template and rendered before
         the rendering result will be written to the target file.
@@ -220,11 +230,11 @@ class DevOpsTemplate:
                 os.makedirs(parent_dname)
             # Load and instantiate template
             template = self.__env.get_template(pkg_fname)
-            with open(project_fpath, "w", encoding="utf-8") as project_fh:
-                template.stream(**context).dump(project_fh)
+            with open(project_fpath, "wb") as project_fh:
+                template.stream(**context).dump(project_fh, encoding="utf-8")
         logger.info("template:%s  ->  project:%s", pkg_fname, project_fpath)
 
-    def __check_project_file(self, project_fpath: str):
+    def __check_project_file(self, project_fpath: str) -> bool:
         """Check whether the given file can be created in the project without
         conflict. A conflict arises if the file exists and should not be
         skipped or overwritten.
