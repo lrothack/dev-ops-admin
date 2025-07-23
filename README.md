@@ -12,6 +12,8 @@ This command-line interface supports the creation and the management of a Python
 
 - testing and deployment in a multi-stage [Docker](https://www.docker.com) environment,
 - packaging with [setuptools](https://setuptools.readthedocs.io/en/latest/),
+- type checking with [mypy](https://mypy-lang.org/)
+- formatting with [black](https://black.readthedocs.io/en/stable/),
 - code analysis with [pylint](https://www.pylint.org/), [bandit](https://bandit.readthedocs.io/en/latest/), [pytest](https://docs.pytest.org/en/stable/) and [coverage](https://coverage.readthedocs.io/en/latest/),
 - code quality monitoring with [SonarQube](https://www.sonarqube.org).
 
@@ -54,7 +56,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Build package
-make dist
+make build
 ```
 
 The binary wheel package is located in the `dist` directory and can be installed with `pip`.
@@ -92,7 +94,7 @@ After creating a new project or after switching to the project directory:
 - Run `make install-dev` in order to install the package (and all dependencies) in development mode.
 - Run `make lint` in order to run code analysis with pylint and bandit.
 - Run `make test` in order to run unit tests with pytest and coverage.
-- Run `make dist` in order to build a Python package (binary and source).
+- Run `make build` in order to build a Python package (binary and source).
 - Make sure you have [Docker](https://www.docker.com) installed and the Docker daemon is running. Allocate at least 4GB RAM in the Docker resource configuration.
 - Run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d` in order to start a SonarQube server. Configure your server through its web interface and obtain an authentication token. The SonarQube URL can be configured through the `Makefile` variable `SONARURL`. The authentication token can be stored in the local file `.sonartoken`.
 - Run `make sonar` in order to run `sonar-scanner` and report results to your SonarQube server.
