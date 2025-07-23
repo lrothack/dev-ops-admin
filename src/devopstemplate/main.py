@@ -133,11 +133,6 @@ def parse_args(args_list: list[str]) -> None:
     parser = argparse.ArgumentParser(description=descr)
     # top-level arguments (optional)
     parser.add_argument(
-        "--project-dir",
-        default=".",
-        help="Project directory, default: current directory",
-    )
-    parser.add_argument(
         "--skip-exists",
         action="store_true",
         help=("Skip copying files if they already " "exist in the project directory"),
@@ -164,7 +159,12 @@ def parse_args(args_list: list[str]) -> None:
     subparsers = parser.add_subparsers(help="Commands")
 
     create_parser = subparsers.add_parser(
-        "create", help=("Create a new project based " "on the dev-ops template")
+        "create", help=("Create a new project based on the dev-ops template")
+    )
+    create_parser.add_argument(
+        "project-dir",
+        type=str,
+        help="Directory where the project will be created",
     )
     create_parser.add_argument(
         "-i",
@@ -191,6 +191,11 @@ def parse_args(args_list: list[str]) -> None:
     manage_parser = subparsers.add_parser(
         "manage", help=("Add individual components of " "the dev-ops template")
     )
+    manage_parser.add_argument(
+        "--project-dir",
+        default=".",
+        help="Project directory, default: current directory",
+    )
     arg_command_group(
         manage_parser,
         "project components",
@@ -203,6 +208,11 @@ def parse_args(args_list: list[str]) -> None:
 
     cc_parser = subparsers.add_parser(
         "cookiecutter", help=("Create a cookiecutter" " template")
+    )
+    cc_parser.add_argument(
+        "project-dir",
+        type=str,
+        help="Project directory where the cookiecutter template will be created",
     )
     cc_parser.add_argument(
         "-i",
