@@ -5,9 +5,8 @@ lists of strings, file names and binary stream for files stored in Python
 distribution packages.
 """
 
-from typing import BinaryIO
-
 from importlib import resources
+from typing import BinaryIO
 
 
 def exists(resource_name: str) -> bool:
