@@ -162,7 +162,7 @@ def parse_args(args_list: list[str]) -> None:
         "create", help=("Create a new project based on the dev-ops template")
     )
     create_parser.add_argument(
-        "project-dir",
+        "project_dir",
         type=str,
         help="Directory where the project will be created",
     )
@@ -210,7 +210,7 @@ def parse_args(args_list: list[str]) -> None:
         "cookiecutter", help=("Create a cookiecutter" " template")
     )
     cc_parser.add_argument(
-        "project-dir",
+        "project_dir",
         type=str,
         help="Project directory where the cookiecutter template will be created",
     )

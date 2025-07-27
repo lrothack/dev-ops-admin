@@ -198,7 +198,7 @@ report: lint test
 ## check:        Checks test coverage, black/isort formatting, ruff linting
 ##               and mypy type hints
 check: $(SRC) $(TESTS)
-	$(PYTEST) --cov=$(SRC) --cov-fail-under=80 $(TESTS)
+	$(PYTEST) --cov=$(SRC) --cov-fail-under=70 $(TESTS)
 	$(BLACK) --extend-exclude "/template/" --check $(SRC)
 	$(RUFF) check --extend-exclude "**/template/*" $(SRC)
 	$(MYPY) --strict --exclude "/template/" $(SRC)

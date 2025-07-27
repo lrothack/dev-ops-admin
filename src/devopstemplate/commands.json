@@ -173,11 +173,6 @@
         ],
         "parameters": [
             {
-                "name": "project-name",
-                "default": "",
-                "help": "default: \"\""
-            },
-            {
                 "name": "project-version",
                 "default": "0.1.0",
                 "help": "default: \"0.1.0\""
