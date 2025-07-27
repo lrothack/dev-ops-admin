@@ -42,7 +42,7 @@ dev = [
 
 [project.scripts]
 devopstemplate = "devopstemplate.main:main"
-devopstemplate-meta = "devopstemplate.template.meta:main"
+devopstemplate-meta = "devopstemplate.meta:main"
 
 [project.urls]
 Repository = "https://github.com/lrothack/dev-ops-admin"
