@@ -23,7 +23,7 @@ COPY . .
 # Use Makefile in order to test/analyse code
 # Docker build fails if unit tests fail
 RUN make clean-all && \
-    make install-dev && \
+    make install && \
     make check && \
     make report >${REPORTFILE}
 

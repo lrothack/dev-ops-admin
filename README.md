@@ -91,7 +91,7 @@ After creating a new project or after switching to the project directory:
 - Set up a virtual environment for your project and activate it (requires Python >= 3.6).
 - Run `make help` in order to get an overview of the targets provided by `Makefile`.
   Note: Running `make` is only supported from project directory.
-- Run `make install-dev` in order to install the package (and all dependencies) in development mode.
+- Run `make install` in order to install the package (and all dependencies) in development mode.
 - Run `make lint` in order to run code analysis with pylint and bandit.
 - Run `make test` in order to run unit tests with pytest and coverage.
 - Run `make build` in order to build a Python package (binary and source).
