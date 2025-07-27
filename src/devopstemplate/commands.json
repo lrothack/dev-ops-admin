@@ -4,7 +4,6 @@
             "src",
             "tests",
             "make",
-            "meta",
             "setuptools",
             "readme",
             "docker"
@@ -47,7 +46,7 @@
                 "default": true,
                 "help": "Do not add meta.py file (use devopstemplate-meta command)",
                 "template": [
-                    "sonar"
+                    "meta"
                 ]
             },
             {
