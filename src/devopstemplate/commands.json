@@ -4,6 +4,7 @@
             "src",
             "tests",
             "make",
+            "meta",
             "setuptools",
             "readme",
             "docker"
@@ -94,6 +95,14 @@
                 ]
             },
             {
+                "name": "add-meta",
+                "default": false,
+                "help": "Add meta.py file",
+                "template": [
+                    "meta"
+                ]
+            },
+            {
                 "name": "add-setuptools",
                 "default": false,
                 "help": "Add setuptools files",
@@ -148,6 +157,7 @@
             "src",
             "tests",
             "make",
+            "meta",
             "setuptools",
             "git",
             "readme",

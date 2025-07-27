@@ -13,6 +13,9 @@
     "make-minimal": [
         "setup.mk"
     ],
+    "meta": [
+        "meta.py"
+    ],
     "setuptools": [
         "pyproject.toml"
     ],
