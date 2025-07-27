@@ -43,6 +43,14 @@
         ],
         "components": [
             {
+                "name": "no-meta",
+                "default": true,
+                "help": "Do not add meta.py file (use devopstemplate-meta command)",
+                "template": [
+                    "sonar"
+                ]
+            },
+            {
                 "name": "no-gitignore-file",
                 "default": true,
                 "help": "Do not add .gitignore file",
