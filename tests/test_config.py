@@ -25,7 +25,8 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.author_name = "full name"
         args_ns.author_email = "full.name@mail.com"
         args_ns.no_gitignore_file = False
-        args_ns.no_sonar = False
+        args_ns.add_docker = False
+        args_ns.add_sonar = False
         args_ns.no_meta = False
         args_ns.add_mongo = False
         args_ns.add_mlflow = False
@@ -53,10 +54,8 @@ class ProjectConfigTest(unittest.TestCase):
             "make",
             "setuptools",
             "readme",
-            "docker",
             "meta",
             "git",
-            "sonar",
         ]
 
         config = ProjectConfig(args_ns)
@@ -70,14 +69,14 @@ class ProjectConfigTest(unittest.TestCase):
         self.assertEqual(comp_list, comps_ref)
 
         # Test with --no-sonar flag
-        args_ns.no_sonar = True
+        args_ns.add_sonar = True
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.create()
         self.assertEqual(param_dict, params_ref)
-        self.assertEqual(comp_list, comps_ref[:-1])
+        self.assertEqual(comp_list, comps_ref + ["sonar"])
 
         # Test without package_name
-        args_ns.no_sonar = False
+        args_ns.add_sonar = False
         args_ns.package_name = None
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.create()
@@ -110,7 +109,7 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.dry_run = False
 
         params_ref = {"project_name": os.path.basename(os.getcwd())}
-        comps_ref = ["git", "sonar"]
+        comps_ref = ["git", "sonar", "make"]
 
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.manage()
@@ -127,7 +126,7 @@ class ProjectConfigTest(unittest.TestCase):
         config = ProjectConfig(args_ns)
         param_dict, comp_list = config.manage()
         self.assertEqual(param_dict, params_ref)
-        self.assertEqual(comp_list, comps_ref[:-1])
+        self.assertEqual(comp_list, comps_ref[:-2])
 
     def test_cookiecutter(self):
         args_ns = Namespace()

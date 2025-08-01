@@ -31,7 +31,8 @@ class TestMain(unittest.TestCase):
         args_ns.author_name = user
         args_ns.author_email = email
         args_ns.no_gitignore_file = False
-        args_ns.no_sonar = False
+        args_ns.add_docker = False
+        args_ns.add_sonar = False
         args_ns.no_meta = False
         args_ns.add_mongo = False
         args_ns.add_mlflow = False

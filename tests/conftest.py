@@ -1,5 +1,9 @@
 def ref_file_head():
     ref_file_list = [
+        "# --- Makefile Intro ---",
+        "# Makefile for building and testing Python package including code analysis",
+        "#  and reporting to SonarQube in a dockerized build environment",
+        "#",
         "# Comments: single '#' for ordinary comments, ",
         "#           '## ' indicates text for 'help' target ",
     ]

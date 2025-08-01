@@ -5,8 +5,7 @@
             "tests",
             "make",
             "setuptools",
-            "readme",
-            "docker"
+            "readme"
         ],
         "parameters": [
             {
@@ -58,9 +57,17 @@
                 ]
             },
             {
-                "name": "no-sonar",
-                "default": true,
-                "help": "Do not add SonarQube support",
+                "name": "add-docker",
+                "default": false,
+                "help": "Add Docker support",
+                "template": [
+                    "docker"
+                ]
+            },
+            {
+                "name": "add-sonar",
+                "default": false,
+                "help": "Add SonarQube support",
                 "template": [
                     "sonar"
                 ]
@@ -110,14 +117,6 @@
                 ]
             },
             {
-                "name": "add-docker",
-                "default": false,
-                "help": "Add Docker files",
-                "template": [
-                    "docker"
-                ]
-            },
-            {
                 "name": "add-gitignore",
                 "default": false,
                 "help": "Add .gitignore file",
@@ -126,11 +125,21 @@
                 ]
             },
             {
+                "name": "add-docker",
+                "default": false,
+                "help": "Add Docker files",
+                "template": [
+                    "docker",
+                    "make"
+                ]
+            },
+            {
                 "name": "add-sonar",
                 "default": false,
                 "help": "Add SonarQube support",
                 "template": [
-                    "sonar"
+                    "sonar",
+                    "make"
                 ]
             },
             {
