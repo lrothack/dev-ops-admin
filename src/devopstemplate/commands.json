@@ -94,14 +94,6 @@
                 ]
             },
             {
-                "name": "add-makefile-min",
-                "default": false,
-                "help": "Add minimal Makefile",
-                "template": [
-                    "make-minimal"
-                ]
-            },
-            {
                 "name": "add-meta",
                 "default": false,
                 "help": "Add meta.py file",

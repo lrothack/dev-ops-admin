@@ -10,9 +10,6 @@
     "make": [
         "Makefile"
     ],
-    "make-minimal": [
-        "setup.mk"
-    ],
     "meta": [
         "meta.py"
     ],

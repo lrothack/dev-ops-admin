@@ -62,7 +62,6 @@ class TestMain(unittest.TestCase):
         args_ns.project_dir = "."
         args_ns.add_gitignore = False
         args_ns.add_makefile = False
-        args_ns.add_makefile_min = False
         args_ns.add_setuptools = False
         args_ns.add_meta = False
         args_ns.add_docker = False
