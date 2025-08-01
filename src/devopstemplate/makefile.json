@@ -1,0 +1,14 @@
+{
+    "make": [
+        "intro",
+        "common",
+        "python",
+        "analysis"
+    ],
+    "docker": [
+        "docker"
+    ],
+    "sonar": [
+        "sonar"
+    ]
+}
