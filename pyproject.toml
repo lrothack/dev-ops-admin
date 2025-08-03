@@ -73,3 +73,6 @@ readme = { file = "README.md", content-type = "text/markdown" }
 [tool.pylint.format]
 # Configure pylint to be compliant with black
 max-line-length = "88"
+
+[tool.isort]
+profile = "black"
