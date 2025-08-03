@@ -152,6 +152,11 @@ clean-all: clean
 	@rm -rf $(EGGINFO)
 	@rm -rf dist/*.whl dist/*.tar.gz
 
+## print-<VAR>:  Print the value of the Makefile variable <VAR>
+##               (e.g., `make print-VERSION`)
+.PHONY: print-%
+print-%: $(EGGINFO)
+	@echo $*=$($*)
 
 # --- Python targets ---
 
@@ -170,7 +175,7 @@ build: $(BUILDTOOLSFILES)
 	$(PIP) install build
 	$(PYTHON) -m build
 
-## install:  Install development dependencies (based on pyproject.toml)
+## install:      Install development dependencies (based on pyproject.toml)
 ##               (installation within a Python virtual environment is
 ##                recommended)
 ##               (application sources will be symlinked to PYTHONPATH)
