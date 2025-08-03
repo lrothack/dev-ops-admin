@@ -8,7 +8,12 @@ or exclude these tests
 import unittest
 import os
 from argparse import Namespace
-from devopstemplate.config import ProjectConfig
+from devopstemplate.config import (
+    ProjectConfig,
+    ARGUMENTS_PROJECT_NAME_KEY,
+    ARGUMENTS_PACKAGE_NAME_KEY,
+    ARGUMENTS_PROJECT_SLUG_KEY,
+)
 
 
 class ProjectConfigTest(unittest.TestCase):
@@ -39,9 +44,9 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.interactive = False
 
         params_ref = {
-            "project_name": os.path.basename(os.getcwd()),
-            "package_name": "test-Project",
-            "project_slug": "test_project",
+            ARGUMENTS_PROJECT_NAME_KEY: os.path.basename(os.getcwd()),
+            ARGUMENTS_PACKAGE_NAME_KEY: "test-Project",
+            ARGUMENTS_PROJECT_SLUG_KEY: "test_project",
             "project_version": "0.1.0",
             "project_url": "",
             "project_description": "",
@@ -83,8 +88,8 @@ class ProjectConfigTest(unittest.TestCase):
         project_name = os.path.basename(os.getcwd())
         project_slug = project_name.replace(" ", "_").replace("-", "_")
         project_slug = project_slug.lower()
-        params_ref["package_name"] = project_slug
-        params_ref["project_slug"] = project_slug
+        params_ref[ARGUMENTS_PACKAGE_NAME_KEY] = project_slug
+        params_ref[ARGUMENTS_PROJECT_SLUG_KEY] = project_slug
         self.assertEqual(param_dict, params_ref)
         self.assertEqual(comp_list, comps_ref)
 
@@ -108,7 +113,7 @@ class ProjectConfigTest(unittest.TestCase):
         args_ns.version = False
         args_ns.dry_run = False
 
-        params_ref = {"project_name": os.path.basename(os.getcwd())}
+        params_ref = {ARGUMENTS_PROJECT_NAME_KEY: os.path.basename(os.getcwd())}
         comps_ref = ["git", "sonar", "make"]
 
         config = ProjectConfig(args_ns)
@@ -158,7 +163,7 @@ class ProjectConfigTest(unittest.TestCase):
             ]
         )
         params_ref = {
-            "project_slug": project_slug,
+            ARGUMENTS_PROJECT_SLUG_KEY: project_slug,
             "project_version": "0.1.0",
             "project_url": "",
             "project_description": "",

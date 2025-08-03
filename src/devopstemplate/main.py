@@ -10,7 +10,20 @@ import sys
 from typing import Any
 
 import devopstemplate
-from devopstemplate.config import CommandsConfig, ProjectConfig
+from devopstemplate.config import (
+    CommandsConfig,
+    ProjectConfig,
+    ARGUMENTS_PROJECT_DIR_KEY,
+    COMMANDS_CREATE_KEY,
+    COMMANDS_MANAGE_KEY,
+    COMMANDS_COOKIECUTTER_KEY,
+    COMMANDS_COMPONENTS_KEY,
+    COMMANDS_PARAMETERS_KEY,
+    COMMANDS_PARAMETERS_NAME_KEY,
+    COMMANDS_PARAMETERS_HELP_KEY,
+    COMMANDS_PARAMETERS_DEFAULT_KEY,
+    ARGUMENTS_INTERACTIVE_KEY,
+)
 from devopstemplate.template import DevOpsTemplate
 
 
@@ -94,10 +107,10 @@ def arg_command_group(
 
     # Add arguments
     for arg_dict in group_argument_list:
-        arg_name = arg_dict["name"]
+        arg_name = arg_dict[COMMANDS_PARAMETERS_NAME_KEY]
         arg_name = f"--{arg_name}"
-        arg_help = arg_dict["help"]
-        arg_value = arg_dict["default"]
+        arg_help = arg_dict[COMMANDS_PARAMETERS_HELP_KEY]
+        arg_value = arg_dict[COMMANDS_PARAMETERS_DEFAULT_KEY]
         if isinstance(arg_value, bool):
             # Attention: always interpret boolean flag in a positive sense
             # The arg_value specifies where to add the corresponding template
@@ -159,29 +172,33 @@ def parse_args(args_list: list[str]) -> None:
     subparsers = parser.add_subparsers(help="Commands")
 
     create_parser = subparsers.add_parser(
-        "create", help=("Create a new project based on the dev-ops template")
+        COMMANDS_CREATE_KEY, help=("Create a new project based on the dev-ops template")
     )
     create_parser.add_argument(
-        "project_dir",
+        ARGUMENTS_PROJECT_DIR_KEY,
         type=str,
         help="Directory where the project will be created",
     )
     create_parser.add_argument(
-        "-i",
-        "--interactive",
+        f"-{ARGUMENTS_INTERACTIVE_KEY[0]}",
+        f"--{ARGUMENTS_INTERACTIVE_KEY}",
         action="store_true",
-        help=("Configure project parameters/components" " interactively"),
+        help=("Configure project parameters/components interactively"),
     )
 
     arg_command_group(
         create_parser,
         "project parameters",
-        group_argument_list=cfg.values_dict("create", "parameters"),
+        group_argument_list=cfg.values_dict(
+            COMMANDS_CREATE_KEY, COMMANDS_PARAMETERS_KEY
+        ),
     )
     arg_command_group(
         create_parser,
         "project components",
-        group_argument_list=cfg.values_dict("create", "components"),
+        group_argument_list=cfg.values_dict(
+            COMMANDS_CREATE_KEY, COMMANDS_COMPONENTS_KEY
+        ),
     )
     # If the create subparser has been activated by the "create" command,
     # override the func attribute with a pointer to the "create" function
@@ -189,17 +206,19 @@ def parse_args(args_list: list[str]) -> None:
     create_parser.set_defaults(func=create)
 
     manage_parser = subparsers.add_parser(
-        "manage", help=("Add individual components of " "the dev-ops template")
+        COMMANDS_MANAGE_KEY, help=("Add individual components of the dev-ops template")
     )
     manage_parser.add_argument(
-        "--project-dir",
+        f"--{ARGUMENTS_PROJECT_DIR_KEY}",
         default=".",
         help="Project directory, default: current directory",
     )
     arg_command_group(
         manage_parser,
         "project components",
-        group_argument_list=cfg.values_dict("manage", "components"),
+        group_argument_list=cfg.values_dict(
+            COMMANDS_MANAGE_KEY, COMMANDS_COMPONENTS_KEY
+        ),
     )
     # If the manage subparser has been activated by the "manage" command,
     # override the func attribute with a pointer to the "manage" function
@@ -207,28 +226,32 @@ def parse_args(args_list: list[str]) -> None:
     manage_parser.set_defaults(func=manage)
 
     cc_parser = subparsers.add_parser(
-        "cookiecutter", help=("Create a cookiecutter" " template")
+        COMMANDS_COOKIECUTTER_KEY, help=("Create a cookiecutter template")
     )
     cc_parser.add_argument(
-        "project_dir",
+        ARGUMENTS_PROJECT_DIR_KEY,
         type=str,
         help="Project directory where the cookiecutter template will be created",
     )
     cc_parser.add_argument(
-        "-i",
-        "--interactive",
+        f"-{ARGUMENTS_INTERACTIVE_KEY[0]}",
+        f"--{ARGUMENTS_INTERACTIVE_KEY}",
         action="store_true",
-        help=("Configure project parameters/components" " interactively"),
+        help=("Configure project parameters/components interactively"),
     )
     arg_command_group(
         cc_parser,
         "project parameters",
-        group_argument_list=cfg.values_dict("cookiecutter", "parameters"),
+        group_argument_list=cfg.values_dict(
+            COMMANDS_COOKIECUTTER_KEY, COMMANDS_PARAMETERS_KEY
+        ),
     )
     arg_command_group(
         cc_parser,
         "project components",
-        group_argument_list=cfg.values_dict("cookiecutter", "components"),
+        group_argument_list=cfg.values_dict(
+            COMMANDS_COOKIECUTTER_KEY, COMMANDS_COMPONENTS_KEY
+        ),
     )
     # If the cookiecutter subparser has been activated by the "cookiecutter"
     # command, override the func attribute with a pointer to the "cookiecutter"

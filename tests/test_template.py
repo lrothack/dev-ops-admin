@@ -16,6 +16,11 @@ from conftest import ref_file_head
 from conftest import ref_template_head
 import devopstemplate.pkg as pkg
 from devopstemplate.template import DevOpsTemplate
+from devopstemplate.config import (
+    ARGUMENTS_PROJECT_NAME_KEY,
+    ARGUMENTS_PROJECT_SLUG_KEY,
+    COOKIECUTTER_FNAME,
+)
 
 
 class TestDevOpsTemplate(unittest.TestCase):
@@ -53,7 +58,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = "tmp_file"
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
             project_slug = "project"
-            context = {"project_slug": project_slug}
+            context = {ARGUMENTS_PROJECT_SLUG_KEY: project_slug}
             template._DevOpsTemplate__install_file(
                 "src/{{project_slug}}/__init__.py", tmp_fpath, context=context
             )
@@ -112,8 +117,8 @@ class TestDevOpsTemplate(unittest.TestCase):
 
         # Define test project
         context = {
-            "project_name": "project",
-            "project_slug": "project",
+            ARGUMENTS_PROJECT_NAME_KEY: "project",
+            ARGUMENTS_PROJECT_SLUG_KEY: "project",
             "project_version": "0.1.0",
             "project_url": "",
             "project_description": "",
@@ -157,7 +162,7 @@ class TestDevOpsTemplate(unittest.TestCase):
     def test_manage(self):
 
         # Define test project
-        context = {"project_name": "project"}
+        context = {ARGUMENTS_PROJECT_NAME_KEY: "project"}
         components = ["git", "sonar", "mongo"]
         # Generate reference data
         project_file_list = []
@@ -194,8 +199,8 @@ class TestDevOpsTemplate(unittest.TestCase):
             ]
         )
         context = {
-            "project_name": "",
-            "project_slug": project_slug,
+            ARGUMENTS_PROJECT_NAME_KEY: "",
+            ARGUMENTS_PROJECT_SLUG_KEY: project_slug,
             "project_version": "0.1.0",
             "project_url": "",
             "project_description": "",
@@ -249,7 +254,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             self.assertEqual(init_contents, init_ref_contents)
 
             # Check cookiecutter files
-            cookiecutter_json_fpath = os.path.join(tmpdirname, "cookiecutter.json")
+            cookiecutter_json_fpath = os.path.join(tmpdirname, COOKIECUTTER_FNAME)
             self.assertTrue(os.path.exists(cookiecutter_json_fpath))
             with open(cookiecutter_json_fpath, "r", encoding="utf-8") as fh:
                 cookiecutter_json = json.load(fh)
@@ -265,14 +270,17 @@ class TestDevOpsTemplate(unittest.TestCase):
 class Jinja2RenderTest(unittest.TestCase):
 
     def test_render(self):
-        context = {"project_slug": "projectname", "project_name": "Name"}
+        context = {
+            ARGUMENTS_PROJECT_SLUG_KEY: "projectname",
+            ARGUMENTS_PROJECT_NAME_KEY: "Name",
+        }
         text = Template("{{project_slug}}/__init__.py").render(**context)
         self.assertEqual(text, "projectname/__init__.py")
 
     def test_render_cc_templatevar(self):
         context = {
-            "project_slug": "{{cookiecutter.project_name}}",
-            "project_name": "Name",
+            ARGUMENTS_PROJECT_SLUG_KEY: "{{cookiecutter.project_name}}",
+            ARGUMENTS_PROJECT_NAME_KEY: "Name",
         }
         text = Template("{{project_slug}}/__init__.py").render(**context)
         self.assertEqual(text, "{{cookiecutter.project_name}}/__init__.py")

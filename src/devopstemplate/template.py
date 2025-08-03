@@ -11,6 +11,14 @@ from typing import Any
 from jinja2 import Environment, PackageLoader, Template, select_autoescape
 
 from devopstemplate import pkg
+from devopstemplate.config import (
+    ARGUMENTS_PROJECT_NAME_KEY,
+    ARGUMENTS_PROJECT_SLUG_KEY,
+    COOKIECUTTER_FNAME,
+    TEMPLATES_FNAME,
+)
+
+COOKIECUTTER_README_FNAME = "README.md"
 
 
 class SkipFileError(FileExistsError):
@@ -50,7 +58,7 @@ class DevOpsTemplate:
         self.__overwrite = overwrite_exists
         self.__skip = skip_exists
         self.__dry_run = dry_run
-        with pkg.stream("template.json") as handle:
+        with pkg.stream(TEMPLATES_FNAME) as handle:
             self.__template_dict = json.load(handle)
         self.__template_dname = "template"
         # ATTENTION: using __package__ may only work as long as this module
@@ -84,8 +92,8 @@ class DevOpsTemplate:
         """
         logger = logging.getLogger("DevOpsTemplate.create")
         logger.info("Create project from template")
-        logger.info("Project name: %s", context["project_name"])
-        logger.info("Package name: %s", context["project_slug"])
+        logger.info("Project name: %s", context[ARGUMENTS_PROJECT_NAME_KEY])
+        logger.info("Package name: %s", context[ARGUMENTS_PROJECT_SLUG_KEY])
         self.__components(context, components)
 
     def cookiecutter(self, context: dict[str, Any], components: list[str]) -> None:
@@ -106,7 +114,7 @@ class DevOpsTemplate:
         logger.info("Generate cookiecutter template")
         # Generate cookiecutter.json
         # configuration is provided by the context dictionary
-        cookiecutter_json_fpath = os.path.join(self.__project_dir, "cookiecutter.json")
+        cookiecutter_json_fpath = os.path.join(self.__project_dir, COOKIECUTTER_FNAME)
         try:
             self.__check_project_file(cookiecutter_json_fpath)
             if not self.__dry_run:
@@ -119,7 +127,7 @@ class DevOpsTemplate:
         # Only generate *cookiecutter* readme if not present already
         # Note: a template readme can be installed via template components
         # (see below)
-        readme_fpath = os.path.join(self.__project_dir, "README.md")
+        readme_fpath = os.path.join(self.__project_dir, COOKIECUTTER_README_FNAME)
         if not os.path.exists(readme_fpath):
             if not self.__dry_run:
                 with open(readme_fpath, "w", encoding="utf-8") as handle:
@@ -131,7 +139,9 @@ class DevOpsTemplate:
         # (might be useful in future)
         #
         # Generate project template
-        cookiecutter_project_dname = "{{cookiecutter.project_name}}/"
+        cookiecutter_project_dname = (
+            f"{{{{cookiecutter.{ARGUMENTS_PROJECT_NAME_KEY}}}}}/"
+        )
         self.__mkdir(cookiecutter_project_dname)
         # Adjust projectdirectory such that __install installs to the correct
         # directory (projectdirectory represents cookiecutter template root)
