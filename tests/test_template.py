@@ -37,7 +37,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             tmp_fname = "tmp_file"
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
-            template._DevOpsTemplate__render("Makefile", tmp_fpath, context={})
+            template._DevOpsTemplate__install_file("Makefile", tmp_fpath, context={})
             with open(tmp_fpath, "r", encoding="utf-8") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
@@ -54,10 +54,10 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fpath = os.path.join(tmpdirname, tmp_fname)
             project_slug = "project"
             context = {"project_slug": project_slug}
-            template._DevOpsTemplate__render(
+            template._DevOpsTemplate__install_file(
                 "src/{{project_slug}}/__init__.py", tmp_fpath, context=context
             )
-            with open(tmp_fpath, "r") as tmp_fh:
+            with open(tmp_fpath, "r", encoding="utf-8") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
         ref_template_list = ref_template_head(project_slug)
@@ -70,7 +70,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
             with self.assertRaises(FileExistsError):
-                template._DevOpsTemplate__render("Makefile", tmp_path, context={})
+                template._DevOpsTemplate__install_file("Makefile", tmp_path, context={})
 
     def test_render_skip(self):
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -78,7 +78,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = "tmp_file"
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__render("Makefile", tmp_path, context={})
+            template._DevOpsTemplate__install_file("Makefile", tmp_path, context={})
             with open(tmp_path, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 self.assertEqual(contents, "")
@@ -91,7 +91,7 @@ class TestDevOpsTemplate(unittest.TestCase):
             tmp_fname = "tmp_file"
             tmp_path = Path(os.path.join(tmpdirname, tmp_fname))
             tmp_path.touch()
-            template._DevOpsTemplate__render("Makefile", tmp_path, context={})
+            template._DevOpsTemplate__install_file("Makefile", tmp_path, context={})
             with open(tmp_path, "r") as tmp_fh:
                 contents = tmp_fh.read()
                 content_list = contents.splitlines()
@@ -104,7 +104,9 @@ class TestDevOpsTemplate(unittest.TestCase):
     def test_render_pkgexists(self):
         template = DevOpsTemplate(projectdirectory=".")
         with self.assertRaises(FileNotFoundError):
-            template._DevOpsTemplate__render("non_existing_file", None, context={})
+            template._DevOpsTemplate__install_file(
+                "non_existing_file", None, context={}
+            )
 
     def test_create(self):
 
@@ -171,7 +173,7 @@ class TestDevOpsTemplate(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdirname:
             template = DevOpsTemplate(projectdirectory=tmpdirname)
             # Create "make" component which is required to test "manage"
-            template._DevOpsTemplate__install("make", context)
+            template._DevOpsTemplate__install_component("make", context)
             # Run "manage"
             template.manage(context, components)
             # Make sure all files exist
@@ -238,18 +240,18 @@ class TestDevOpsTemplate(unittest.TestCase):
                 projectdirname, "src", "{{cookiecutter.project_slug}}"
             )
             init_fpath = os.path.join(pkgdirname, "__init__.py")
-            with open(init_fpath, "r") as fh:
+            with open(init_fpath, "r", encoding="utf-8") as fh:
                 init_contents = fh.read()
             tests_dpath = os.path.dirname(__file__)
             init_ref_fpath = os.path.join(tests_dpath, "template_init.ref")
-            with open(init_ref_fpath, "r") as fh:
+            with open(init_ref_fpath, "r", encoding="utf-8") as fh:
                 init_ref_contents = fh.read()
             self.assertEqual(init_contents, init_ref_contents)
 
             # Check cookiecutter files
             cookiecutter_json_fpath = os.path.join(tmpdirname, "cookiecutter.json")
             self.assertTrue(os.path.exists(cookiecutter_json_fpath))
-            with open(cookiecutter_json_fpath, "r") as fh:
+            with open(cookiecutter_json_fpath, "r", encoding="utf-8") as fh:
                 cookiecutter_json = json.load(fh)
                 self.assertEqual(cookiecutter_json, context)
 
@@ -257,7 +259,7 @@ class TestDevOpsTemplate(unittest.TestCase):
 
             # Check that the DevOps template project directory is the unittest
             # tmp directory
-            self.assertEqual(template._DevOpsTemplate__projectdir, tmpdirname)
+            self.assertEqual(template._DevOpsTemplate__project_dir, tmpdirname)
 
 
 class Jinja2RenderTest(unittest.TestCase):

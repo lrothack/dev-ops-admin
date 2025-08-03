@@ -46,7 +46,7 @@ class DevOpsTemplate:
             dry_run: Boolean specifying whether to not perform any actions in
                 order to see (in the log) what would have happened.
         """
-        self.__projectdir = projectdirectory
+        self.__project_dir = projectdirectory
         self.__overwrite = overwrite_exists
         self.__skip = skip_exists
         self.__dry_run = dry_run
@@ -62,6 +62,16 @@ class DevOpsTemplate:
         # Create project base directory if not present
         self.__mkdir(projectdirectory)
 
+    def __components(self, context: dict[str, Any], components: list[str]) -> None:
+        """Install components for the DevOps template given the context for rendering
+        Jinja2 templates and the list of components to install.
+        """
+        logger = logging.getLogger("DevOpsTemplate.__components")
+        # Install files for components
+        for component in components:
+            logger.debug(" # %s", component)
+            self.__install_component(component, context)
+
     def create(self, context: dict[str, Any], components: list[str]) -> None:
         """Create a new project from the DevOps template given config options.
 
@@ -76,10 +86,7 @@ class DevOpsTemplate:
         logger.info("Create project from template")
         logger.info("Project name: %s", context["project_name"])
         logger.info("Package name: %s", context["project_slug"])
-        # Install files for components
-        for component in components:
-            logger.debug(" # %s", component)
-            self.__install(component, context)
+        self.__components(context, components)
 
     def cookiecutter(self, context: dict[str, Any], components: list[str]) -> None:
         """Create a new cookiecutter template from the DevOps template given
@@ -99,7 +106,7 @@ class DevOpsTemplate:
         logger.info("Generate cookiecutter template")
         # Generate cookiecutter.json
         # configuration is provided by the context dictionary
-        cookiecutter_json_fpath = os.path.join(self.__projectdir, "cookiecutter.json")
+        cookiecutter_json_fpath = os.path.join(self.__project_dir, "cookiecutter.json")
         try:
             self.__check_project_file(cookiecutter_json_fpath)
             if not self.__dry_run:
@@ -112,7 +119,7 @@ class DevOpsTemplate:
         # Only generate *cookiecutter* readme if not present already
         # Note: a template readme can be installed via template components
         # (see below)
-        readme_fpath = os.path.join(self.__projectdir, "README.md")
+        readme_fpath = os.path.join(self.__project_dir, "README.md")
         if not os.path.exists(readme_fpath):
             if not self.__dry_run:
                 with open(readme_fpath, "w", encoding="utf-8") as handle:
@@ -128,21 +135,22 @@ class DevOpsTemplate:
         self.__mkdir(cookiecutter_project_dname)
         # Adjust projectdirectory such that __install installs to the correct
         # directory (projectdirectory represents cookiecutter template root)
-        cookiecutter_rootdir = self.__projectdir
-        self.__projectdir = os.path.join(self.__projectdir, cookiecutter_project_dname)
+        cookiecutter_rootdir = self.__project_dir
+        self.__project_dir = os.path.join(
+            self.__project_dir, cookiecutter_project_dname
+        )
         # Generate cookiecutterconfig for rendering cookiecutter template
         # variables
         # pylint: disable=consider-using-f-string
         # simplifies handling of jinja2 template syntax {{ }}
-        cookiecutterconfig = {
+        cookiecutter_config = {
             key: "{{cookiecutter.%s}}" % key for key in context.keys()
         }
         # Install all template components
-        for comp in components:
-            self.__install(comp, cookiecutterconfig)
+        self.__components(cookiecutter_config, components)
 
         # Revert project directory to cookiecutter root directory
-        self.__projectdir = cookiecutter_rootdir
+        self.__project_dir = cookiecutter_rootdir
 
     def manage(self, context: dict[str, Any], components: list[str]) -> None:
         """Add functionality/components to an existing project that has been
@@ -150,18 +158,19 @@ class DevOpsTemplate:
 
         Params:
             context: Dictionary with configuration flags supported by the
-                template (flags are defined in ProjectConfig.managa and
+                template (flags are defined in ProjectConfig.manage and
                 can be modified based on command-line args, see
                 main.manage)
             components: Template components that should be installed.
         """
         logger = logging.getLogger("DevOpsTemplate.manage")
+        logger.info("Adding template components to existing project")
         # Install files for components
-        for component in components:
-            logger.debug(" # %s", component)
-            self.__install(component, context)
+        self.__components(context, components)
 
-    def __install(self, template_component: str, context: dict[str, Any]) -> None:
+    def __install_component(
+        self, template_component: str, context: dict[str, Any]
+    ) -> None:
         """Copy and render files for a template component
         Components, i.e., file to install, are defined in "template.json" which
         is represented by __template_dict.
@@ -173,9 +182,10 @@ class DevOpsTemplate:
         """
         file_list = self.__template_dict[template_component]
         for template_fpath in file_list:
-            # Render file path (paths can contain template variables)
+            # Render template file path (paths can contain template variables)
             project_fpath = Template(template_fpath).render(**context)
-            self.__render(template_fpath, project_fpath, context)
+            # Render template file (template content) and write to project_fpath
+            self.__install_file(template_fpath, project_fpath, context)
 
     def __mkdir(self, project_dname: str) -> None:
         """Create a directory within the project if not present
@@ -184,7 +194,7 @@ class DevOpsTemplate:
             project_dname: String specifying the name of the directory
         """
         logger = logging.getLogger("DevOpsTemplate.__mkdir")
-        project_dpath = os.path.join(self.__projectdir, project_dname)
+        project_dpath = os.path.join(self.__project_dir, project_dname)
         if not os.path.exists(project_dpath):
             logger.info("creating directory: %s", project_dpath)
             if not self.__dry_run:
@@ -192,13 +202,14 @@ class DevOpsTemplate:
         else:
             logger.debug("directory %s exists", project_dpath)
 
-    def __render(
+    def __install_file(
         self,
         pkg_fname: str,
         project_fname: str,
         context: dict[str, Any],
     ) -> None:
-        """Render template to project according to overwrite/skip class members
+        """Render and install template to project. Installs the file according to
+        overwrite/skip class members.
         The source file will be used as a Jinja2 template and rendered before
         the rendering result will be written to the target file.
 
@@ -215,9 +226,9 @@ class DevOpsTemplate:
         pkg_fpath = os.path.join(self.__template_dname, pkg_fname)
         if not pkg.exists(pkg_fpath):
             raise FileNotFoundError(
-                f"File {pkg_fpath} not available in " "distribution package"
+                f"File {pkg_fpath} not available in distribution package"
             )
-        project_fpath = os.path.join(self.__projectdir, project_fname)
+        project_fpath = os.path.join(self.__project_dir, project_fname)
         try:
             self.__check_project_file(project_fpath)
         except SkipFileError:
