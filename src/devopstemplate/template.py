@@ -63,6 +63,11 @@ class DevOpsTemplate:
             self.__template_dict = json.load(handle)
         # ATTENTION: using __package__ may only work as long as this module
         # (template.py) is located in the top-level import directory
+        if not __package__:
+            raise RuntimeError(
+                "DevOpsTemplate: __package__ is not set, cannot"
+                " locate template package files"
+            )
         loader = PackageLoader(__package__, TEMPLATE_DNAME)
         self.__env = Environment(
             loader=loader, autoescape=select_autoescape(default=True)
