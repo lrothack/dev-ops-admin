@@ -76,12 +76,10 @@ devopstemplate --help
 devopstemplate <sub-command> --help
 ```
 
-The working directory is always the root directory of your project, for example:
+To create an instance of the template:
 
 ```bash
-mkdir sampleproject
-cd sampleproject
-devopstemplate create
+devopstemplate create sampleproject
 ```
 
 ## Using the dev-ops template
@@ -94,6 +92,7 @@ After creating a new project or after switching to the project directory:
 - Run `make install` in order to install the package (and all dependencies) in development mode.
 - Run `make lint` in order to run code analysis with pylint and bandit.
 - Run `make test` in order to run unit tests with pytest and coverage.
+- Run `make check` in order to run code quality checks including tests, linting and mypy.
 - Run `make build` in order to build a Python package (binary and source).
 - Make sure you have [Docker](https://www.docker.com) installed and the Docker daemon is running. Allocate at least 4GB RAM in the Docker resource configuration.
 - Run `docker-compose -p sonarqube -f sonarqube/docker-compose.yml up -d` in order to start a SonarQube server. Configure your server through its web interface and obtain an authentication token. The SonarQube URL can be configured through the `Makefile` variable `SONARURL`. The authentication token can be stored in the local file `.sonartoken`.
