@@ -1,3 +1,3 @@
 [submodule "devopstemplate/template"]
-	path = src/devopstemplate/template
+	path = src/devopstemplate/template_pkg
 	url = git@github.com:lrothack/dev-ops.git

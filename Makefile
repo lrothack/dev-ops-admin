@@ -25,7 +25,7 @@ MKFILE_PATH := $(lastword $(MAKEFILE_LIST))
 # Define names of executables used in make targets (and variables)
 PYTHON = python
 PIP = pip
-META=$(PYTHON) $(SRC)/devopstemplate/template/meta.py
+META=$(PYTHON) $(SRC)/devopstemplate/template_pkg/meta.py
 # Files required by `python build` (pip, name/version discovery)
 # Note that building is only supported from the project root
 # --> BUILDTOOLSFILES must be present in the working directory
@@ -193,9 +193,9 @@ test: $(SRC) $(TESTS)
 ## lint:         Run Python linter (bandit, pylint) and print output to terminal
 lint: $(SRC)
 	@echo "\n\nBandit Vulnerabilities\n----------------------\n"
-	-$(BANDIT) -r --exclude "**/template/*,**/venv/*" $(SRC)
+	-$(BANDIT) -r --exclude "**/template_pkg/*,**/venv/*" $(SRC)
 	@echo "\n\nPylint Code Analysis\n--------------------\n"
-	$(PYLINT) --ignore template,venv --output-format=colorized --reports=n --exit-zero $(SRC)
+	$(PYLINT) --ignore template_pkg,venv --output-format=colorized --reports=n --exit-zero $(SRC)
 
 ## report:       Combines test and lint targets in order to create a report
 report: lint test
@@ -204,9 +204,9 @@ report: lint test
 ##               and mypy type hints
 check: $(SRC) $(TESTS)
 	$(PYTEST) --cov=$(SRC) --cov-fail-under=70 $(TESTS)
-	$(BLACK) --extend-exclude "/template/" --check $(SRC)
-	$(RUFF) check --extend-exclude "**/template/*" $(SRC)
-	$(MYPY) --strict --exclude "/template/" $(SRC)
+	$(BLACK) --extend-exclude "/template_pkg/" --check $(SRC)
+	$(RUFF) check --extend-exclude "**/template_pkg/*" $(SRC)
+	$(MYPY) --strict --exclude "/template_pkg/" $(SRC)
 	$(ISORT) --check $(SRC)
 
 

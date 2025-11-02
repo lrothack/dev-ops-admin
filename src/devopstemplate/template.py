@@ -15,10 +15,11 @@ from devopstemplate.config import (
     ARGUMENTS_PROJECT_NAME_KEY,
     ARGUMENTS_PROJECT_SLUG_KEY,
     COOKIECUTTER_FNAME,
-    TEMPLATES_FNAME,
+    TEMPLATE_FNAME,
 )
 
 COOKIECUTTER_README_FNAME = "README.md"
+TEMPLATE_DNAME = "template_pkg"
 
 
 class SkipFileError(FileExistsError):
@@ -58,12 +59,11 @@ class DevOpsTemplate:
         self.__overwrite = overwrite_exists
         self.__skip = skip_exists
         self.__dry_run = dry_run
-        with pkg.stream(TEMPLATES_FNAME) as handle:
+        with pkg.stream(TEMPLATE_FNAME) as handle:
             self.__template_dict = json.load(handle)
-        self.__template_dname = "template"
         # ATTENTION: using __package__ may only work as long as this module
         # (template.py) is located in the top-level import directory
-        loader = PackageLoader(__package__, self.__template_dname)
+        loader = PackageLoader(__package__, TEMPLATE_DNAME)
         self.__env = Environment(
             loader=loader, autoescape=select_autoescape(default=True)
         )
@@ -233,7 +233,7 @@ class DevOpsTemplate:
                 and skip-exists=False, overwrite-exists=False
         """
         logger = logging.getLogger("DevOpsTemplate.__render")
-        pkg_fpath = os.path.join(self.__template_dname, pkg_fname)
+        pkg_fpath = os.path.join(TEMPLATE_DNAME, pkg_fname)
         if not pkg.exists(pkg_fpath):
             raise FileNotFoundError(
                 f"File {pkg_fpath} not available in distribution package"

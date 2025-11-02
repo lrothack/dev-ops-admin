@@ -20,12 +20,12 @@ class PackageResourcesTest(unittest.TestCase):
 
     def test_exists(self):
         self.assertTrue(pkg.exists("template.json"))
-        self.assertTrue(pkg.exists("template"))
+        self.assertTrue(pkg.exists("template_pkg"))
         self.assertFalse(pkg.exists("dummy_file_nonexits"))
 
     def test_isdir(self):
         self.assertFalse(pkg.isdir("template.json"))
-        self.assertTrue(pkg.isdir("template"))
+        self.assertTrue(pkg.isdir("template_pkg"))
 
     def test_filepath(self):
         fpath = pkg.filepath("template.json")
@@ -33,12 +33,12 @@ class PackageResourcesTest(unittest.TestCase):
 
     def test_string(self):
         refstr_head = "\n".join(self.__ref_template_index_head)
-        filestr = pkg.string("template/Makefile")
+        filestr = pkg.string("template_pkg/Makefile")
         filestr_head = filestr[: len(refstr_head)]
         self.assertEqual(filestr_head, refstr_head)
 
     def test_string_list(self):
-        filestr_list = pkg.string_list("template/Makefile")
+        filestr_list = pkg.string_list("template_pkg/Makefile")
         self.assertEqual(
             filestr_list[: len(self.__ref_template_index_head)],
             self.__ref_template_index_head,
@@ -46,7 +46,7 @@ class PackageResourcesTest(unittest.TestCase):
 
     def test_stream(self):
         refstr_head = "\n".join(self.__ref_template_index_head)
-        with pkg.stream("template/Makefile") as fh:
+        with pkg.stream("template_pkg/Makefile") as fh:
             buffer = fh.read(2)
             b_list = [buffer]
             while buffer:
@@ -62,9 +62,9 @@ class PackageResourcesTest(unittest.TestCase):
             template_dict = json.load(fh)
             filestr_list = list(itertools.chain(*template_dict.values()))
 
-        self.assertTrue(pkg.isdir("template"))
+        self.assertTrue(pkg.isdir("template_pkg"))
         for fpath in filestr_list:
-            self.assertTrue(pkg.exists(f"template/{fpath}"))
+            self.assertTrue(pkg.exists(f"template_pkg/{fpath}"))
 
 
 if __name__ == "__main__":

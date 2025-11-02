@@ -31,7 +31,7 @@ COMMANDS_PARAMETERS_TEMPLATE_KEY = "template"
 COMMANDS_PARAMETERS_HELP_KEY = "help"
 GIT_NAME_KEY = "git_name"
 GIT_EMAIL_KEY = "git_email"
-TEMPLATES_FNAME = "template.json"
+TEMPLATE_FNAME = "template.json"
 
 
 class CommandsConfig:

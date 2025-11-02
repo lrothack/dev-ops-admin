@@ -1,4 +1,4 @@
-"""Wrapper around the setuptools pkg_resources package
+"""Wrapper around importlib.resources for package resource access.
 
 The module offers convenience function for easily reading strings,
 lists of strings, file names and binary stream for files stored in Python
