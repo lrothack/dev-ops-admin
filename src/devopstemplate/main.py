@@ -5,6 +5,7 @@ Defines module functions for sub-commands
 
 import argparse
 import logging
+import os
 import platform
 import sys
 from typing import Any
@@ -24,7 +25,10 @@ from devopstemplate.config import (
     CommandsConfig,
     ProjectConfig,
 )
-from devopstemplate.template import DevOpsTemplate
+from devopstemplate.pkg import string as pkg_string
+from devopstemplate.template import TEMPLATE_DNAME, DevOpsTemplate
+
+MANUAL_PKG_PATH = os.path.join(TEMPLATE_DNAME, "docs", "README.md")
 
 
 def create(args: argparse.Namespace) -> None:
@@ -162,6 +166,14 @@ def parse_args(args_list: list[str]) -> None:
     parser.add_argument(
         "--dry-run", action="store_true", help="Pretend to perform actions"
     )
+    parser.add_argument(
+        "--manual",
+        action="store_true",
+        help=(
+            "Print manual page (pipe through markdown pager,"
+            " like 'glow', 'mdless', 'rich')"
+        ),
+    )
     parser.add_argument("--version", action="store_true", help="Print version")
     # Default for printing help message if no command is provided
     # attribute "func" is set to a lambda function
@@ -261,7 +273,12 @@ def parse_args(args_list: list[str]) -> None:
 
     # If version flag is set: print version and quit
     if args_ns.version:
-        logger.info("devopstemplate v%s", devopstemplate.__version__)
+        print("devopstemplate v{version}".format(version=devopstemplate.__version__))
+        return
+
+    # If manual flag is set: print manual page and quit
+    if args_ns.manual:
+        print(pkg_string(MANUAL_PKG_PATH))
         return
 
     # Set log level according to command-line flags

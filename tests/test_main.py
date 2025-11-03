@@ -40,6 +40,7 @@ class TestMain(unittest.TestCase):
         args_ns.skip_exists = False
         args_ns.verbose = False
         args_ns.quiet = False
+        args_ns.manual = False
         args_ns.version = False
         args_ns.dry_run = False
         args_ns.interactive = False
@@ -73,6 +74,7 @@ class TestMain(unittest.TestCase):
         args_ns.skip_exists = False
         args_ns.verbose = False
         args_ns.quiet = False
+        args_ns.manual = False
         args_ns.version = False
         args_ns.dry_run = False
         args_ns.func = mock_manage
@@ -97,6 +99,7 @@ class TestMain(unittest.TestCase):
         args_ns.skip_exists = False
         args_ns.verbose = False
         args_ns.quiet = False
+        args_ns.manual = False
         args_ns.version = False
         args_ns.dry_run = False
         args_ns.interactive = False
