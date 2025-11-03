@@ -136,7 +136,7 @@ class ProjectConfigTest(unittest.TestCase):
     def test_cookiecutter(self):
         args_ns = Namespace()
         args_ns.project_dir = "."
-        args_ns.project_name = "test"
+        args_ns.project_name = ""
         args_ns.project_version = "0.1.0"
         args_ns.project_url = ""
         args_ns.project_description = ""
@@ -163,6 +163,7 @@ class ProjectConfigTest(unittest.TestCase):
             ]
         )
         params_ref = {
+            "project_name": "",
             ARGUMENTS_PROJECT_SLUG_KEY: project_slug,
             "project_version": "0.1.0",
             "project_url": "",

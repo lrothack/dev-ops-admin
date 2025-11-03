@@ -332,7 +332,12 @@ class ProjectConfig:
                 " }}",
             ]
         )
-        param_dict[ARGUMENTS_PROJECT_SLUG_KEY] = project_slug
+        param_dict = {
+            # Default project_name to be filled by cookiecutter user
+            ARGUMENTS_PROJECT_NAME_KEY: "",
+            ARGUMENTS_PROJECT_SLUG_KEY: project_slug,
+            **param_dict,
+        }
 
         # Components
         comp_list = self.__comp_list(command=COMMANDS_COOKIECUTTER_KEY)
