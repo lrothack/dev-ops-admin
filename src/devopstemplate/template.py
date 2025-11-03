@@ -19,6 +19,7 @@ from devopstemplate.config import (
 )
 
 COOKIECUTTER_README_FNAME = "README.md"
+COOKIECUTTER_README_TEMPLATE = "docs/cookiecutter.readme.md"
 TEMPLATE_DNAME = "template_pkg"
 
 
@@ -70,7 +71,9 @@ class DevOpsTemplate:
             )
         loader = PackageLoader(__package__, TEMPLATE_DNAME)
         self.__env = Environment(
-            loader=loader, autoescape=select_autoescape(default=True)
+            loader=loader,
+            autoescape=select_autoescape(default=True),
+            keep_trailing_newline=True,
         )
         # Create project base directory if not present
         self.__mkdir(projectdirectory)
@@ -129,16 +132,12 @@ class DevOpsTemplate:
         except SkipFileError:
             logger.warning("File %s exists, skipping", cookiecutter_json_fpath)
 
-        # Only generate *cookiecutter* readme if not present already
-        # Note: a template readme can be installed via template components
-        # (see below)
-        readme_fpath = os.path.join(self.__project_dir, COOKIECUTTER_README_FNAME)
-        if not os.path.exists(readme_fpath):
-            if not self.__dry_run:
-                with open(readme_fpath, "w", encoding="utf-8") as handle:
-                    readme_content_list = ["# Cookiecutter PyDevops"]
-                    handle.writelines(readme_content_list)
-            logger.info("project:%s", readme_fpath)
+        # README for the cookiecutter project (not the template)
+        self.__install_file(
+            COOKIECUTTER_README_TEMPLATE,
+            COOKIECUTTER_README_FNAME,
+            context,
+        )
 
         # Generate hooks directory with pre/post generation scripts if required
         # (might be useful in future)

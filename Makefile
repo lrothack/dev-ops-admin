@@ -200,6 +200,12 @@ lint: $(SRC)
 ## report:       Combines test and lint targets in order to create a report
 report: lint test
 
+## format:       Runs code formatters (black, isort) on source files
+.PHONY: format
+format: $(SRC)
+	$(BLACK) --extend-exclude "/template_pkg/" $(SRC)
+	$(ISORT) $(SRC)
+
 ## check:        Checks test coverage, black/isort formatting, ruff linting
 ##               and mypy type hints
 check: $(SRC) $(TESTS)
